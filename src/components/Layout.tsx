@@ -28,7 +28,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-3">
               <img 
-                src="/lovable-uploads/fd27470b-dad2-4545-8dec-a298a0c94d29.png" 
+                src="/lovable-uploads/9bdb3a99-0580-4f1a-90fd-bca0f42a713d.png" 
                 alt="MPRJ Logo" 
                 className="h-16 w-auto"
               />

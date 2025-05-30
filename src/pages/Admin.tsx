@@ -45,7 +45,9 @@ import {
   BarChart3,
   Settings,
   CheckCircle,
-  XCircle
+  XCircle,
+  BookOpen,
+  Globe
 } from 'lucide-react';
 import { generateProfileReport } from '../utils/pdfReports';
 import { format } from 'date-fns';
@@ -85,7 +87,7 @@ const Admin: React.FC = () => {
   const promoteToAdmin = (profileId: string) => {
     setProfiles(prev => prev.map(profile => 
       profile.id === profileId 
-        ? { ...profile, profile: { ...profile.profile!, role: 'admin' } }
+        ? { ...profile, role: 'admin' }
         : profile
     ));
   };

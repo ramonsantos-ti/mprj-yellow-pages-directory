@@ -22,7 +22,7 @@ import {
   DialogTrigger,
 } from '../components/ui/dialog';
 import { Search, Filter, Download, X, Users } from 'lucide-react';
-import { AREAS_JURIDICAS, AREAS_ADMINISTRATIVAS, CARGOS, UNIDADES, HABILIDADES_TECNICAS, IDIOMAS } from '../data/constants';
+import { AREAS_JURIDICAS, AREAS_ADMINISTRATIVAS, CARGOS, UNIDADES, HABILIDADES_TECNICAS_ADMINISTRATIVAS, HABILIDADES_TECNICAS_JURIDICAS, HABILIDADES_TECNICAS_TI, IDIOMAS } from '../data/constants';
 import { generateProfileReport } from '../utils/pdfReports';
 
 const PROFILES_PER_PAGE = 6;
@@ -106,6 +106,13 @@ const Home: React.FC = () => {
   };
 
   const activeFiltersCount = Object.values(filters).filter(Boolean).length;
+
+  // Combine all technical skills for the filter
+  const allTechnicalSkills = [
+    ...HABILIDADES_TECNICAS_ADMINISTRATIVAS,
+    ...HABILIDADES_TECNICAS_JURIDICAS,
+    ...HABILIDADES_TECNICAS_TI
+  ];
 
   return (
     <div className="space-y-6">
@@ -230,7 +237,7 @@ const Home: React.FC = () => {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="">Todas</SelectItem>
-                        {HABILIDADES_TECNICAS.map(habilidade => (
+                        {allTechnicalSkills.map(habilidade => (
                           <SelectItem key={habilidade} value={habilidade}>{habilidade}</SelectItem>
                         ))}
                       </SelectContent>
@@ -319,7 +326,7 @@ const Home: React.FC = () => {
                     Cancelar
                   </Button>
                   <Button onClick={handleExport}>
-                    Exportar Excel
+                    Exportar PDF
                   </Button>
                 </div>
               </DialogContent>
@@ -399,7 +406,7 @@ const Home: React.FC = () => {
                 variant={page === currentPage ? "default" : "outline"}
                 size="sm"
                 onClick={() => setCurrentPage(page)}
-                className={page === currentPage ? "bg-amber-900 hover:bg-amber-800" : ""}
+                className={page === currentPage ? "bg-red-900 hover:bg-red-800" : ""}
               >
                 {page}
               </Button>
