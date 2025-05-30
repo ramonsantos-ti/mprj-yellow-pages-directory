@@ -23,6 +23,7 @@ import {
 } from '../components/ui/dialog';
 import { Search, Filter, Download, X, Users } from 'lucide-react';
 import { AREAS_JURIDICAS, AREAS_ADMINISTRATIVAS, CARGOS, UNIDADES, HABILIDADES_TECNICAS, IDIOMAS } from '../data/constants';
+import { generateProfileReport } from '../utils/pdfReports';
 
 const PROFILES_PER_PAGE = 6;
 
@@ -99,9 +100,8 @@ const Home: React.FC = () => {
       ? filteredProfiles 
       : filteredProfiles.slice(0, Number(exportCount));
     
-    console.log('Exportando perfis:', profilesToExport.length);
-    console.log('Incluir filtros:', includeFilters);
-    // Aqui seria implementada a lógica de exportação para Excel
+    // Generate PDF report with filtered profiles
+    generateProfileReport(profilesToExport, 'geral');
     setIsExportOpen(false);
   };
 

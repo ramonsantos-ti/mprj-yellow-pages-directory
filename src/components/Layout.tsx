@@ -27,12 +27,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <div className="flex justify-between items-center h-20">
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-3">
-              <div className="w-16 h-16 bg-red-900 rounded-lg flex items-center justify-center">
-                <div className="text-white font-bold text-center">
-                  <div className="text-lg leading-none">MP</div>
-                  <div className="text-xs leading-none">RJ</div>
-                </div>
-              </div>
+              <img 
+                src="/lovable-uploads/fd27470b-dad2-4545-8dec-a298a0c94d29.png" 
+                alt="MPRJ Logo" 
+                className="h-16 w-auto"
+              />
               <div>
                 <h1 className="text-xl font-bold text-red-900">Páginas Amarelas</h1>
                 <p className="text-sm text-gray-600">Ministério Público do Rio de Janeiro</p>

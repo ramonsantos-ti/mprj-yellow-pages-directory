@@ -32,7 +32,7 @@ const ProfileDetail: React.FC = () => {
     return (
       <div className="text-center py-12">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">Perfil não encontrado</h2>
-        <Link to="/" className="text-amber-900 hover:text-amber-800">
+        <Link to="/" className="text-red-900 hover:text-red-800">
           Voltar ao início
         </Link>
       </div>
@@ -67,7 +67,7 @@ const ProfileDetail: React.FC = () => {
           <div className="flex items-start space-x-6">
             <Avatar className="w-24 h-24">
               <AvatarImage src={profile.fotoUrl} alt={profile.name} />
-              <AvatarFallback className="bg-amber-100 text-amber-900 font-semibold text-lg">
+              <AvatarFallback className="bg-red-100 text-red-900 font-semibold text-lg">
                 {getInitials(profile.name)}
               </AvatarFallback>
             </Avatar>
@@ -76,7 +76,7 @@ const ProfileDetail: React.FC = () => {
               <p className="text-lg text-gray-600 mb-2">Matrícula: {profile.matricula}</p>
               <div className="flex flex-wrap gap-2 mb-4">
                 {profile.cargo.map((cargo, index) => (
-                  <Badge key={index} className="bg-amber-900 text-white">
+                  <Badge key={index} className="bg-red-900 text-white">
                     {cargo}
                   </Badge>
                 ))}

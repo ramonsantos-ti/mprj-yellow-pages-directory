@@ -29,7 +29,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile }) => {
         <div className="flex items-start space-x-4">
           <Avatar className="w-16 h-16">
             <AvatarImage src={profile.fotoUrl} alt={profile.name} />
-            <AvatarFallback className="bg-amber-100 text-amber-900 font-semibold">
+            <AvatarFallback className="bg-red-100 text-red-900 font-semibold">
               {getInitials(profile.name)}
             </AvatarFallback>
           </Avatar>
@@ -81,7 +81,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile }) => {
           <h4 className="text-sm font-medium text-gray-900 mb-2">Áreas de Conhecimento</h4>
           <div className="flex flex-wrap gap-1">
             {profile.areasConhecimento.slice(0, 3).map((area, index) => (
-              <Badge key={index} className="text-xs bg-amber-100 text-amber-900 hover:bg-amber-200">
+              <Badge key={index} className="text-xs bg-red-100 text-red-900 hover:bg-red-200">
                 {area}
               </Badge>
             ))}
@@ -114,7 +114,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile }) => {
         <div className="pt-2">
           <Link
             to={`/profile/${profile.id}`}
-            className="block w-full text-center bg-amber-900 text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-amber-800 transition-colors"
+            className="block w-full text-center bg-red-900 text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-red-800 transition-colors"
           >
             Ver Perfil Completo
           </Link>

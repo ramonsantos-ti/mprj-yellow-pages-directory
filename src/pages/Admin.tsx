@@ -1,23 +1,31 @@
 
-import React, { useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { mockProfiles, mockUsers } from '../data/mockData';
+import React, { useState, useMemo } from 'react';
+import { mockProfiles } from '../data/mockData';
+import { Profile, User } from '../types';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
 import { Badge } from '../components/ui/badge';
-import { Alert, AlertDescription } from '../components/ui/alert';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '../components/ui/table';
-import { 
+import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
+import { Input } from '../components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../components/ui/select';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '../components/ui/alert-dialog';
+import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -26,599 +34,364 @@ import {
 } from '../components/ui/dialog';
 import { 
   Users, 
-  FileText, 
-  BarChart3, 
-  Settings, 
-  Search,
-  Edit,
-  Trash2,
-  Eye,
+  Search, 
+  UserCheck, 
+  UserX, 
+  Shield, 
+  Trash2, 
+  Undo2,
   Download,
-  AlertCircle,
+  FileText,
+  BarChart3,
+  Settings,
   CheckCircle,
-  XCircle,
-  UserCheck,
-  UserX,
-  Mail,
-  Shield,
-  ShieldOff
+  XCircle
 } from 'lucide-react';
+import { generateProfileReport } from '../utils/pdfReports';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { toast } from 'sonner';
-import { generateProfileReport } from '../utils/pdfReports';
 
 const Admin: React.FC = () => {
-  const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState('profiles');
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedProfile, setSelectedProfile] = useState<string | null>(null);
-  const [selectedReportType, setSelectedReportType] = useState('');
+  const [selectedProfiles, setSelectedProfiles] = useState<string[]>([]);
+  const [profiles, setProfiles] = useState<Profile[]>(mockProfiles);
+  const [undoDialogOpen, setUndoDialogOpen] = useState(false);
+  const [selectedProfileForUndo, setSelectedProfileForUndo] = useState<Profile | null>(null);
 
-  if (!user || user.role !== 'admin') {
-    return (
-      <Alert variant="destructive">
-        <AlertCircle className="h-4 w-4" />
-        <AlertDescription>
-          Acesso negado. Esta página é restrita a administradores.
-        </AlertDescription>
-      </Alert>
+  // Sort profiles to show recently updated first
+  const sortedProfiles = useMemo(() => {
+    return [...profiles].sort((a, b) => 
+      new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime()
     );
-  }
+  }, [profiles]);
 
-  const filteredProfiles = mockProfiles.filter(profile =>
-    profile.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    profile.matricula.includes(searchTerm) ||
-    profile.cargo.some(cargo => cargo.toLowerCase().includes(searchTerm.toLowerCase()))
+  const filteredProfiles = useMemo(() => {
+    return sortedProfiles.filter(profile =>
+      profile.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      profile.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      profile.matricula.includes(searchTerm)
+    );
+  }, [sortedProfiles, searchTerm]);
+
+  const toggleProfileStatus = (profileId: string) => {
+    setProfiles(prev => prev.map(profile => 
+      profile.id === profileId 
+        ? { ...profile, isActive: !profile.isActive }
+        : profile
+    ));
+  };
+
+  const promoteToAdmin = (profileId: string) => {
+    setProfiles(prev => prev.map(profile => 
+      profile.id === profileId 
+        ? { ...profile, profile: { ...profile.profile!, role: 'admin' } }
+        : profile
+    ));
+  };
+
+  const deleteProfile = (profileId: string) => {
+    setProfiles(prev => prev.filter(profile => profile.id !== profileId));
+  };
+
+  const handleUndoUpdate = (profile: Profile) => {
+    setSelectedProfileForUndo(profile);
+    setUndoDialogOpen(true);
+  };
+
+  const confirmUndoUpdate = () => {
+    if (selectedProfileForUndo) {
+      // Here you would implement the actual undo logic
+      // For now, we'll just show that the action was performed
+      console.log('Desfazendo atualização do perfil:', selectedProfileForUndo.name);
+      
+      // Reset the profile to a previous state (mock implementation)
+      setProfiles(prev => prev.map(profile => 
+        profile.id === selectedProfileForUndo.id 
+          ? { 
+              ...profile, 
+              lastUpdated: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) // 30 days ago
+            }
+          : profile
+      ));
+    }
+    setUndoDialogOpen(false);
+    setSelectedProfileForUndo(null);
+  };
+
+  const generateReport = (reportType: string) => {
+    generateProfileReport(profiles, reportType);
+  };
+
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .substring(0, 2)
+      .toUpperCase();
+  };
+
+  const isRecentlyUpdated = (lastUpdated: Date) => {
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    return new Date(lastUpdated) > oneDayAgo;
+  };
+
+  const renderProfilesTab = () => (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Buscar por nome, email ou matrícula..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 w-96"
+            />
+          </div>
+        </div>
+        <div className="text-sm text-gray-600">
+          {filteredProfiles.length} perfis encontrados
+        </div>
+      </div>
+
+      <div className="grid gap-4">
+        {filteredProfiles.map((profile) => (
+          <Card 
+            key={profile.id} 
+            className={`${isRecentlyUpdated(profile.lastUpdated) ? 'ring-2 ring-red-200 bg-red-50' : ''}`}
+          >
+            <CardContent className="p-6">
+              <div className="flex items-start justify-between">
+                <div className="flex items-start space-x-4">
+                  <Avatar className="w-12 h-12">
+                    <AvatarImage src={profile.fotoUrl} alt={profile.name} />
+                    <AvatarFallback className="bg-red-100 text-red-900 font-semibold">
+                      {getInitials(profile.name)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-2">
+                      <h3 className="text-lg font-semibold text-gray-900">{profile.name}</h3>
+                      {isRecentlyUpdated(profile.lastUpdated) && (
+                        <Badge className="bg-red-900 text-white text-xs">
+                          Atualizado recentemente
+                        </Badge>
+                      )}
+                      <Badge variant={profile.isActive ? "default" : "secondary"}>
+                        {profile.isActive ? "Ativo" : "Inativo"}
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-gray-600">Matrícula: {profile.matricula}</p>
+                    <p className="text-sm text-gray-600">{profile.email}</p>
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {profile.cargo.map((cargo, index) => (
+                        <Badge key={index} variant="outline" className="text-xs">
+                          {cargo}
+                        </Badge>
+                      ))}
+                    </div>
+                    <p className="text-xs text-gray-500 mt-2">
+                      Última atualização: {format(profile.lastUpdated, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => toggleProfileStatus(profile.id)}
+                    className="flex items-center space-x-1"
+                  >
+                    {profile.isActive ? (
+                      <>
+                        <XCircle className="w-4 h-4" />
+                        <span>Desativar</span>
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle className="w-4 h-4" />
+                        <span>Ativar</span>
+                      </>
+                    )}
+                  </Button>
+                  
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => promoteToAdmin(profile.id)}
+                    className="flex items-center space-x-1"
+                  >
+                    <Shield className="w-4 h-4" />
+                    <span>Admin</span>
+                  </Button>
+                  
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleUndoUpdate(profile)}
+                    className="flex items-center space-x-1"
+                  >
+                    <Undo2 className="w-4 h-4" />
+                    <span>Desfazer</span>
+                  </Button>
+                  
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex items-center space-x-1 text-red-600 hover:text-red-700"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        <span>Excluir</span>
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Tem certeza que deseja excluir o perfil de {profile.name}? 
+                          Esta ação não pode ser desfeita.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction 
+                          onClick={() => deleteProfile(profile.id)}
+                          className="bg-red-600 hover:bg-red-700"
+                        >
+                          Excluir
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Undo Update Dialog */}
+      <AlertDialog open={undoDialogOpen} onOpenChange={setUndoDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Desfazer Atualização</AlertDialogTitle>
+            <AlertDialogDescription>
+              {selectedProfileForUndo && (
+                <div className="space-y-2">
+                  <p>Perfil: <strong>{selectedProfileForUndo.name}</strong></p>
+                  <p>Última atualização: <strong>{format(selectedProfileForUndo.lastUpdated, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</strong></p>
+                  <p className="text-sm text-gray-600 mt-2">
+                    Esta ação irá desfazer a última atualização do perfil e um e-mail será enviado 
+                    ao usuário informando sobre a ação tomada por violar as regras de utilização.
+                  </p>
+                </div>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmUndoUpdate}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Confirmar e Enviar E-mail
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
   );
 
-  const handleDeleteProfile = (profileId: string) => {
-    toast.success('Perfil excluído com sucesso');
-  };
-
-  const handleToggleProfileStatus = (profileId: string, isActive: boolean) => {
-    const action = isActive ? 'desativado' : 'ativado';
-    toast.success(`Perfil ${action} com sucesso`);
-  };
-
-  const handlePromoteToAdmin = (userId: string) => {
-    toast.success('Usuário promovido a administrador');
-  };
-
-  const handleSendEmail = (profileId: string, reason: string) => {
-    toast.success('Email enviado com sucesso');
-  };
-
-  const handleUndoUpdate = (profileId: string) => {
-    toast.success('Atualização desfeita com sucesso');
-  };
-
-  const handleGenerateReport = () => {
-    if (!selectedReportType) {
-      toast.error('Selecione um tipo de relatório');
-      return;
-    }
-    
-    generateProfileReport(mockProfiles, selectedReportType);
-    toast.success('Relatório PDF gerado com sucesso');
-  };
-
-  const exportAllData = () => {
-    generateProfileReport(mockProfiles, 'geral');
-    toast.success('Relatório geral exportado com sucesso');
-  };
-
-  const getProfileStats = () => {
-    const total = mockProfiles.length;
-    const active = mockProfiles.filter(p => p.isActive !== false).length;
-    const inactive = total - active;
-    const membros = mockProfiles.filter(p => p.cargo.some(c => c.includes('Procurador') || c.includes('Promotor'))).length;
-    const servidores = total - membros;
-    const atualizadosRecentemente = mockProfiles.filter(p => {
-      const diffTime = Math.abs(new Date().getTime() - p.lastUpdated.getTime());
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      return diffDays <= 30;
-    }).length;
-    const pendingDeactivation = mockProfiles.filter(p => {
-      const diffTime = Math.abs(new Date().getTime() - p.lastUpdated.getTime());
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      return diffDays > 180; // 6 months
-    }).length;
-
-    return { total, active, inactive, membros, servidores, atualizadosRecentemente, pendingDeactivation };
-  };
-
-  const stats = getProfileStats();
-
-  const isProfileInactive = (profile: any) => {
-    const diffTime = Math.abs(new Date().getTime() - profile.lastUpdated.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays > 180; // 6 months
-  };
+  const renderReportsTab = () => (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <BarChart3 className="w-5 h-5" />
+            <span>Relatórios Disponíveis</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[
+              { type: 'cargos', title: 'Relatório por Cargos', icon: Users },
+              { type: 'areas-conhecimento', title: 'Áreas de Conhecimento', icon: BookOpen },
+              { type: 'formacao', title: 'Formação Acadêmica', icon: FileText },
+              { type: 'habilidades', title: 'Habilidades Técnicas', icon: Settings },
+              { type: 'idiomas', title: 'Idiomas', icon: Globe },
+              { type: 'colaboracao', title: 'Tipos de Colaboração', icon: Users },
+            ].map((report) => {
+              const IconComponent = report.icon;
+              return (
+                <Card key={report.type} className="hover:shadow-md transition-shadow">
+                  <CardContent className="p-4 text-center">
+                    <IconComponent className="w-8 h-8 mx-auto mb-2 text-red-900" />
+                    <h3 className="font-medium text-gray-900 mb-2">{report.title}</h3>
+                    <Button
+                      onClick={() => generateReport(report.type)}
+                      className="w-full bg-red-900 hover:bg-red-800"
+                      size="sm"
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Gerar PDF
+                    </Button>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-red-900">Administração</h1>
-        <Button onClick={exportAllData} className="bg-red-900 hover:bg-red-800">
-          <Download className="w-4 h-4 mr-2" />
-          Exportar Relatório Geral
-        </Button>
+      <div className="text-center space-y-4">
+        <h1 className="text-3xl font-bold text-gray-900">
+          Painel de Administração
+        </h1>
+        <p className="text-lg text-gray-600">
+          Gerencie perfis, usuários e gere relatórios do sistema
+        </p>
       </div>
 
-      {/* Cards de Estatísticas */}
-      <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-2">
-              <Users className="w-8 h-8 text-red-900" />
-              <div>
-                <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
-                <p className="text-sm text-gray-600">Total de Perfis</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-2">
-              <UserCheck className="w-8 h-8 text-green-600" />
-              <div>
-                <p className="text-2xl font-bold text-gray-900">{stats.active}</p>
-                <p className="text-sm text-gray-600">Perfis Ativos</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-2">
-              <UserX className="w-8 h-8 text-red-600" />
-              <div>
-                <p className="text-2xl font-bold text-gray-900">{stats.inactive}</p>
-                <p className="text-sm text-gray-600">Perfis Inativos</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-2">
-              <Users className="w-8 h-8 text-blue-600" />
-              <div>
-                <p className="text-2xl font-bold text-gray-900">{stats.membros}</p>
-                <p className="text-sm text-gray-600">Membros do MP</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-2">
-              <BarChart3 className="w-8 h-8 text-orange-600" />
-              <div>
-                <p className="text-2xl font-bold text-gray-900">{stats.atualizadosRecentemente}</p>
-                <p className="text-sm text-gray-600">Atualizados (30d)</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-2">
-              <AlertCircle className="w-8 h-8 text-yellow-600" />
-              <div>
-                <p className="text-2xl font-bold text-gray-900">{stats.pendingDeactivation}</p>
-                <p className="text-sm text-gray-600">Pendentes Desativação</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      {/* Navigation Tabs */}
+      <div className="border-b border-gray-200">
+        <nav className="-mb-px flex space-x-8">
+          <button
+            onClick={() => setActiveTab('profiles')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'profiles'
+                ? 'border-red-900 text-red-900'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            <Users className="w-4 h-4 inline-block mr-2" />
+            Gestão de Perfis
+          </button>
+          <button
+            onClick={() => setActiveTab('reports')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'reports'
+                ? 'border-red-900 text-red-900'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            <BarChart3 className="w-4 h-4 inline-block mr-2" />
+            Relatórios
+          </button>
+        </nav>
       </div>
 
-      <Tabs defaultValue="profiles" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="profiles">Gestão de Perfis</TabsTrigger>
-          <TabsTrigger value="users">Usuários</TabsTrigger>
-          <TabsTrigger value="reports">Relatórios</TabsTrigger>
-          <TabsTrigger value="settings">Configurações</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="profiles" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <span>Gestão de Perfis</span>
-                <div className="flex items-center space-x-2">
-                  <div className="relative">
-                    <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                    <Input
-                      placeholder="Buscar perfis..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10 w-64"
-                    />
-                  </div>
-                </div>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Nome</TableHead>
-                    <TableHead>Matrícula</TableHead>
-                    <TableHead>Cargo</TableHead>
-                    <TableHead>Última Atualização</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Ações</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredProfiles.map((profile) => (
-                    <TableRow key={profile.id}>
-                      <TableCell className="font-medium">{profile.name}</TableCell>
-                      <TableCell>{profile.matricula}</TableCell>
-                      <TableCell>
-                        <div className="flex flex-wrap gap-1">
-                          {profile.cargo.slice(0, 2).map((cargo, index) => (
-                            <Badge key={index} variant="secondary" className="text-xs">
-                              {cargo}
-                            </Badge>
-                          ))}
-                          {profile.cargo.length > 2 && (
-                            <Badge variant="outline" className="text-xs">
-                              +{profile.cargo.length - 2}
-                            </Badge>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        {format(profile.lastUpdated, "dd/MM/yyyy", { locale: ptBR })}
-                      </TableCell>
-                      <TableCell>
-                        {isProfileInactive(profile) ? (
-                          <Badge variant="destructive" className="bg-red-100 text-red-800">
-                            <XCircle className="w-3 h-3 mr-1" />
-                            Pendente Desativação
-                          </Badge>
-                        ) : profile.isActive !== false ? (
-                          <Badge variant="secondary" className="bg-green-100 text-green-800">
-                            <CheckCircle className="w-3 h-3 mr-1" />
-                            Ativo
-                          </Badge>
-                        ) : (
-                          <Badge variant="destructive" className="bg-red-100 text-red-800">
-                            <XCircle className="w-3 h-3 mr-1" />
-                            Inativo
-                          </Badge>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center space-x-2">
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button size="sm" variant="outline">
-                                <Eye className="w-4 h-4" />
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent className="max-w-2xl">
-                              <DialogHeader>
-                                <DialogTitle>Detalhes do Perfil</DialogTitle>
-                              </DialogHeader>
-                              <div className="space-y-4">
-                                <div className="grid grid-cols-2 gap-4">
-                                  <div>
-                                    <p className="font-medium">Nome:</p>
-                                    <p className="text-gray-700">{profile.name}</p>
-                                  </div>
-                                  <div>
-                                    <p className="font-medium">Email:</p>
-                                    <p className="text-gray-700">{profile.email}</p>
-                                  </div>
-                                  <div>
-                                    <p className="font-medium">Unidades:</p>
-                                    <div className="flex flex-wrap gap-1 mt-1">
-                                      {profile.unidade.map((unidade, index) => (
-                                        <Badge key={index} variant="outline" className="text-xs">
-                                          {unidade}
-                                        </Badge>
-                                      ))}
-                                    </div>
-                                  </div>
-                                  <div>
-                                    <p className="font-medium">Áreas de Conhecimento:</p>
-                                    <div className="flex flex-wrap gap-1 mt-1">
-                                      {profile.areasConhecimento.slice(0, 3).map((area, index) => (
-                                        <Badge key={index} variant="secondary" className="text-xs">
-                                          {area}
-                                        </Badge>
-                                      ))}
-                                      {profile.areasConhecimento.length > 3 && (
-                                        <Badge variant="outline" className="text-xs">
-                                          +{profile.areasConhecimento.length - 3}
-                                        </Badge>
-                                      )}
-                                    </div>
-                                  </div>
-                                </div>
-                                {profile.biografia && (
-                                  <div>
-                                    <p className="font-medium">Biografia:</p>
-                                    <p className="text-gray-700 text-sm mt-1">{profile.biografia}</p>
-                                  </div>
-                                )}
-                              </div>
-                            </DialogContent>
-                          </Dialog>
-                          
-                          <Button size="sm" variant="outline">
-                            <Edit className="w-4 h-4" />
-                          </Button>
-
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleToggleProfileStatus(profile.id, profile.isActive !== false)}
-                            className={profile.isActive !== false ? "text-red-600" : "text-green-600"}
-                          >
-                            {profile.isActive !== false ? <UserX className="w-4 h-4" /> : <UserCheck className="w-4 h-4" />}
-                          </Button>
-
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleSendEmail(profile.id, 'regras')}
-                          >
-                            <Mail className="w-4 h-4" />
-                          </Button>
-
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleUndoUpdate(profile.id)}
-                          >
-                            <AlertCircle className="w-4 h-4" />
-                          </Button>
-                          
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            onClick={() => handleDeleteProfile(profile.id)}
-                            className="text-red-600"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="users" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Usuários do Sistema</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Nome</TableHead>
-                    <TableHead>Usuário</TableHead>
-                    <TableHead>Matrícula</TableHead>
-                    <TableHead>Tipo</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Ações</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {mockUsers.map((user) => (
-                    <TableRow key={user.id}>
-                      <TableCell className="font-medium">{user.name}</TableCell>
-                      <TableCell>{user.username}</TableCell>
-                      <TableCell>{user.matricula}</TableCell>
-                      <TableCell>
-                        <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>
-                          {user.role === 'admin' ? 'Administrador' : 'Usuário'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="secondary" className="bg-green-100 text-green-800">
-                          Ativo
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        {user.role !== 'admin' && (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handlePromoteToAdmin(user.id)}
-                          >
-                            <Shield className="w-4 h-4 mr-1" />
-                            Promover a Admin
-                          </Button>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="reports" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <FileText className="w-5 h-5" />
-                  <span>Gerar Relatórios PDF</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <Select value={selectedReportType} onValueChange={setSelectedReportType}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione o tipo de relatório" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="cargos">Distribuição por Cargos</SelectItem>
-                    <SelectItem value="areas-conhecimento">Áreas de Conhecimento</SelectItem>
-                    <SelectItem value="formacao">Formação Acadêmica</SelectItem>
-                    <SelectItem value="habilidades">Habilidades Técnicas</SelectItem>
-                    <SelectItem value="idiomas">Idiomas</SelectItem>
-                    <SelectItem value="colaboracao">Tipos de Colaboração</SelectItem>
-                  </SelectContent>
-                </Select>
-                
-                <Button 
-                  onClick={handleGenerateReport}
-                  className="w-full bg-red-900 hover:bg-red-800"
-                  disabled={!selectedReportType}
-                >
-                  <Download className="w-4 h-4 mr-2" />
-                  Gerar Relatório PDF
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <BarChart3 className="w-5 h-5" />
-                  <span>Distribuição por Cargo</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span>Procuradores de Justiça</span>
-                    <Badge>
-                      {mockProfiles.filter(p => p.cargo.some(c => c.includes('Procurador'))).length}
-                    </Badge>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span>Promotores de Justiça</span>
-                    <Badge>
-                      {mockProfiles.filter(p => p.cargo.some(c => c.includes('Promotor'))).length}
-                    </Badge>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span>Servidores Efetivos</span>
-                    <Badge>
-                      {mockProfiles.filter(p => p.cargo.some(c => c.includes('Efetivo'))).length}
-                    </Badge>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span>Servidores Comissionados</span>
-                    <Badge>
-                      {mockProfiles.filter(p => p.cargo.some(c => c.includes('Comissionado'))).length}
-                    </Badge>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <FileText className="w-5 h-5" />
-                  <span>Áreas Mais Populares</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {/* Simulação das áreas mais populares */}
-                  <div className="flex justify-between items-center">
-                    <span>Direito Penal</span>
-                    <Badge>8</Badge>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span>Gestão Pública</span>
-                    <Badge>6</Badge>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span>Direito Civil</span>
-                    <Badge>5</Badge>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span>Tecnologia da Informação</span>
-                    <Badge>4</Badge>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="settings" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Settings className="w-5 h-5" />
-                <span>Configurações do Sistema</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Moderação e Segurança</h3>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium">Desativação automática (6 meses)</p>
-                      <p className="text-sm text-gray-600">Perfis são desativados automaticamente após 6 meses sem atualização</p>
-                    </div>
-                    <Button variant="outline" size="sm" className="bg-green-100 text-green-800">
-                      Ativado
-                    </Button>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium">Notificações por email</p>
-                      <p className="text-sm text-gray-600">Enviar notificações sobre atualizações e violações</p>
-                    </div>
-                    <Button variant="outline" size="sm" className="bg-green-100 text-green-800">
-                      Ativado
-                    </Button>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium">Validação de email @mprj.mp.br</p>
-                      <p className="text-sm text-gray-600">Apenas emails institucionais são aceitos</p>
-                    </div>
-                    <Button variant="outline" size="sm" className="bg-green-100 text-green-800">
-                      Ativado
-                    </Button>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Exportação e Relatórios</h3>
-                <div className="space-y-3">
-                  <Button className="bg-red-900 hover:bg-red-800">
-                    <Download className="w-4 h-4 mr-2" />
-                    Exportar Todos os Perfis (PDF)
-                  </Button>
-                  <Button variant="outline">
-                    <Download className="w-4 h-4 mr-2" />
-                    Exportar Logs do Sistema
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+      {/* Tab Content */}
+      {activeTab === 'profiles' && renderProfilesTab()}
+      {activeTab === 'reports' && renderReportsTab()}
     </div>
   );
 };
