@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -615,7 +616,7 @@ const ProfileEdit: React.FC = () => {
                   <FormItem>
                     <FormLabel>Habilidades Técnicas</FormLabel>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                      {SAFE_HABILIDADES_TECNICAS.map(habilidade => (
+                      {HABILIDADES_TECNICAS.map(habilidade => (
                         <div key={habilidade} className="flex items-center space-x-2">
                           <Checkbox
                             checked={field.value.includes(habilidade)}
@@ -643,7 +644,7 @@ const ProfileEdit: React.FC = () => {
                   <FormItem>
                     <FormLabel>Habilidades Comportamentais</FormLabel>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                      {SAFE_HABILIDADES_COMPORTAMENTAIS.map(habilidade => (
+                      {HABILIDADES_COMPORTAMENTAIS.map(habilidade => (
                         <div key={habilidade} className="flex items-center space-x-2">
                           <Checkbox
                             checked={field.value.includes(habilidade)}
@@ -671,7 +672,7 @@ const ProfileEdit: React.FC = () => {
                   <FormItem>
                     <FormLabel>Idiomas</FormLabel>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                      {SAFE_IDIOMAS.map(idioma => (
+                      {IDIOMAS.map(idioma => (
                         <div key={idioma} className="flex items-center space-x-2">
                           <Checkbox
                             checked={field.value.includes(idioma)}
@@ -703,7 +704,7 @@ const ProfileEdit: React.FC = () => {
               <div>
                 <label className="text-sm font-medium text-gray-900">Tipo de Colaboração</label>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
-                  {SAFE_TIPOS_COLABORACAO.map(tipo => (
+                  {TIPOS_COLABORACAO.map(tipo => (
                     <div key={tipo} className="flex items-center space-x-2">
                       <Checkbox
                         checked={tipoColaboracao.includes(tipo)}
@@ -733,7 +734,7 @@ const ProfileEdit: React.FC = () => {
                     <SelectValue placeholder="Selecione sua disponibilidade" />
                   </SelectTrigger>
                   <SelectContent>
-                    {SAFE_DISPONIBILIDADE_ESTIMADA.map(disponibilidade => {
+                    {DISPONIBILIDADE_ESTIMADA.map((disponibilidade, dispIndex) => {
                       if (!isValidSelectValue(disponibilidade)) {
                         console.error('Invalid disponibilidade value:', disponibilidade);
                         return null;
@@ -768,7 +769,7 @@ const ProfileEdit: React.FC = () => {
                     <SelectValue placeholder="Selecione a forma de contato" />
                   </SelectTrigger>
                   <SelectContent>
-                    {SAFE_FORMAS_CONTATO.map(forma => {
+                    {FORMAS_CONTATO.map((forma, formaIndex) => {
                       if (!isValidSelectValue(forma)) {
                         console.error('Invalid forma contato value:', forma);
                         return null;
