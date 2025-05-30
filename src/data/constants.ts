@@ -26,7 +26,7 @@ export const AREAS_JURIDICAS = [
   'Execução Penal e Sistema Prisional',
   'Legislação Institucional do Ministério Público',
   'Outro'
-];
+].filter(item => item && item.trim() !== '');
 
 export const AREAS_ADMINISTRATIVAS = [
   'Administração Pública',
@@ -61,7 +61,7 @@ export const AREAS_ADMINISTRATIVAS = [
   'Compliance e Integridade',
   'Inovação no Setor Público',
   'Outro'
-];
+].filter(item => item && item.trim() !== '');
 
 export const HABILIDADES_TECNICAS = [
   'Microsoft Office',
@@ -113,7 +113,7 @@ export const HABILIDADES_TECNICAS = [
   'Sketch',
   'InVision',
   'Zeplin'
-];
+].filter(item => item && item.trim() !== '');
 
 export const HABILIDADES_COMPORTAMENTAIS = [
   'Liderança',
@@ -156,7 +156,7 @@ export const HABILIDADES_COMPORTAMENTAIS = [
   'Atenção aos detalhes',
   'Paciência',
   'Diplomacia'
-];
+].filter(item => item && item.trim() !== '');
 
 export const IDIOMAS = [
   'Português',
@@ -184,7 +184,7 @@ export const IDIOMAS = [
   'Hebraico',
   'Tailandês',
   'Vietnamita'
-];
+].filter(item => item && item.trim() !== '');
 
 export const CARGOS = [
   'Procurador-Geral de Justiça',
@@ -210,7 +210,7 @@ export const CARGOS = [
   'Técnico',
   'Assistente',
   'Auxiliar'
-];
+].filter(item => item && item.trim() !== '');
 
 export const UNIDADES = [
   'Procuradoria-Geral de Justiça',
@@ -253,7 +253,7 @@ export const UNIDADES = [
   'Ouvidoria',
   'Arquivo Geral',
   'Biblioteca'
-];
+].filter(item => item && item.trim() !== '');
 
 export const NIVEIS_FORMACAO = [
   'Ensino Fundamental',
@@ -265,7 +265,7 @@ export const NIVEIS_FORMACAO = [
   'Mestrado',
   'Doutorado',
   'Pós-Doutorado'
-];
+].filter(item => item && item.trim() !== '');
 
 export const TIPOS_COLABORACAO = [
   'Consultoria interna',
@@ -273,13 +273,13 @@ export const TIPOS_COLABORACAO = [
   'Capacitações/tutoria',
   'Grupos de trabalho',
   'Mentoria'
-];
+].filter(item => item && item.trim() !== '');
 
 export const DISPONIBILIDADE_ESTIMADA = [
   'Até 2h/semana',
   '2h a 4h/semana',
   'Sob demanda (caso a caso)'
-];
+].filter(item => item && item.trim() !== '');
 
 export const FORMAS_CONTATO = [
   'E-mail',
@@ -287,4 +287,4 @@ export const FORMAS_CONTATO = [
   'Microsoft Teams',
   'WhatsApp',
   'Presencial'
-];
+].filter(item => item && item.trim() !== '');

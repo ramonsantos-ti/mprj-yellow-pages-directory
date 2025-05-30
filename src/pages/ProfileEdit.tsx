@@ -52,9 +52,18 @@ const profileSchema = z.object({
 
 type ProfileFormData = z.infer<typeof profileSchema>;
 
-// Helper function to filter out empty strings and whitespace-only strings
+// Enhanced helper function to filter out empty strings and whitespace-only strings
 const filterValidOptions = (array: string[]) => {
-  return array.filter(item => item && typeof item === 'string' && item.trim().length > 0);
+  console.log('Filtering array:', array);
+  const filtered = array.filter(item => {
+    const isValid = item && typeof item === 'string' && item.trim().length > 0;
+    if (!isValid) {
+      console.log('Filtered out invalid item:', item);
+    }
+    return isValid;
+  });
+  console.log('Filtered result:', filtered);
+  return filtered;
 };
 
 const ProfileEdit: React.FC = () => {
@@ -260,7 +269,7 @@ const ProfileEdit: React.FC = () => {
                     <FormLabel>Cargos *</FormLabel>
                     <div className="space-y-2">
                       <Select onValueChange={(value) => {
-                        if (value && !field.value.includes(value)) {
+                        if (value && value.trim() !== '' && !field.value.includes(value)) {
                           field.onChange([...field.value, value]);
                         }
                       }}>
@@ -298,7 +307,7 @@ const ProfileEdit: React.FC = () => {
                     <FormLabel>Unidades *</FormLabel>
                     <div className="space-y-2">
                       <Select onValueChange={(value) => {
-                        if (value && !field.value.includes(value)) {
+                        if (value && value.trim() !== '' && !field.value.includes(value)) {
                           field.onChange([...field.value, value]);
                         }
                       }}>
@@ -507,7 +516,7 @@ const ProfileEdit: React.FC = () => {
                     <Select
                       value={formacao.nivel}
                       onValueChange={(value) => {
-                        if (value) {
+                        if (value && value.trim() !== '') {
                           const novas = [...formacoes];
                           novas[index].nivel = value;
                           setFormacoes(novas);
