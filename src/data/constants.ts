@@ -1,5 +1,37 @@
 
-export const AREAS_JURIDICAS = [
+// Helper function to filter and validate arrays
+const filterAndValidate = (array: string[], arrayName: string) => {
+  console.log(`Processing ${arrayName}:`, array);
+  
+  const filtered = array.filter(item => {
+    if (item == null) {
+      console.log(`Filtered out null/undefined in ${arrayName}:`, item);
+      return false;
+    }
+    if (typeof item !== 'string') {
+      console.log(`Filtered out non-string in ${arrayName}:`, item, typeof item);
+      return false;
+    }
+    const trimmed = item.trim();
+    if (trimmed === '' || trimmed.length === 0) {
+      console.log(`Filtered out empty/whitespace in ${arrayName}:`, JSON.stringify(item));
+      return false;
+    }
+    return true;
+  });
+  
+  console.log(`${arrayName} final result:`, filtered);
+  
+  // Additional validation - ensure no empty strings made it through
+  const hasEmpty = filtered.some(item => !item || item.trim() === '');
+  if (hasEmpty) {
+    console.error(`WARNING: ${arrayName} still contains empty values after filtering!`);
+  }
+  
+  return filtered;
+};
+
+const rawAreasJuridicas = [
   'Direito Constitucional',
   'Direito Administrativo',
   'Direito Civil',
@@ -26,9 +58,9 @@ export const AREAS_JURIDICAS = [
   'Execução Penal e Sistema Prisional',
   'Legislação Institucional do Ministério Público',
   'Outro'
-].filter(item => item && item.trim() !== '');
+];
 
-export const AREAS_ADMINISTRATIVAS = [
+const rawAreasAdministrativas = [
   'Administração Pública',
   'Gestão Pública',
   'Gestão de Pessoas / Recursos Humanos',
@@ -61,9 +93,9 @@ export const AREAS_ADMINISTRATIVAS = [
   'Compliance e Integridade',
   'Inovação no Setor Público',
   'Outro'
-].filter(item => item && item.trim() !== '');
+];
 
-export const HABILIDADES_TECNICAS = [
+const rawHabilidadesTecnicas = [
   'Microsoft Office',
   'Power BI',
   'Excel Avançado',
@@ -113,9 +145,9 @@ export const HABILIDADES_TECNICAS = [
   'Sketch',
   'InVision',
   'Zeplin'
-].filter(item => item && item.trim() !== '');
+];
 
-export const HABILIDADES_COMPORTAMENTAIS = [
+const rawHabilidadesComportamentais = [
   'Liderança',
   'Comunicação',
   'Trabalho em equipe',
@@ -156,9 +188,9 @@ export const HABILIDADES_COMPORTAMENTAIS = [
   'Atenção aos detalhes',
   'Paciência',
   'Diplomacia'
-].filter(item => item && item.trim() !== '');
+];
 
-export const IDIOMAS = [
+const rawIdiomas = [
   'Português',
   'Inglês',
   'Espanhol',
@@ -184,9 +216,9 @@ export const IDIOMAS = [
   'Hebraico',
   'Tailandês',
   'Vietnamita'
-].filter(item => item && item.trim() !== '');
+];
 
-export const CARGOS = [
+const rawCargos = [
   'Procurador-Geral de Justiça',
   'Subprocurador-Geral de Justiça',
   'Procurador de Justiça',
@@ -210,9 +242,9 @@ export const CARGOS = [
   'Técnico',
   'Assistente',
   'Auxiliar'
-].filter(item => item && item.trim() !== '');
+];
 
-export const UNIDADES = [
+const rawUnidades = [
   'Procuradoria-Geral de Justiça',
   'Corregedoria-Geral do Ministério Público',
   'Colégio de Procuradores de Justiça',
@@ -253,9 +285,9 @@ export const UNIDADES = [
   'Ouvidoria',
   'Arquivo Geral',
   'Biblioteca'
-].filter(item => item && item.trim() !== '');
+];
 
-export const NIVEIS_FORMACAO = [
+const rawNiveisFormacao = [
   'Ensino Fundamental',
   'Ensino Médio',
   'Tecnólogo',
@@ -265,26 +297,39 @@ export const NIVEIS_FORMACAO = [
   'Mestrado',
   'Doutorado',
   'Pós-Doutorado'
-].filter(item => item && item.trim() !== '');
+];
 
-export const TIPOS_COLABORACAO = [
+const rawTiposColaboracao = [
   'Consultoria interna',
   'Formação de equipes',
   'Capacitações/tutoria',
   'Grupos de trabalho',
   'Mentoria'
-].filter(item => item && item.trim() !== '');
+];
 
-export const DISPONIBILIDADE_ESTIMADA = [
+const rawDisponibilidadeEstimada = [
   'Até 2h/semana',
   '2h a 4h/semana',
   'Sob demanda (caso a caso)'
-].filter(item => item && item.trim() !== '');
+];
 
-export const FORMAS_CONTATO = [
+const rawFormasContato = [
   'E-mail',
   'Telefone',
   'Microsoft Teams',
   'WhatsApp',
   'Presencial'
-].filter(item => item && item.trim() !== '');
+];
+
+// Export filtered and validated arrays
+export const AREAS_JURIDICAS = filterAndValidate(rawAreasJuridicas, 'AREAS_JURIDICAS');
+export const AREAS_ADMINISTRATIVAS = filterAndValidate(rawAreasAdministrativas, 'AREAS_ADMINISTRATIVAS');
+export const HABILIDADES_TECNICAS = filterAndValidate(rawHabilidadesTecnicas, 'HABILIDADES_TECNICAS');
+export const HABILIDADES_COMPORTAMENTAIS = filterAndValidate(rawHabilidadesComportamentais, 'HABILIDADES_COMPORTAMENTAIS');
+export const IDIOMAS = filterAndValidate(rawIdiomas, 'IDIOMAS');
+export const CARGOS = filterAndValidate(rawCargos, 'CARGOS');
+export const UNIDADES = filterAndValidate(rawUnidades, 'UNIDADES');
+export const NIVEIS_FORMACAO = filterAndValidate(rawNiveisFormacao, 'NIVEIS_FORMACAO');
+export const TIPOS_COLABORACAO = filterAndValidate(rawTiposColaboracao, 'TIPOS_COLABORACAO');
+export const DISPONIBILIDADE_ESTIMADA = filterAndValidate(rawDisponibilidadeEstimada, 'DISPONIBILIDADE_ESTIMADA');
+export const FORMAS_CONTATO = filterAndValidate(rawFormasContato, 'FORMAS_CONTATO');
