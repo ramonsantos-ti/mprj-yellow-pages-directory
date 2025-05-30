@@ -22,7 +22,11 @@ import {
   HABILIDADES_COMPORTAMENTAIS,
   IDIOMAS,
   CARGOS,
-  UNIDADES
+  UNIDADES,
+  NIVEIS_FORMACAO,
+  TIPOS_COLABORACAO,
+  DISPONIBILIDADE_ESTIMADA,
+  FORMAS_CONTATO
 } from '../data/constants';
 import { mockProfiles } from '../data/mockData';
 import { Save, Plus, X, AlertCircle } from 'lucide-react';
@@ -128,14 +132,6 @@ const ProfileEdit: React.FC = () => {
 
   const removerFormacao = (index: number) => {
     setFormacoes(formacoes.filter((_, i) => i !== index));
-  };
-
-  const toggleArray = (array: string[], value: string, setter: (arr: string[]) => void) => {
-    if (array.includes(value)) {
-      setter(array.filter(item => item !== value));
-    } else {
-      setter([...array, value]);
-    }
   };
 
   if (!user) {
@@ -259,7 +255,7 @@ const ProfileEdit: React.FC = () => {
                     <FormLabel>Cargos *</FormLabel>
                     <div className="space-y-2">
                       <Select onValueChange={(value) => {
-                        if (!field.value.includes(value)) {
+                        if (value && !field.value.includes(value)) {
                           field.onChange([...field.value, value]);
                         }
                       }}>
@@ -267,7 +263,7 @@ const ProfileEdit: React.FC = () => {
                           <SelectValue placeholder="Selecione um cargo" />
                         </SelectTrigger>
                         <SelectContent>
-                          {CARGOS.map(cargo => (
+                          {CARGOS.filter(cargo => cargo.trim() !== '').map(cargo => (
                             <SelectItem key={cargo} value={cargo}>{cargo}</SelectItem>
                           ))}
                         </SelectContent>
@@ -297,7 +293,7 @@ const ProfileEdit: React.FC = () => {
                     <FormLabel>Unidades *</FormLabel>
                     <div className="space-y-2">
                       <Select onValueChange={(value) => {
-                        if (!field.value.includes(value)) {
+                        if (value && !field.value.includes(value)) {
                           field.onChange([...field.value, value]);
                         }
                       }}>
@@ -305,7 +301,7 @@ const ProfileEdit: React.FC = () => {
                           <SelectValue placeholder="Selecione uma unidade" />
                         </SelectTrigger>
                         <SelectContent>
-                          {UNIDADES.map(unidade => (
+                          {UNIDADES.filter(unidade => unidade.trim() !== '').map(unidade => (
                             <SelectItem key={unidade} value={unidade}>{unidade}</SelectItem>
                           ))}
                         </SelectContent>
@@ -345,7 +341,7 @@ const ProfileEdit: React.FC = () => {
                       <div>
                         <h4 className="text-sm font-medium text-gray-900 mb-2">Jurídica</h4>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                          {AREAS_JURIDICAS.map(area => (
+                          {AREAS_JURIDICAS.filter(area => area.trim() !== '').map(area => (
                             <div key={area} className="flex items-center space-x-2">
                               <Checkbox
                                 checked={field.value.includes(area)}
@@ -368,7 +364,7 @@ const ProfileEdit: React.FC = () => {
                       <div>
                         <h4 className="text-sm font-medium text-gray-900 mb-2">Administrativa</h4>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                          {AREAS_ADMINISTRATIVAS.map(area => (
+                          {AREAS_ADMINISTRATIVAS.filter(area => area.trim() !== '').map(area => (
                             <div key={area} className="flex items-center space-x-2">
                               <Checkbox
                                 checked={field.value.includes(area)}
@@ -477,6 +473,85 @@ const ProfileEdit: React.FC = () => {
             </CardContent>
           </Card>
 
+          {/* Formação Acadêmica */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <span>Formação Acadêmica</span>
+                <Button type="button" onClick={adicionarFormacao} size="sm" variant="outline">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Adicionar
+                </Button>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {formacoes.map((formacao, index) => (
+                <div key={index} className="border rounded-lg p-4 space-y-3">
+                  <div className="flex justify-between items-start">
+                    <h4 className="font-medium">Formação {index + 1}</h4>
+                    <Button
+                      type="button"
+                      onClick={() => removerFormacao(index)}
+                      size="sm"
+                      variant="ghost"
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                    <Select
+                      value={formacao.nivel}
+                      onValueChange={(value) => {
+                        if (value) {
+                          const novas = [...formacoes];
+                          novas[index].nivel = value;
+                          setFormacoes(novas);
+                        }
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Nível" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {NIVEIS_FORMACAO.filter(nivel => nivel.trim() !== '').map(nivel => (
+                          <SelectItem key={nivel} value={nivel}>{nivel}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Input
+                      placeholder="Instituição"
+                      value={formacao.instituicao}
+                      onChange={(e) => {
+                        const novas = [...formacoes];
+                        novas[index].instituicao = e.target.value;
+                        setFormacoes(novas);
+                      }}
+                    />
+                    <Input
+                      placeholder="Curso"
+                      value={formacao.curso}
+                      onChange={(e) => {
+                        const novas = [...formacoes];
+                        novas[index].curso = e.target.value;
+                        setFormacoes(novas);
+                      }}
+                    />
+                    <Input
+                      type="number"
+                      placeholder="Ano"
+                      value={formacao.ano}
+                      onChange={(e) => {
+                        const novas = [...formacoes];
+                        novas[index].ano = parseInt(e.target.value);
+                        setFormacoes(novas);
+                      }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
           {/* Habilidades */}
           <Card>
             <CardHeader>
@@ -490,7 +565,7 @@ const ProfileEdit: React.FC = () => {
                   <FormItem>
                     <FormLabel>Habilidades Técnicas</FormLabel>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                      {HABILIDADES_TECNICAS.map(habilidade => (
+                      {HABILIDADES_TECNICAS.filter(habilidade => habilidade.trim() !== '').map(habilidade => (
                         <div key={habilidade} className="flex items-center space-x-2">
                           <Checkbox
                             checked={field.value.includes(habilidade)}
@@ -518,7 +593,7 @@ const ProfileEdit: React.FC = () => {
                   <FormItem>
                     <FormLabel>Habilidades Comportamentais</FormLabel>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                      {HABILIDADES_COMPORTAMENTAIS.map(habilidade => (
+                      {HABILIDADES_COMPORTAMENTAIS.filter(habilidade => habilidade.trim() !== '').map(habilidade => (
                         <div key={habilidade} className="flex items-center space-x-2">
                           <Checkbox
                             checked={field.value.includes(habilidade)}
@@ -538,6 +613,109 @@ const ProfileEdit: React.FC = () => {
                   </FormItem>
                 )}
               />
+
+              <FormField
+                control={form.control}
+                name="idiomas"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Idiomas</FormLabel>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                      {IDIOMAS.filter(idioma => idioma.trim() !== '').map(idioma => (
+                        <div key={idioma} className="flex items-center space-x-2">
+                          <Checkbox
+                            checked={field.value.includes(idioma)}
+                            onCheckedChange={() => {
+                              if (field.value.includes(idioma)) {
+                                field.onChange(field.value.filter(i => i !== idioma));
+                              } else {
+                                field.onChange([...field.value, idioma]);
+                              }
+                            }}
+                          />
+                          <span className="text-sm">{idioma}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </CardContent>
+          </Card>
+
+          {/* Disponibilidade */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Disponibilidade para Colaboração</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <label className="text-sm font-medium text-gray-900">Tipo de Colaboração</label>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
+                  {TIPOS_COLABORACAO.filter(tipo => tipo.trim() !== '').map(tipo => (
+                    <div key={tipo} className="flex items-center space-x-2">
+                      <Checkbox
+                        checked={tipoColaboracao.includes(tipo)}
+                        onCheckedChange={() => {
+                          if (tipoColaboracao.includes(tipo)) {
+                            setTipoColaboracao(tipoColaboracao.filter(t => t !== tipo));
+                          } else {
+                            setTipoColaboracao([...tipoColaboracao, tipo]);
+                          }
+                        }}
+                      />
+                      <span className="text-sm">{tipo}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-gray-900">Disponibilidade Estimada</label>
+                <Select value={disponibilidadeEstimada} onValueChange={setDisponibilidadeEstimada}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Selecione sua disponibilidade" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {DISPONIBILIDADE_ESTIMADA.filter(disp => disp.trim() !== '').map(disponibilidade => (
+                      <SelectItem key={disponibilidade} value={disponibilidade}>{disponibilidade}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Preferências de Contato */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Preferências de Contato</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <label className="text-sm font-medium text-gray-900">Forma Preferencial de Contato</label>
+                <Select value={formaContato} onValueChange={setFormaContato}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Selecione a forma de contato" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {FORMAS_CONTATO.filter(forma => forma.trim() !== '').map(forma => (
+                      <SelectItem key={forma} value={forma}>{forma}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-gray-900">Horário Preferencial</label>
+                <Input
+                  className="mt-2"
+                  placeholder="Ex: manhã, tarde, 14h às 16h"
+                  value={horarioPreferencial}
+                  onChange={(e) => setHorarioPreferencial(e.target.value)}
+                />
+              </div>
             </CardContent>
           </Card>
 
