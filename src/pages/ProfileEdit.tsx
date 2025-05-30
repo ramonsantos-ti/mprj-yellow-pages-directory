@@ -52,32 +52,53 @@ const profileSchema = z.object({
 
 type ProfileFormData = z.infer<typeof profileSchema>;
 
-// Enhanced helper function to filter out empty strings and whitespace-only strings
-const filterValidOptions = (array: string[]) => {
-  console.log('Filtering array:', array);
+// Enhanced helper function with extensive validation and logging
+const filterValidOptions = (array: string[], fieldName?: string) => {
+  console.log(`Filtering ${fieldName || 'array'}:`, array);
+  
+  if (!Array.isArray(array)) {
+    console.error(`${fieldName || 'array'} is not an array:`, array);
+    return [];
+  }
+  
   const filtered = array.filter(item => {
-    const isValid = item && typeof item === 'string' && item.trim().length > 0 && item.trim() !== '';
-    if (!isValid) {
-      console.log('Filtered out invalid item:', item);
+    // Check for null, undefined, or non-string values
+    if (item == null || typeof item !== 'string') {
+      console.log(`Filtered out non-string item in ${fieldName}:`, item, typeof item);
+      return false;
     }
-    return isValid;
+    
+    // Check for empty strings or whitespace-only strings
+    const trimmed = item.trim();
+    if (trimmed.length === 0 || trimmed === '' || trimmed === ' ') {
+      console.log(`Filtered out empty/whitespace item in ${fieldName}:`, item);
+      return false;
+    }
+    
+    return true;
   });
-  console.log('Filtered result:', filtered);
+  
+  console.log(`${fieldName || 'array'} filtered result:`, filtered);
   return filtered;
 };
 
-// Pre-filter all constants to ensure no empty values
-const FILTERED_CARGOS = filterValidOptions(CARGOS);
-const FILTERED_UNIDADES = filterValidOptions(UNIDADES);
-const FILTERED_AREAS_JURIDICAS = filterValidOptions(AREAS_JURIDICAS);
-const FILTERED_AREAS_ADMINISTRATIVAS = filterValidOptions(AREAS_ADMINISTRATIVAS);
-const FILTERED_HABILIDADES_TECNICAS = filterValidOptions(HABILIDADES_TECNICAS);
-const FILTERED_HABILIDADES_COMPORTAMENTAIS = filterValidOptions(HABILIDADES_COMPORTAMENTAIS);
-const FILTERED_IDIOMAS = filterValidOptions(IDIOMAS);
-const FILTERED_NIVEIS_FORMACAO = filterValidOptions(NIVEIS_FORMACAO);
-const FILTERED_TIPOS_COLABORACAO = filterValidOptions(TIPOS_COLABORACAO);
-const FILTERED_DISPONIBILIDADE_ESTIMADA = filterValidOptions(DISPONIBILIDADE_ESTIMADA);
-const FILTERED_FORMAS_CONTATO = filterValidOptions(FORMAS_CONTATO);
+// Pre-filter all constants with logging
+const SAFE_CARGOS = filterValidOptions(CARGOS, 'CARGOS');
+const SAFE_UNIDADES = filterValidOptions(UNIDADES, 'UNIDADES');
+const SAFE_AREAS_JURIDICAS = filterValidOptions(AREAS_JURIDICAS, 'AREAS_JURIDICAS');
+const SAFE_AREAS_ADMINISTRATIVAS = filterValidOptions(AREAS_ADMINISTRATIVAS, 'AREAS_ADMINISTRATIVAS');
+const SAFE_HABILIDADES_TECNICAS = filterValidOptions(HABILIDADES_TECNICAS, 'HABILIDADES_TECNICAS');
+const SAFE_HABILIDADES_COMPORTAMENTAIS = filterValidOptions(HABILIDADES_COMPORTAMENTAIS, 'HABILIDADES_COMPORTAMENTAIS');
+const SAFE_IDIOMAS = filterValidOptions(IDIOMAS, 'IDIOMAS');
+const SAFE_NIVEIS_FORMACAO = filterValidOptions(NIVEIS_FORMACAO, 'NIVEIS_FORMACAO');
+const SAFE_TIPOS_COLABORACAO = filterValidOptions(TIPOS_COLABORACAO, 'TIPOS_COLABORACAO');
+const SAFE_DISPONIBILIDADE_ESTIMADA = filterValidOptions(DISPONIBILIDADE_ESTIMADA, 'DISPONIBILIDADE_ESTIMADA');
+const SAFE_FORMAS_CONTATO = filterValidOptions(FORMAS_CONTATO, 'FORMAS_CONTATO');
+
+// Additional validation function for Select values
+const isValidSelectValue = (value: any): value is string => {
+  return typeof value === 'string' && value.trim().length > 0;
+};
 
 const ProfileEdit: React.FC = () => {
   const { user } = useAuth();
@@ -282,7 +303,8 @@ const ProfileEdit: React.FC = () => {
                     <FormLabel>Cargos *</FormLabel>
                     <div className="space-y-2">
                       <Select onValueChange={(value) => {
-                        if (value && value.trim() !== '' && !field.value.includes(value)) {
+                        console.log('Cargo selected:', value);
+                        if (isValidSelectValue(value) && !field.value.includes(value)) {
                           field.onChange([...field.value, value]);
                         }
                       }}>
@@ -290,9 +312,15 @@ const ProfileEdit: React.FC = () => {
                           <SelectValue placeholder="Selecione um cargo" />
                         </SelectTrigger>
                         <SelectContent>
-                          {FILTERED_CARGOS.map(cargo => (
-                            <SelectItem key={cargo} value={cargo}>{cargo}</SelectItem>
-                          ))}
+                          {SAFE_CARGOS.map(cargo => {
+                            if (!isValidSelectValue(cargo)) {
+                              console.error('Invalid cargo value:', cargo);
+                              return null;
+                            }
+                            return (
+                              <SelectItem key={cargo} value={cargo}>{cargo}</SelectItem>
+                            );
+                          })}
                         </SelectContent>
                       </Select>
                       <div className="flex flex-wrap gap-2">
@@ -320,7 +348,8 @@ const ProfileEdit: React.FC = () => {
                     <FormLabel>Unidades *</FormLabel>
                     <div className="space-y-2">
                       <Select onValueChange={(value) => {
-                        if (value && value.trim() !== '' && !field.value.includes(value)) {
+                        console.log('Unidade selected:', value);
+                        if (isValidSelectValue(value) && !field.value.includes(value)) {
                           field.onChange([...field.value, value]);
                         }
                       }}>
@@ -328,9 +357,15 @@ const ProfileEdit: React.FC = () => {
                           <SelectValue placeholder="Selecione uma unidade" />
                         </SelectTrigger>
                         <SelectContent>
-                          {FILTERED_UNIDADES.map(unidade => (
-                            <SelectItem key={unidade} value={unidade}>{unidade}</SelectItem>
-                          ))}
+                          {SAFE_UNIDADES.map(unidade => {
+                            if (!isValidSelectValue(unidade)) {
+                              console.error('Invalid unidade value:', unidade);
+                              return null;
+                            }
+                            return (
+                              <SelectItem key={unidade} value={unidade}>{unidade}</SelectItem>
+                            );
+                          })}
                         </SelectContent>
                       </Select>
                       <div className="flex flex-wrap gap-2">
@@ -368,7 +403,7 @@ const ProfileEdit: React.FC = () => {
                       <div>
                         <h4 className="text-sm font-medium text-gray-900 mb-2">Jurídica</h4>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                          {FILTERED_AREAS_JURIDICAS.map(area => (
+                          {SAFE_AREAS_JURIDICAS.map(area => (
                             <div key={area} className="flex items-center space-x-2">
                               <Checkbox
                                 checked={field.value.includes(area)}
@@ -391,7 +426,7 @@ const ProfileEdit: React.FC = () => {
                       <div>
                         <h4 className="text-sm font-medium text-gray-900 mb-2">Administrativa</h4>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                          {FILTERED_AREAS_ADMINISTRATIVAS.map(area => (
+                          {SAFE_AREAS_ADMINISTRATIVAS.map(area => (
                             <div key={area} className="flex items-center space-x-2">
                               <Checkbox
                                 checked={field.value.includes(area)}
@@ -529,7 +564,8 @@ const ProfileEdit: React.FC = () => {
                     <Select
                       value={formacao.nivel}
                       onValueChange={(value) => {
-                        if (value && value.trim() !== '') {
+                        console.log('Formacao nivel selected:', value);
+                        if (isValidSelectValue(value)) {
                           const novas = [...formacoes];
                           novas[index].nivel = value;
                           setFormacoes(novas);
@@ -540,9 +576,15 @@ const ProfileEdit: React.FC = () => {
                         <SelectValue placeholder="Nível" />
                       </SelectTrigger>
                       <SelectContent>
-                        {FILTERED_NIVEIS_FORMACAO.map(nivel => (
-                          <SelectItem key={nivel} value={nivel}>{nivel}</SelectItem>
-                        ))}
+                        {SAFE_NIVEIS_FORMACAO.map(nivel => {
+                          if (!isValidSelectValue(nivel)) {
+                            console.error('Invalid nivel value:', nivel);
+                            return null;
+                          }
+                          return (
+                            <SelectItem key={nivel} value={nivel}>{nivel}</SelectItem>
+                          );
+                        })}
                       </SelectContent>
                     </Select>
                     <Input
@@ -592,7 +634,7 @@ const ProfileEdit: React.FC = () => {
                   <FormItem>
                     <FormLabel>Habilidades Técnicas</FormLabel>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                      {FILTERED_HABILIDADES_TECNICAS.map(habilidade => (
+                      {SAFE_HABILIDADES_TECNICAS.map(habilidade => (
                         <div key={habilidade} className="flex items-center space-x-2">
                           <Checkbox
                             checked={field.value.includes(habilidade)}
@@ -620,7 +662,7 @@ const ProfileEdit: React.FC = () => {
                   <FormItem>
                     <FormLabel>Habilidades Comportamentais</FormLabel>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                      {FILTERED_HABILIDADES_COMPORTAMENTAIS.map(habilidade => (
+                      {SAFE_HABILIDADES_COMPORTAMENTAIS.map(habilidade => (
                         <div key={habilidade} className="flex items-center space-x-2">
                           <Checkbox
                             checked={field.value.includes(habilidade)}
@@ -648,7 +690,7 @@ const ProfileEdit: React.FC = () => {
                   <FormItem>
                     <FormLabel>Idiomas</FormLabel>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                      {FILTERED_IDIOMAS.map(idioma => (
+                      {SAFE_IDIOMAS.map(idioma => (
                         <div key={idioma} className="flex items-center space-x-2">
                           <Checkbox
                             checked={field.value.includes(idioma)}
@@ -680,7 +722,7 @@ const ProfileEdit: React.FC = () => {
               <div>
                 <label className="text-sm font-medium text-gray-900">Tipo de Colaboração</label>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
-                  {FILTERED_TIPOS_COLABORACAO.map(tipo => (
+                  {SAFE_TIPOS_COLABORACAO.map(tipo => (
                     <div key={tipo} className="flex items-center space-x-2">
                       <Checkbox
                         checked={tipoColaboracao.includes(tipo)}
@@ -700,14 +742,25 @@ const ProfileEdit: React.FC = () => {
 
               <div>
                 <label className="text-sm font-medium text-gray-900">Disponibilidade Estimada</label>
-                <Select value={disponibilidadeEstimada} onValueChange={setDisponibilidadeEstimada}>
+                <Select value={disponibilidadeEstimada} onValueChange={(value) => {
+                  console.log('Disponibilidade selected:', value);
+                  if (isValidSelectValue(value)) {
+                    setDisponibilidadeEstimada(value);
+                  }
+                }}>
                   <SelectTrigger className="mt-2">
                     <SelectValue placeholder="Selecione sua disponibilidade" />
                   </SelectTrigger>
                   <SelectContent>
-                    {FILTERED_DISPONIBILIDADE_ESTIMADA.map(disponibilidade => (
-                      <SelectItem key={disponibilidade} value={disponibilidade}>{disponibilidade}</SelectItem>
-                    ))}
+                    {SAFE_DISPONIBILIDADE_ESTIMADA.map(disponibilidade => {
+                      if (!isValidSelectValue(disponibilidade)) {
+                        console.error('Invalid disponibilidade value:', disponibilidade);
+                        return null;
+                      }
+                      return (
+                        <SelectItem key={disponibilidade} value={disponibilidade}>{disponibilidade}</SelectItem>
+                      );
+                    })}
                   </SelectContent>
                 </Select>
               </div>
@@ -722,14 +775,25 @@ const ProfileEdit: React.FC = () => {
             <CardContent className="space-y-4">
               <div>
                 <label className="text-sm font-medium text-gray-900">Forma Preferencial de Contato</label>
-                <Select value={formaContato} onValueChange={setFormaContato}>
+                <Select value={formaContato} onValueChange={(value) => {
+                  console.log('Forma contato selected:', value);
+                  if (isValidSelectValue(value)) {
+                    setFormaContato(value);
+                  }
+                }}>
                   <SelectTrigger className="mt-2">
                     <SelectValue placeholder="Selecione a forma de contato" />
                   </SelectTrigger>
                   <SelectContent>
-                    {FILTERED_FORMAS_CONTATO.map(forma => (
-                      <SelectItem key={forma} value={forma}>{forma}</SelectItem>
-                    ))}
+                    {SAFE_FORMAS_CONTATO.map(forma => {
+                      if (!isValidSelectValue(forma)) {
+                        console.error('Invalid forma contato value:', forma);
+                        return null;
+                      }
+                      return (
+                        <SelectItem key={forma} value={forma}>{forma}</SelectItem>
+                      );
+                    })}
                   </SelectContent>
                 </Select>
               </div>
