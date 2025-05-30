@@ -52,6 +52,11 @@ const profileSchema = z.object({
 
 type ProfileFormData = z.infer<typeof profileSchema>;
 
+// Helper function to filter out empty strings and whitespace-only strings
+const filterValidOptions = (array: string[]) => {
+  return array.filter(item => item && typeof item === 'string' && item.trim().length > 0);
+};
+
 const ProfileEdit: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -263,7 +268,7 @@ const ProfileEdit: React.FC = () => {
                           <SelectValue placeholder="Selecione um cargo" />
                         </SelectTrigger>
                         <SelectContent>
-                          {CARGOS.filter(cargo => cargo.trim() !== '').map(cargo => (
+                          {filterValidOptions(CARGOS).map(cargo => (
                             <SelectItem key={cargo} value={cargo}>{cargo}</SelectItem>
                           ))}
                         </SelectContent>
@@ -301,7 +306,7 @@ const ProfileEdit: React.FC = () => {
                           <SelectValue placeholder="Selecione uma unidade" />
                         </SelectTrigger>
                         <SelectContent>
-                          {UNIDADES.filter(unidade => unidade.trim() !== '').map(unidade => (
+                          {filterValidOptions(UNIDADES).map(unidade => (
                             <SelectItem key={unidade} value={unidade}>{unidade}</SelectItem>
                           ))}
                         </SelectContent>
@@ -341,7 +346,7 @@ const ProfileEdit: React.FC = () => {
                       <div>
                         <h4 className="text-sm font-medium text-gray-900 mb-2">Jurídica</h4>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                          {AREAS_JURIDICAS.filter(area => area.trim() !== '').map(area => (
+                          {filterValidOptions(AREAS_JURIDICAS).map(area => (
                             <div key={area} className="flex items-center space-x-2">
                               <Checkbox
                                 checked={field.value.includes(area)}
@@ -364,7 +369,7 @@ const ProfileEdit: React.FC = () => {
                       <div>
                         <h4 className="text-sm font-medium text-gray-900 mb-2">Administrativa</h4>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                          {AREAS_ADMINISTRATIVAS.filter(area => area.trim() !== '').map(area => (
+                          {filterValidOptions(AREAS_ADMINISTRATIVAS).map(area => (
                             <div key={area} className="flex items-center space-x-2">
                               <Checkbox
                                 checked={field.value.includes(area)}
@@ -513,7 +518,7 @@ const ProfileEdit: React.FC = () => {
                         <SelectValue placeholder="Nível" />
                       </SelectTrigger>
                       <SelectContent>
-                        {NIVEIS_FORMACAO.filter(nivel => nivel.trim() !== '').map(nivel => (
+                        {filterValidOptions(NIVEIS_FORMACAO).map(nivel => (
                           <SelectItem key={nivel} value={nivel}>{nivel}</SelectItem>
                         ))}
                       </SelectContent>
@@ -565,7 +570,7 @@ const ProfileEdit: React.FC = () => {
                   <FormItem>
                     <FormLabel>Habilidades Técnicas</FormLabel>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                      {HABILIDADES_TECNICAS.filter(habilidade => habilidade.trim() !== '').map(habilidade => (
+                      {filterValidOptions(HABILIDADES_TECNICAS).map(habilidade => (
                         <div key={habilidade} className="flex items-center space-x-2">
                           <Checkbox
                             checked={field.value.includes(habilidade)}
@@ -593,7 +598,7 @@ const ProfileEdit: React.FC = () => {
                   <FormItem>
                     <FormLabel>Habilidades Comportamentais</FormLabel>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                      {HABILIDADES_COMPORTAMENTAIS.filter(habilidade => habilidade.trim() !== '').map(habilidade => (
+                      {filterValidOptions(HABILIDADES_COMPORTAMENTAIS).map(habilidade => (
                         <div key={habilidade} className="flex items-center space-x-2">
                           <Checkbox
                             checked={field.value.includes(habilidade)}
@@ -621,7 +626,7 @@ const ProfileEdit: React.FC = () => {
                   <FormItem>
                     <FormLabel>Idiomas</FormLabel>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                      {IDIOMAS.filter(idioma => idioma.trim() !== '').map(idioma => (
+                      {filterValidOptions(IDIOMAS).map(idioma => (
                         <div key={idioma} className="flex items-center space-x-2">
                           <Checkbox
                             checked={field.value.includes(idioma)}
@@ -653,7 +658,7 @@ const ProfileEdit: React.FC = () => {
               <div>
                 <label className="text-sm font-medium text-gray-900">Tipo de Colaboração</label>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
-                  {TIPOS_COLABORACAO.filter(tipo => tipo.trim() !== '').map(tipo => (
+                  {filterValidOptions(TIPOS_COLABORACAO).map(tipo => (
                     <div key={tipo} className="flex items-center space-x-2">
                       <Checkbox
                         checked={tipoColaboracao.includes(tipo)}
@@ -678,7 +683,7 @@ const ProfileEdit: React.FC = () => {
                     <SelectValue placeholder="Selecione sua disponibilidade" />
                   </SelectTrigger>
                   <SelectContent>
-                    {DISPONIBILIDADE_ESTIMADA.filter(disp => disp.trim() !== '').map(disponibilidade => (
+                    {filterValidOptions(DISPONIBILIDADE_ESTIMADA).map(disponibilidade => (
                       <SelectItem key={disponibilidade} value={disponibilidade}>{disponibilidade}</SelectItem>
                     ))}
                   </SelectContent>
@@ -700,7 +705,7 @@ const ProfileEdit: React.FC = () => {
                     <SelectValue placeholder="Selecione a forma de contato" />
                   </SelectTrigger>
                   <SelectContent>
-                    {FORMAS_CONTATO.filter(forma => forma.trim() !== '').map(forma => (
+                    {filterValidOptions(FORMAS_CONTATO).map(forma => (
                       <SelectItem key={forma} value={forma}>{forma}</SelectItem>
                     ))}
                   </SelectContent>
