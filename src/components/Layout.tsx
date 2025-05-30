@@ -22,16 +22,19 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b-4 border-amber-900">
+      <header className="bg-white shadow-sm border-b-4 border-red-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-amber-900 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xl">MP</span>
+              <div className="w-16 h-16 bg-red-900 rounded-lg flex items-center justify-center">
+                <div className="text-white font-bold text-center">
+                  <div className="text-lg leading-none">MP</div>
+                  <div className="text-xs leading-none">RJ</div>
+                </div>
               </div>
               <div>
-                <h1 className="text-xl font-bold text-amber-900">Páginas Amarelas</h1>
+                <h1 className="text-xl font-bold text-red-900">Páginas Amarelas</h1>
                 <p className="text-sm text-gray-600">Ministério Público do Rio de Janeiro</p>
               </div>
             </Link>
@@ -42,8 +45,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 to="/"
                 className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium ${
                   location.pathname === '/'
-                    ? 'text-amber-900 bg-amber-50'
-                    : 'text-gray-700 hover:text-amber-900 hover:bg-amber-50'
+                    ? 'text-red-900 bg-red-50'
+                    : 'text-gray-700 hover:text-red-900 hover:bg-red-50'
                 }`}
               >
                 <Home className="w-4 h-4" />
@@ -56,7 +59,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               {user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="flex items-center space-x-2">
+                    <Button variant="outline" className="flex items-center space-x-2 border-red-900 text-red-900 hover:bg-red-50">
                       <User className="w-4 h-4" />
                       <span className="hidden md:inline">{user.name}</span>
                     </Button>
@@ -84,7 +87,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 </DropdownMenu>
               ) : (
                 <Link to="/login">
-                  <Button className="bg-amber-900 hover:bg-amber-800">
+                  <Button className="bg-red-900 hover:bg-red-800">
                     Login
                   </Button>
                 </Link>
@@ -100,11 +103,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       </main>
 
       {/* Footer */}
-      <footer className="bg-amber-900 text-white mt-16">
+      <footer className="bg-red-900 text-white mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
             <p>&copy; 2024 Ministério Público do Estado do Rio de Janeiro</p>
-            <p className="text-sm text-amber-200 mt-2">
+            <p className="text-sm text-red-200 mt-2">
               Sistema de Páginas Amarelas - Conectando especialistas
             </p>
           </div>

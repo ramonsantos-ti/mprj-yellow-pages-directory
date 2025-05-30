@@ -7,6 +7,8 @@ export interface User {
   matricula: string;
   role: 'admin' | 'user';
   profile?: Profile;
+  isActive?: boolean;
+  lastLogin?: Date;
 }
 
 export interface Profile {
@@ -34,6 +36,9 @@ export interface Profile {
   fotoUrl?: string;
   lastUpdated: Date;
   aceiteTermos: boolean;
+  isActive?: boolean;
+  certificacoes?: string[];
+  publicacoes?: string;
 }
 
 export interface Project {

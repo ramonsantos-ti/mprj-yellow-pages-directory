@@ -95,56 +95,64 @@ const rawAreasAdministrativas = [
   'Outro'
 ];
 
-const rawHabilidadesTecnicas = [
-  'Microsoft Office',
-  'Power BI',
-  'Excel Avançado',
-  'SQL',
-  'Python',
-  'R',
-  'Tableau',
-  'SPSS',
-  'AutoCAD',
-  'Photoshop',
-  'Illustrator',
-  'InDesign',
-  'Premiere',
-  'After Effects',
-  'WordPress',
-  'HTML/CSS',
-  'JavaScript',
-  'Java',
-  'C#',
-  'PHP',
-  'SAP',
-  'Oracle',
-  'SharePoint',
-  'Teams',
-  'Zoom',
-  'Slack',
-  'Trello',
-  'Asana',
-  'Monday',
-  'Jira',
-  'Git',
-  'GitHub',
-  'Docker',
-  'Kubernetes',
-  'AWS',
-  'Azure',
-  'Google Cloud',
-  'Salesforce',
-  'HubSpot',
-  'Mailchimp',
-  'Google Analytics',
-  'Facebook Ads',
-  'LinkedIn Ads',
-  'SEO/SEM',
-  'Adobe Acrobat',
-  'Figma',
-  'Sketch',
-  'InVision',
-  'Zeplin'
+// New technical skills as requested
+const rawHabilidadesTecnicasAdministrativas = [
+  'Gestão de processos administrativos (BPM)',
+  'Mapeamento e melhoria de processos',
+  'Planejamento estratégico (BSC, SWOT, GUT)',
+  'Definição e acompanhamento de indicadores (KPIs)',
+  'Elaboração e execução orçamentária (PPA, LDO, LOA)',
+  'Análise e controle financeiro',
+  'Gestão de contratos administrativos (Lei nº 14.133/2021)',
+  'Gestão documental e arquivística',
+  'Redação de ofícios, memorandos e relatórios técnicos',
+  'Atendimento ao público e comunicação institucional',
+  'Administração de pessoal (recrutamento, avaliação e capacitação)',
+  'Gestão de almoxarifado e patrimônio público',
+  'Elaboração de planos de trabalho e cronogramas',
+  'Utilização de sistemas administrativos (ex: SEI, SIPAC, Sigepe)',
+  'Domínio de Excel avançado e Power BI',
+  'Conhecimento de governança e controle interno',
+  'Gestão da qualidade (5S, PDCA, ISO)',
+  'Gestão do conhecimento organizacional',
+  'Ética e responsabilidade na administração pública',
+  'Noções de licitação e contratos administrativos'
+];
+
+const rawHabilidadesTecnicasJuridicas = [
+  'Redação jurídica (petições, pareceres, contratos)',
+  'Interpretação de leis, jurisprudência e doutrina',
+  'Elaboração e análise de contratos públicos e privados',
+  'Atuação em processos judiciais e administrativos',
+  'Pesquisa jurídica em bases como Jusbrasil, STF, STJ',
+  'Conhecimento dos ritos processuais (CPC, CPP, CLT, etc.)',
+  'Elaboração de normas, regulamentos e projetos de lei',
+  'Atendimento e orientação jurídica institucional',
+  'Análise de constitucionalidade e legalidade',
+  'Direito Administrativo e Constitucional aplicado',
+  'Atuação em processos disciplinares e sindicâncias',
+  'Conhecimento em licitações e contratos (Nova Lei)',
+  'Noções de Direito Tributário, Civil e Penal',
+  'Conhecimento da Lei Geral de Proteção de Dados (LGPD)',
+  'Implantação de programas de integridade e compliance',
+  'Utilização de sistemas jurídicos (PJe, e-SAJ, Projudi)',
+  'Técnicas de conciliação e mediação (alternativas ao litígio)',
+  'Ética profissional e responsabilidade funcional',
+  'Controle da legalidade de atos administrativos',
+  'Domínio das competências dos órgãos públicos e entes federativos'
+];
+
+const rawHabilidadesTecnicasTI = [
+  'Lógica de programação',
+  'Desenvolvimento de sistemas (Java, Python, Spring Boot etc.)',
+  'Banco de dados (modelagem, SQL, MySQL, PostgreSQL, H2)',
+  'Administração de redes e sistemas (configuração, segurança, backup)',
+  'Gestão de sistemas de informação (ERP, SEI, e-SIC)',
+  'Análise de dados e BI (Excel avançado, Power BI, dashboards)',
+  'Segurança da informação (LGPD, criptografia, ISO/IEC 27001)',
+  'Gestão de projetos de TI (Scrum, Kanban, PMBOK)',
+  'Automação de processos (RPA, Power Automate, scripts)',
+  'Computação em nuvem (AWS, Azure, Google Cloud)'
 ];
 
 const rawHabilidadesComportamentais = [
@@ -321,10 +329,35 @@ const rawFormasContato = [
   'Presencial'
 ];
 
+// New constants for certifications
+const rawCertificacoes = [
+  'PMP (Project Management Professional)',
+  'ITIL (Information Technology Infrastructure Library)',
+  'ISO 9001 (Sistema de Gestão da Qualidade)',
+  'ISO 27001 (Sistema de Gestão de Segurança da Informação)',
+  'COBIT (Control Objectives for Information and Related Technologies)',
+  'Six Sigma',
+  'Scrum Master',
+  'Product Owner',
+  'CISSP (Certified Information Systems Security Professional)',
+  'CISA (Certified Information Systems Auditor)',
+  'CGEIT (Certified in the Governance of Enterprise IT)',
+  'CRISC (Certified in Risk and Information Systems Control)',
+  'CompTIA Security+',
+  'AWS Certified Solutions Architect',
+  'Microsoft Azure Fundamentals',
+  'Google Cloud Platform',
+  'Certificação OAB',
+  'Certificações em Línguas Estrangeiras',
+  'Outro'
+];
+
 // Export filtered and validated arrays
 export const AREAS_JURIDICAS = filterAndValidate(rawAreasJuridicas, 'AREAS_JURIDICAS');
 export const AREAS_ADMINISTRATIVAS = filterAndValidate(rawAreasAdministrativas, 'AREAS_ADMINISTRATIVAS');
-export const HABILIDADES_TECNICAS = filterAndValidate(rawHabilidadesTecnicas, 'HABILIDADES_TECNICAS');
+export const HABILIDADES_TECNICAS_ADMINISTRATIVAS = filterAndValidate(rawHabilidadesTecnicasAdministrativas, 'HABILIDADES_TECNICAS_ADMINISTRATIVAS');
+export const HABILIDADES_TECNICAS_JURIDICAS = filterAndValidate(rawHabilidadesTecnicasJuridicas, 'HABILIDADES_TECNICAS_JURIDICAS');
+export const HABILIDADES_TECNICAS_TI = filterAndValidate(rawHabilidadesTecnicasTI, 'HABILIDADES_TECNICAS_TI');
 export const HABILIDADES_COMPORTAMENTAIS = filterAndValidate(rawHabilidadesComportamentais, 'HABILIDADES_COMPORTAMENTAIS');
 export const IDIOMAS = filterAndValidate(rawIdiomas, 'IDIOMAS');
 export const CARGOS = filterAndValidate(rawCargos, 'CARGOS');
@@ -333,3 +366,11 @@ export const NIVEIS_FORMACAO = filterAndValidate(rawNiveisFormacao, 'NIVEIS_FORM
 export const TIPOS_COLABORACAO = filterAndValidate(rawTiposColaboracao, 'TIPOS_COLABORACAO');
 export const DISPONIBILIDADE_ESTIMADA = filterAndValidate(rawDisponibilidadeEstimada, 'DISPONIBILIDADE_ESTIMADA');
 export const FORMAS_CONTATO = filterAndValidate(rawFormasContato, 'FORMAS_CONTATO');
+export const CERTIFICACOES = filterAndValidate(rawCertificacoes, 'CERTIFICACOES');
+
+// Combined technical skills for backward compatibility
+export const HABILIDADES_TECNICAS = [
+  ...HABILIDADES_TECNICAS_ADMINISTRATIVAS,
+  ...HABILIDADES_TECNICAS_JURIDICAS,
+  ...HABILIDADES_TECNICAS_TI
+];

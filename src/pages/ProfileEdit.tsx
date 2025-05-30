@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -18,7 +17,9 @@ import { Alert, AlertDescription } from '../components/ui/alert';
 import { 
   AREAS_JURIDICAS, 
   AREAS_ADMINISTRATIVAS, 
-  HABILIDADES_TECNICAS, 
+  HABILIDADES_TECNICAS_ADMINISTRATIVAS,
+  HABILIDADES_TECNICAS_JURIDICAS,
+  HABILIDADES_TECNICAS_TI,
   HABILIDADES_COMPORTAMENTAIS,
   IDIOMAS,
   CARGOS,
@@ -26,18 +27,20 @@ import {
   NIVEIS_FORMACAO,
   TIPOS_COLABORACAO,
   DISPONIBILIDADE_ESTIMADA,
-  FORMAS_CONTATO
+  FORMAS_CONTATO,
+  CERTIFICACOES
 } from '../data/constants';
 import { mockProfiles } from '../data/mockData';
-import { Save, Plus, X, AlertCircle } from 'lucide-react';
+import { Save, Plus, X, AlertCircle, Upload, Camera } from 'lucide-react';
 import { toast } from 'sonner';
+import { validateEmail } from '../utils/pdfReports';
 
 const profileSchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório'),
   matricula: z.string().min(1, 'Matrícula é obrigatória'),
   cargo: z.array(z.string()).min(1, 'Pelo menos um cargo é obrigatório'),
   unidade: z.array(z.string()).min(1, 'Pelo menos uma unidade é obrigatória'),
-  email: z.string().email('Email inválido'),
+  email: z.string().email('Email inválido').refine(validateEmail, 'Email deve ser do domínio @mprj.mp.br'),
   telefone: z.string().optional(),
   biografia: z.string().optional(),
   areasConhecimento: z.array(z.string()).min(1, 'Pelo menos uma área de conhecimento é obrigatória'),
@@ -47,6 +50,8 @@ const profileSchema = z.object({
   habilidadesComportamentais: z.array(z.string()),
   idiomas: z.array(z.string()),
   linkCurriculo: z.string().optional(),
+  certificacoes: z.array(z.string()).optional(),
+  publicacoes: z.string().optional(),
   aceiteTermos: z.boolean().refine(val => val === true, 'Deve aceitar os termos')
 });
 
@@ -71,6 +76,8 @@ const ProfileEdit: React.FC = () => {
   const [disponibilidadeEstimada, setDisponibilidadeEstimada] = useState('');
   const [formaContato, setFormaContato] = useState('');
   const [horarioPreferencial, setHorarioPreferencial] = useState('');
+  const [fotoFile, setFotoFile] = useState<File | null>(null);
+  const [fotoPreview, setFotoPreview] = useState<string>('');
 
   // Buscar perfil existente do usuário
   const userProfile = mockProfiles.find(p => p.userId === user?.id);
@@ -92,6 +99,8 @@ const ProfileEdit: React.FC = () => {
       habilidadesComportamentais: userProfile?.habilidadesComportamentais || [],
       idiomas: userProfile?.idiomas || [],
       linkCurriculo: userProfile?.linkCurriculo || '',
+      certificacoes: userProfile?.certificacoes || [],
+      publicacoes: userProfile?.publicacoes || '',
       aceiteTermos: userProfile?.aceiteTermos || false
     }
   });
@@ -109,8 +118,31 @@ const ProfileEdit: React.FC = () => {
       setDisponibilidadeEstimada(userProfile.disponibilidade.disponibilidadeEstimada);
       setFormaContato(userProfile.contato.formaContato);
       setHorarioPreferencial(userProfile.contato.horarioPreferencial || '');
+      setFotoPreview(userProfile.fotoUrl || '');
     }
   }, [userProfile]);
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        toast.error('Arquivo muito grande. Máximo 5MB.');
+        return;
+      }
+      
+      if (!file.type.startsWith('image/')) {
+        toast.error('Apenas imagens são permitidas.');
+        return;
+      }
+
+      setFotoFile(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setFotoPreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const onSubmit = async (data: ProfileFormData) => {
     setIsLoading(true);
@@ -169,7 +201,7 @@ const ProfileEdit: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">
+        <h1 className="text-2xl font-bold text-red-900">
           {userProfile ? 'Editar Perfil' : 'Completar Cadastro'}
         </h1>
         <Button onClick={() => navigate('/')} variant="outline">
@@ -180,6 +212,47 @@ const ProfileEdit: React.FC = () => {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           
+          {/* Foto do Perfil */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Foto do Perfil</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center space-x-6">
+                <div className="w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center overflow-hidden">
+                  {fotoPreview ? (
+                    <img src={fotoPreview} alt="Preview" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="text-center">
+                      <Camera className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                      <p className="text-sm text-gray-500">Sem foto</p>
+                    </div>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="foto-upload">
+                    <Button type="button" variant="outline" className="cursor-pointer" asChild>
+                      <span>
+                        <Upload className="w-4 h-4 mr-2" />
+                        Fazer Upload de Foto
+                      </span>
+                    </Button>
+                  </label>
+                  <input
+                    id="foto-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                  />
+                  <p className="text-sm text-gray-500">
+                    Formatos aceitos: JPG, PNG, GIF. Máximo 5MB.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Informações Básicas */}
           <Card>
             <CardHeader>
@@ -222,9 +295,9 @@ const ProfileEdit: React.FC = () => {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email Institucional *</FormLabel>
+                      <FormLabel>Email Institucional * (@mprj.mp.br)</FormLabel>
                       <FormControl>
-                        <Input {...field} type="email" />
+                        <Input {...field} type="email" placeholder="nome@mprj.mp.br" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -236,9 +309,9 @@ const ProfileEdit: React.FC = () => {
                   name="telefone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Telefone</FormLabel>
+                      <FormLabel>Telefone Institucional</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input {...field} placeholder="(21) 9999-9999" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -380,9 +453,9 @@ const ProfileEdit: React.FC = () => {
                     <FormLabel>Áreas de Conhecimento *</FormLabel>
                     <div className="space-y-4">
                       <div>
-                        <h4 className="text-sm font-medium text-gray-900 mb-2">Jurídica</h4>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                          {AREAS_JURIDICAS.map(area => (
+                        <h4 className="text-sm font-medium text-gray-900 mb-3">Área Administrativa</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                          {AREAS_ADMINISTRATIVAS.map(area => (
                             <div key={area} className="flex items-center space-x-2">
                               <Checkbox
                                 checked={field.value.includes(area)}
@@ -403,9 +476,9 @@ const ProfileEdit: React.FC = () => {
                       <Separator />
                       
                       <div>
-                        <h4 className="text-sm font-medium text-gray-900 mb-2">Administrativa</h4>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                          {AREAS_ADMINISTRATIVAS.map(area => (
+                        <h4 className="text-sm font-medium text-gray-900 mb-3">Área Jurídica</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                          {AREAS_JURIDICAS.map(area => (
                             <div key={area} className="flex items-center space-x-2">
                               <Checkbox
                                 checked={field.value.includes(area)}
@@ -603,6 +676,80 @@ const ProfileEdit: React.FC = () => {
             </CardContent>
           </Card>
 
+          {/* Certificações */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Certificações Relevantes</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <FormField
+                control={form.control}
+                name="certificacoes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Certificações (PMP, ITIL, ISO, etc.)</FormLabel>
+                    <div className="space-y-2">
+                      <Select onValueChange={(value) => {
+                        if (isValidSelectValue(value) && !field.value?.includes(value)) {
+                          field.onChange([...(field.value || []), value]);
+                        }
+                      }}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione uma certificação" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {CERTIFICACOES.map((cert, index) => (
+                            <SelectItem key={`cert-${index}-${cert}`} value={cert}>
+                              {cert}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <div className="flex flex-wrap gap-2">
+                        {field.value?.map((cert, index) => (
+                          <Badge key={index} variant="secondary" className="flex items-center space-x-1">
+                            <span>{cert}</span>
+                            <X 
+                              className="w-3 h-3 cursor-pointer" 
+                              onClick={() => field.onChange(field.value?.filter((_, i) => i !== index))}
+                            />
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </CardContent>
+          </Card>
+
+          {/* Publicações e Trabalhos */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Publicações, Cursos Ministrados e Trabalhos de Destaque</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <FormField
+                control={form.control}
+                name="publicacoes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Publicações e Trabalhos de Destaque</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        {...field} 
+                        rows={5} 
+                        placeholder="Liste suas publicações, cursos ministrados, trabalhos de destaque, etc..."
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </CardContent>
+          </Card>
+
           {/* Habilidades */}
           <Card>
             <CardHeader>
@@ -614,23 +761,73 @@ const ProfileEdit: React.FC = () => {
                 name="habilidadesTecnicas"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Habilidades Técnicas</FormLabel>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                      {HABILIDADES_TECNICAS.map(habilidade => (
-                        <div key={habilidade} className="flex items-center space-x-2">
-                          <Checkbox
-                            checked={field.value.includes(habilidade)}
-                            onCheckedChange={() => {
-                              if (field.value.includes(habilidade)) {
-                                field.onChange(field.value.filter(h => h !== habilidade));
-                              } else {
-                                field.onChange([...field.value, habilidade]);
-                              }
-                            }}
-                          />
-                          <span className="text-sm">{habilidade}</span>
+                    <div className="space-y-6">
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-900 mb-3">Área Administrativa</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                          {HABILIDADES_TECNICAS_ADMINISTRATIVAS.map(habilidade => (
+                            <div key={habilidade} className="flex items-center space-x-2">
+                              <Checkbox
+                                checked={field.value.includes(habilidade)}
+                                onCheckedChange={() => {
+                                  if (field.value.includes(habilidade)) {
+                                    field.onChange(field.value.filter(h => h !== habilidade));
+                                  } else {
+                                    field.onChange([...field.value, habilidade]);
+                                  }
+                                }}
+                              />
+                              <span className="text-sm">{habilidade}</span>
+                            </div>
+                          ))}
                         </div>
-                      ))}
+                      </div>
+                      
+                      <Separator />
+                      
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-900 mb-3">Área Jurídica</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                          {HABILIDADES_TECNICAS_JURIDICAS.map(habilidade => (
+                            <div key={habilidade} className="flex items-center space-x-2">
+                              <Checkbox
+                                checked={field.value.includes(habilidade)}
+                                onCheckedChange={() => {
+                                  if (field.value.includes(habilidade)) {
+                                    field.onChange(field.value.filter(h => h !== habilidade));
+                                  } else {
+                                    field.onChange([...field.value, habilidade]);
+                                  }
+                                }}
+                              />
+                              <span className="text-sm">{habilidade}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <Separator />
+                      
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-900 mb-3">Tecnologia da Informação</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                          {HABILIDADES_TECNICAS_TI.map(habilidade => (
+                            <div key={habilidade} className="flex items-center space-x-2">
+                              <Checkbox
+                                checked={field.value.includes(habilidade)}
+                                onCheckedChange={() => {
+                                  if (field.value.includes(habilidade)) {
+                                    field.onChange(field.value.filter(h => h !== habilidade));
+                                  } else {
+                                    field.onChange([...field.value, habilidade]);
+                                  }
+                                }}
+                              />
+                              <span className="text-sm">{habilidade}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                     <FormMessage />
                   </FormItem>

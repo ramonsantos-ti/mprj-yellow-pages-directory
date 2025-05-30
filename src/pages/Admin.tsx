@@ -8,6 +8,7 @@ import { Input } from '../components/ui/input';
 import { Badge } from '../components/ui/badge';
 import { Alert, AlertDescription } from '../components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { 
   Table, 
   TableBody, 
@@ -35,16 +36,23 @@ import {
   Download,
   AlertCircle,
   CheckCircle,
-  XCircle
+  XCircle,
+  UserCheck,
+  UserX,
+  Mail,
+  Shield,
+  ShieldOff
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
+import { generateProfileReport } from '../utils/pdfReports';
 
 const Admin: React.FC = () => {
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedProfile, setSelectedProfile] = useState<string | null>(null);
+  const [selectedReportType, setSelectedReportType] = useState('');
 
   if (!user || user.role !== 'admin') {
     return (
@@ -64,27 +72,45 @@ const Admin: React.FC = () => {
   );
 
   const handleDeleteProfile = (profileId: string) => {
-    // Simular exclusão
     toast.success('Perfil excluído com sucesso');
   };
 
-  const handleApproveProfile = (profileId: string) => {
-    // Simular aprovação
-    toast.success('Perfil aprovado com sucesso');
+  const handleToggleProfileStatus = (profileId: string, isActive: boolean) => {
+    const action = isActive ? 'desativado' : 'ativado';
+    toast.success(`Perfil ${action} com sucesso`);
   };
 
-  const handleRejectProfile = (profileId: string) => {
-    // Simular rejeição
-    toast.success('Perfil rejeitado');
+  const handlePromoteToAdmin = (userId: string) => {
+    toast.success('Usuário promovido a administrador');
   };
 
-  const exportData = () => {
-    // Simular exportação
-    toast.success('Relatório gerado com sucesso');
+  const handleSendEmail = (profileId: string, reason: string) => {
+    toast.success('Email enviado com sucesso');
+  };
+
+  const handleUndoUpdate = (profileId: string) => {
+    toast.success('Atualização desfeita com sucesso');
+  };
+
+  const handleGenerateReport = () => {
+    if (!selectedReportType) {
+      toast.error('Selecione um tipo de relatório');
+      return;
+    }
+    
+    generateProfileReport(mockProfiles, selectedReportType);
+    toast.success('Relatório PDF gerado com sucesso');
+  };
+
+  const exportAllData = () => {
+    generateProfileReport(mockProfiles, 'geral');
+    toast.success('Relatório geral exportado com sucesso');
   };
 
   const getProfileStats = () => {
     const total = mockProfiles.length;
+    const active = mockProfiles.filter(p => p.isActive !== false).length;
+    const inactive = total - active;
     const membros = mockProfiles.filter(p => p.cargo.some(c => c.includes('Procurador') || c.includes('Promotor'))).length;
     const servidores = total - membros;
     const atualizadosRecentemente = mockProfiles.filter(p => {
@@ -92,31 +118,66 @@ const Admin: React.FC = () => {
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
       return diffDays <= 30;
     }).length;
+    const pendingDeactivation = mockProfiles.filter(p => {
+      const diffTime = Math.abs(new Date().getTime() - p.lastUpdated.getTime());
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return diffDays > 180; // 6 months
+    }).length;
 
-    return { total, membros, servidores, atualizadosRecentemente };
+    return { total, active, inactive, membros, servidores, atualizadosRecentemente, pendingDeactivation };
   };
 
   const stats = getProfileStats();
 
+  const isProfileInactive = (profile: any) => {
+    const diffTime = Math.abs(new Date().getTime() - profile.lastUpdated.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays > 180; // 6 months
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Administração</h1>
-        <Button onClick={exportData} className="bg-amber-900 hover:bg-amber-800">
+        <h1 className="text-2xl font-bold text-red-900">Administração</h1>
+        <Button onClick={exportAllData} className="bg-red-900 hover:bg-red-800">
           <Download className="w-4 h-4 mr-2" />
-          Exportar Relatório
+          Exportar Relatório Geral
         </Button>
       </div>
 
       {/* Cards de Estatísticas */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center space-x-2">
-              <Users className="w-8 h-8 text-amber-900" />
+              <Users className="w-8 h-8 text-red-900" />
               <div>
                 <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
                 <p className="text-sm text-gray-600">Total de Perfis</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center space-x-2">
+              <UserCheck className="w-8 h-8 text-green-600" />
+              <div>
+                <p className="text-2xl font-bold text-gray-900">{stats.active}</p>
+                <p className="text-sm text-gray-600">Perfis Ativos</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center space-x-2">
+              <UserX className="w-8 h-8 text-red-600" />
+              <div>
+                <p className="text-2xl font-bold text-gray-900">{stats.inactive}</p>
+                <p className="text-sm text-gray-600">Perfis Inativos</p>
               </div>
             </div>
           </CardContent>
@@ -137,10 +198,10 @@ const Admin: React.FC = () => {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center space-x-2">
-              <Users className="w-8 h-8 text-green-600" />
+              <BarChart3 className="w-8 h-8 text-orange-600" />
               <div>
-                <p className="text-2xl font-bold text-gray-900">{stats.servidores}</p>
-                <p className="text-sm text-gray-600">Servidores</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.atualizadosRecentemente}</p>
+                <p className="text-sm text-gray-600">Atualizados (30d)</p>
               </div>
             </div>
           </CardContent>
@@ -149,10 +210,10 @@ const Admin: React.FC = () => {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center space-x-2">
-              <BarChart3 className="w-8 h-8 text-orange-600" />
+              <AlertCircle className="w-8 h-8 text-yellow-600" />
               <div>
-                <p className="text-2xl font-bold text-gray-900">{stats.atualizadosRecentemente}</p>
-                <p className="text-sm text-gray-600">Atualizados (30d)</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.pendingDeactivation}</p>
+                <p className="text-sm text-gray-600">Pendentes Desativação</p>
               </div>
             </div>
           </CardContent>
@@ -220,10 +281,22 @@ const Admin: React.FC = () => {
                         {format(profile.lastUpdated, "dd/MM/yyyy", { locale: ptBR })}
                       </TableCell>
                       <TableCell>
-                        <Badge variant="secondary" className="bg-green-100 text-green-800">
-                          <CheckCircle className="w-3 h-3 mr-1" />
-                          Ativo
-                        </Badge>
+                        {isProfileInactive(profile) ? (
+                          <Badge variant="destructive" className="bg-red-100 text-red-800">
+                            <XCircle className="w-3 h-3 mr-1" />
+                            Pendente Desativação
+                          </Badge>
+                        ) : profile.isActive !== false ? (
+                          <Badge variant="secondary" className="bg-green-100 text-green-800">
+                            <CheckCircle className="w-3 h-3 mr-1" />
+                            Ativo
+                          </Badge>
+                        ) : (
+                          <Badge variant="destructive" className="bg-red-100 text-red-800">
+                            <XCircle className="w-3 h-3 mr-1" />
+                            Inativo
+                          </Badge>
+                        )}
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center space-x-2">
@@ -286,11 +359,37 @@ const Admin: React.FC = () => {
                           <Button size="sm" variant="outline">
                             <Edit className="w-4 h-4" />
                           </Button>
+
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleToggleProfileStatus(profile.id, profile.isActive !== false)}
+                            className={profile.isActive !== false ? "text-red-600" : "text-green-600"}
+                          >
+                            {profile.isActive !== false ? <UserX className="w-4 h-4" /> : <UserCheck className="w-4 h-4" />}
+                          </Button>
+
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleSendEmail(profile.id, 'regras')}
+                          >
+                            <Mail className="w-4 h-4" />
+                          </Button>
+
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleUndoUpdate(profile.id)}
+                          >
+                            <AlertCircle className="w-4 h-4" />
+                          </Button>
                           
                           <Button 
                             size="sm" 
                             variant="outline"
                             onClick={() => handleDeleteProfile(profile.id)}
+                            className="text-red-600"
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>
@@ -318,6 +417,7 @@ const Admin: React.FC = () => {
                     <TableHead>Matrícula</TableHead>
                     <TableHead>Tipo</TableHead>
                     <TableHead>Status</TableHead>
+                    <TableHead>Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -336,6 +436,18 @@ const Admin: React.FC = () => {
                           Ativo
                         </Badge>
                       </TableCell>
+                      <TableCell>
+                        {user.role !== 'admin' && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handlePromoteToAdmin(user.id)}
+                          >
+                            <Shield className="w-4 h-4 mr-1" />
+                            Promover a Admin
+                          </Button>
+                        )}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -346,6 +458,39 @@ const Admin: React.FC = () => {
 
         <TabsContent value="reports" className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <FileText className="w-5 h-5" />
+                  <span>Gerar Relatórios PDF</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Select value={selectedReportType} onValueChange={setSelectedReportType}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o tipo de relatório" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="cargos">Distribuição por Cargos</SelectItem>
+                    <SelectItem value="areas-conhecimento">Áreas de Conhecimento</SelectItem>
+                    <SelectItem value="formacao">Formação Acadêmica</SelectItem>
+                    <SelectItem value="habilidades">Habilidades Técnicas</SelectItem>
+                    <SelectItem value="idiomas">Idiomas</SelectItem>
+                    <SelectItem value="colaboracao">Tipos de Colaboração</SelectItem>
+                  </SelectContent>
+                </Select>
+                
+                <Button 
+                  onClick={handleGenerateReport}
+                  className="w-full bg-red-900 hover:bg-red-800"
+                  disabled={!selectedReportType}
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Gerar Relatório PDF
+                </Button>
+              </CardContent>
+            </Card>
+
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
@@ -425,23 +570,32 @@ const Admin: React.FC = () => {
             </CardHeader>
             <CardContent className="space-y-6">
               <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Moderação</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Moderação e Segurança</h3>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-medium">Aprovação automática de perfis</p>
-                      <p className="text-sm text-gray-600">Perfis são aprovados automaticamente após cadastro</p>
+                      <p className="font-medium">Desativação automática (6 meses)</p>
+                      <p className="text-sm text-gray-600">Perfis são desativados automaticamente após 6 meses sem atualização</p>
                     </div>
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" className="bg-green-100 text-green-800">
                       Ativado
                     </Button>
                   </div>
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="font-medium">Notificações por email</p>
-                      <p className="text-sm text-gray-600">Enviar notificações sobre atualizações de perfil</p>
+                      <p className="text-sm text-gray-600">Enviar notificações sobre atualizações e violações</p>
                     </div>
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" className="bg-green-100 text-green-800">
+                      Ativado
+                    </Button>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">Validação de email @mprj.mp.br</p>
+                      <p className="text-sm text-gray-600">Apenas emails institucionais são aceitos</p>
+                    </div>
+                    <Button variant="outline" size="sm" className="bg-green-100 text-green-800">
                       Ativado
                     </Button>
                   </div>
@@ -449,15 +603,15 @@ const Admin: React.FC = () => {
               </div>
 
               <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Exportação</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Exportação e Relatórios</h3>
                 <div className="space-y-3">
-                  <Button className="bg-amber-900 hover:bg-amber-800">
+                  <Button className="bg-red-900 hover:bg-red-800">
                     <Download className="w-4 h-4 mr-2" />
-                    Exportar Todos os Perfis (Excel)
+                    Exportar Todos os Perfis (PDF)
                   </Button>
                   <Button variant="outline">
                     <Download className="w-4 h-4 mr-2" />
-                    Exportar Relatório de Uso (PDF)
+                    Exportar Logs do Sistema
                   </Button>
                 </div>
               </div>
