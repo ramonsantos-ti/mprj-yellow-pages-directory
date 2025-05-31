@@ -4,7 +4,8 @@ const filterAndValidate = (array: string[], arrayName: string) => {
   console.log(`Processing ${arrayName}:`, array);
   
   const filtered = array.filter(item => {
-    if (item == null) {
+    // More strict validation
+    if (item == null || item === undefined) {
       console.log(`Filtered out null/undefined in ${arrayName}:`, item);
       return false;
     }
@@ -17,18 +18,24 @@ const filterAndValidate = (array: string[], arrayName: string) => {
       console.log(`Filtered out empty/whitespace in ${arrayName}:`, JSON.stringify(item));
       return false;
     }
+    // Additional check for purely whitespace strings
+    if (!/\S/.test(trimmed)) {
+      console.log(`Filtered out whitespace-only in ${arrayName}:`, JSON.stringify(item));
+      return false;
+    }
     return true;
-  });
+  }).map(item => item.trim()); // Ensure all items are trimmed
   
   console.log(`${arrayName} final result:`, filtered);
   
-  // Additional validation - ensure no empty strings made it through
-  const hasEmpty = filtered.some(item => !item || item.trim() === '');
-  if (hasEmpty) {
-    console.error(`WARNING: ${arrayName} still contains empty values after filtering!`);
+  // Final validation - double check no empty strings made it through
+  const finalFiltered = filtered.filter(item => item && item.length > 0 && /\S/.test(item));
+  
+  if (finalFiltered.length !== filtered.length) {
+    console.error(`WARNING: ${arrayName} had additional empty values removed in final filter!`);
   }
   
-  return filtered;
+  return finalFiltered;
 };
 
 const rawAreasJuridicas = [

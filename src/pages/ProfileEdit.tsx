@@ -57,13 +57,29 @@ const profileSchema = z.object({
 
 type ProfileFormData = z.infer<typeof profileSchema>;
 
-// Validation function for Select values - ensure no empty strings can be used
+// Enhanced validation function for Select values
 const isValidSelectValue = (value: any): value is string => {
-  const isValid = typeof value === 'string' && value.trim().length > 0;
+  const isValid = typeof value === 'string' && 
+                 value.trim().length > 0 && 
+                 /\S/.test(value.trim());
   if (!isValid) {
     console.error('Invalid select value detected:', value, typeof value);
   }
   return isValid;
+};
+
+// Helper function to safely filter arrays for Select components
+const safeFilterForSelect = (array: string[], arrayName: string) => {
+  const filtered = array.filter(item => {
+    const valid = isValidSelectValue(item);
+    if (!valid) {
+      console.warn(`Filtering out invalid ${arrayName} item:`, item);
+    }
+    return valid;
+  });
+  
+  console.log(`Safe filter for ${arrayName}: ${array.length} -> ${filtered.length}`);
+  return filtered;
 };
 
 const ProfileEdit: React.FC = () => {
@@ -186,16 +202,25 @@ const ProfileEdit: React.FC = () => {
     );
   }
 
+  // Safe filtered arrays for Select components
+  const safeCargos = safeFilterForSelect(CARGOS, 'CARGOS');
+  const safeUnidades = safeFilterForSelect(UNIDADES, 'UNIDADES');
+  const safeNiveisFormacao = safeFilterForSelect(NIVEIS_FORMACAO, 'NIVEIS_FORMACAO');
+  const safeTiposColaboracao = safeFilterForSelect(TIPOS_COLABORACAO, 'TIPOS_COLABORACAO');
+  const safeDisponibilidadeEstimada = safeFilterForSelect(DISPONIBILIDADE_ESTIMADA, 'DISPONIBILIDADE_ESTIMADA');
+  const safeFormasContato = safeFilterForSelect(FORMAS_CONTATO, 'FORMAS_CONTATO');
+  const safeCertificacoes = safeFilterForSelect(CERTIFICACOES, 'CERTIFICACOES');
+
   // Debug log to check constants
-  console.log('Constants loaded:', {
-    CARGOS: CARGOS.length,
-    UNIDADES: UNIDADES.length,
+  console.log('Constants loaded and filtered:', {
+    CARGOS: safeCargos.length,
+    UNIDADES: safeUnidades.length,
     AREAS_JURIDICAS: AREAS_JURIDICAS.length,
     AREAS_ADMINISTRATIVAS: AREAS_ADMINISTRATIVAS.length,
-    NIVEIS_FORMACAO: NIVEIS_FORMACAO.length,
-    TIPOS_COLABORACAO: TIPOS_COLABORACAO.length,
-    DISPONIBILIDADE_ESTIMADA: DISPONIBILIDADE_ESTIMADA.length,
-    FORMAS_CONTATO: FORMAS_CONTATO.length
+    NIVEIS_FORMACAO: safeNiveisFormacao.length,
+    TIPOS_COLABORACAO: safeTiposColaboracao.length,
+    DISPONIBILIDADE_ESTIMADA: safeDisponibilidadeEstimada.length,
+    FORMAS_CONTATO: safeFormasContato.length
   });
 
   return (
@@ -358,18 +383,11 @@ const ProfileEdit: React.FC = () => {
                           <SelectValue placeholder="Selecione um cargo" />
                         </SelectTrigger>
                         <SelectContent>
-                          {CARGOS.map((cargo, index) => {
-                            console.log(`Rendering cargo ${index}:`, cargo, 'Valid:', isValidSelectValue(cargo));
-                            if (!isValidSelectValue(cargo)) {
-                              console.error('Skipping invalid cargo:', cargo);
-                              return null;
-                            }
-                            return (
-                              <SelectItem key={`cargo-${index}-${cargo}`} value={cargo}>
-                                {cargo}
-                              </SelectItem>
-                            );
-                          })}
+                          {safeCargos.map((cargo, index) => (
+                            <SelectItem key={`cargo-${index}-${cargo}`} value={cargo}>
+                              {cargo}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                       <div className="flex flex-wrap gap-2">
@@ -406,18 +424,11 @@ const ProfileEdit: React.FC = () => {
                           <SelectValue placeholder="Selecione uma unidade" />
                         </SelectTrigger>
                         <SelectContent>
-                          {UNIDADES.map((unidade, index) => {
-                            console.log(`Rendering unidade ${index}:`, unidade, 'Valid:', isValidSelectValue(unidade));
-                            if (!isValidSelectValue(unidade)) {
-                              console.error('Skipping invalid unidade:', unidade);
-                              return null;
-                            }
-                            return (
-                              <SelectItem key={`unidade-${index}-${unidade}`} value={unidade}>
-                                {unidade}
-                              </SelectItem>
-                            );
-                          })}
+                          {safeUnidades.map((unidade, index) => (
+                            <SelectItem key={`unidade-${index}-${unidade}`} value={unidade}>
+                              {unidade}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                       <div className="flex flex-wrap gap-2">
@@ -628,18 +639,11 @@ const ProfileEdit: React.FC = () => {
                         <SelectValue placeholder="Nível" />
                       </SelectTrigger>
                       <SelectContent>
-                        {NIVEIS_FORMACAO.map((nivel, nivelIndex) => {
-                          console.log(`Rendering nivel ${nivelIndex}:`, nivel, 'Valid:', isValidSelectValue(nivel));
-                          if (!isValidSelectValue(nivel)) {
-                            console.error('Skipping invalid nivel:', nivel);
-                            return null;
-                          }
-                          return (
-                            <SelectItem key={`nivel-${nivelIndex}-${nivel}`} value={nivel}>
-                              {nivel}
-                            </SelectItem>
-                          );
-                        })}
+                        {safeNiveisFormacao.map((nivel, nivelIndex) => (
+                          <SelectItem key={`nivel-${nivelIndex}-${nivel}`} value={nivel}>
+                            {nivel}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <Input
@@ -698,7 +702,7 @@ const ProfileEdit: React.FC = () => {
                           <SelectValue placeholder="Selecione uma certificação" />
                         </SelectTrigger>
                         <SelectContent>
-                          {CERTIFICACOES.map((cert, index) => (
+                          {safeCertificacoes.map((cert, index) => (
                             <SelectItem key={`cert-${index}-${cert}`} value={cert}>
                               {cert}
                             </SelectItem>
@@ -901,7 +905,7 @@ const ProfileEdit: React.FC = () => {
               <div>
                 <label className="text-sm font-medium text-gray-900">Tipo de Colaboração</label>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
-                  {TIPOS_COLABORACAO.map(tipo => (
+                  {safeTiposColaboracao.map(tipo => (
                     <div key={tipo} className="flex items-center space-x-2">
                       <Checkbox
                         checked={tipoColaboracao.includes(tipo)}
@@ -931,17 +935,11 @@ const ProfileEdit: React.FC = () => {
                     <SelectValue placeholder="Selecione sua disponibilidade" />
                   </SelectTrigger>
                   <SelectContent>
-                    {DISPONIBILIDADE_ESTIMADA.map((disponibilidade, dispIndex) => {
-                      if (!isValidSelectValue(disponibilidade)) {
-                        console.error('Invalid disponibilidade value:', disponibilidade);
-                        return null;
-                      }
-                      return (
-                        <SelectItem key={`disp-${dispIndex}-${disponibilidade}`} value={disponibilidade}>
-                          {disponibilidade}
-                        </SelectItem>
-                      );
-                    })}
+                    {safeDisponibilidadeEstimada.map((disponibilidade, dispIndex) => (
+                      <SelectItem key={`disp-${dispIndex}-${disponibilidade}`} value={disponibilidade}>
+                        {disponibilidade}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -966,17 +964,11 @@ const ProfileEdit: React.FC = () => {
                     <SelectValue placeholder="Selecione a forma de contato" />
                   </SelectTrigger>
                   <SelectContent>
-                    {FORMAS_CONTATO.map((forma, formaIndex) => {
-                      if (!isValidSelectValue(forma)) {
-                        console.error('Invalid forma contato value:', forma);
-                        return null;
-                      }
-                      return (
-                        <SelectItem key={`forma-${formaIndex}-${forma}`} value={forma}>
-                          {forma}
-                        </SelectItem>
-                      );
-                    })}
+                    {safeFormasContato.map((forma, formaIndex) => (
+                      <SelectItem key={`forma-${formaIndex}-${forma}`} value={forma}>
+                        {forma}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
