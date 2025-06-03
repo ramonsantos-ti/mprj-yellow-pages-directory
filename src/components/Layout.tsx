@@ -24,46 +24,37 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       {/* Header */}
       <header className="bg-white shadow-sm border-b-4 border-red-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Title Bar */}
-          <div className="text-center py-4 border-b border-gray-200">
-            <h1 className="text-2xl font-marcellus text-gray-800">
-              <span className="font-fave-script text-yellow-500 text-3xl">Páginas Amarelas</span> do{' '}
-              <span className="font-neuropolitical text-red-900">MPRJ</span>
-            </h1>
-            <p className="text-sm font-marcellus text-gray-600 mt-1">
-              Ministério Público do Estado do Rio de Janeiro
-            </p>
-          </div>
-          
-          {/* Navigation Bar */}
-          <div className="flex justify-between items-center h-16">
+          <div className="flex justify-between items-center h-20">
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-3">
               <img 
                 src="/lovable-uploads/9bdb3a99-0580-4f1a-90fd-bca0f42a713d.png" 
                 alt="MPRJ Logo" 
-                className="h-12 w-auto"
+                className="h-16 w-auto"
               />
+              <div>
+                <h1 className="text-xl font-bold text-red-900">Páginas Amarelas</h1>
+                <p className="text-sm text-gray-600">Ministério Público do Rio de Janeiro</p>
+              </div>
             </Link>
 
-            {/* Right side navigation */}
-            <div className="flex items-center space-x-4">
-              {/* Home Navigation */}
-              <nav className="hidden md:flex">
-                <Link
-                  to="/"
-                  className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium ${
-                    location.pathname === '/'
-                      ? 'text-red-900 bg-red-50'
-                      : 'text-gray-700 hover:text-red-900 hover:bg-red-50'
-                  }`}
-                >
-                  <Home className="w-4 h-4" />
-                  <span>Início</span>
-                </Link>
-              </nav>
+            {/* Navigation */}
+            <nav className="hidden md:flex space-x-8">
+              <Link
+                to="/"
+                className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium ${
+                  location.pathname === '/'
+                    ? 'text-red-900 bg-red-50'
+                    : 'text-gray-700 hover:text-red-900 hover:bg-red-50'
+                }`}
+              >
+                <Home className="w-4 h-4" />
+                <span>Início</span>
+              </Link>
+            </nav>
 
-              {/* User Menu */}
+            {/* User Menu */}
+            <div className="flex items-center space-x-4">
               {user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>

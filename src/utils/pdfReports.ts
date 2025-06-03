@@ -219,7 +219,7 @@ const generateGeneralReport = (doc: jsPDF, profiles: Profile[], startY: number) 
   currentY += 15;
 
   profiles.forEach((profile, index) => {
-    if (currentY > 230) {
+    if (currentY > 250) {
       doc.addPage();
       currentY = 20;
     }
@@ -232,21 +232,13 @@ const generateGeneralReport = (doc: jsPDF, profiles: Profile[], startY: number) 
     doc.text(`Matrícula: ${profile.matricula}`, 25, currentY);
     currentY += 5;
     
+    doc.text(`Email: ${profile.email}`, 25, currentY);
+    currentY += 5;
+    
     doc.text(`Cargo: ${profile.cargo.join(', ')}`, 25, currentY);
     currentY += 5;
     
     doc.text(`Unidade: ${profile.unidade.join(', ')}`, 25, currentY);
-    currentY += 5;
-    
-    doc.text(`Email: ${profile.email}`, 25, currentY);
-    currentY += 5;
-    
-    if (profile.telefone) {
-      doc.text(`Telefone: ${profile.telefone}`, 25, currentY);
-      currentY += 5;
-    }
-    
-    doc.text(`Preferência de Contato: ${profile.contato.formaContato || 'Email'}`, 25, currentY);
     currentY += 10;
   });
 };
