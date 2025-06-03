@@ -84,11 +84,9 @@ const Home: React.FC = () => {
     <div className="space-y-6">
       {/* Header */}
       <div className="text-center space-y-4">
-        <img 
-          src="/lovable-uploads/fbfd3fba-70ba-4035-931b-20ecf1c57f13.png" 
-          alt="Páginas Amarelas do MPRJ" 
-          className="mx-auto h-24 w-auto"
-        />
+        <h1 className="text-3xl font-bold text-gray-900">
+          Páginas Amarelas do MPRJ
+        </h1>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
           Encontre especialistas e colaboradores em diversas áreas do conhecimento 
           no Ministério Público do Estado do Rio de Janeiro
