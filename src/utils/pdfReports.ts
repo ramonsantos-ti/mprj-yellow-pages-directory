@@ -246,7 +246,7 @@ const generateGeneralReport = (doc: jsPDF, profiles: Profile[], startY: number) 
       currentY += 5;
     }
     
-    doc.text(`Preferência de Contato: ${profile.preferenciaContato || 'Email'}`, 25, currentY);
+    doc.text(`Preferência de Contato: ${profile.contato.formaContato || 'Email'}`, 25, currentY);
     currentY += 10;
   });
 };

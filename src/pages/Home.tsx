@@ -87,6 +87,10 @@ const Home: React.FC = () => {
     <div className="space-y-6">
       {/* Header */}
       <div className="text-center space-y-4">
+        <h1 className="text-3xl font-bold text-gray-900">
+          <span className="font-fave-script text-yellow-500 text-4xl">Páginas Amarelas</span> do{' '}
+          <span className="font-neuropolitical text-red-900">MPRJ</span>
+        </h1>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
           Encontre especialistas e colaboradores em diversas áreas do conhecimento 
           no Ministério Público do Estado do Rio de Janeiro
