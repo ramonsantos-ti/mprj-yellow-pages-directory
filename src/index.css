@@ -1,6 +1,23 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Marcellus+SC:wght@400&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@font-face {
+  font-family: 'Fave Script Bold Pro';
+  src: url('https://fonts.cdnfonts.com/css/fave-script-bold-pro') format('woff2');
+  font-weight: bold;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Neuropolitical RG';
+  src: url('https://fonts.cdnfonts.com/css/neuropolitical-rg') format('woff2');
+  font-weight: normal;
+  font-display: swap;
+}
 
 @layer base {
   :root {
@@ -98,4 +115,16 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.font-fave-script {
+  font-family: 'Fave Script Bold Pro', cursive;
+}
+
+.font-neuropolitical {
+  font-family: 'Neuropolitical RG', sans-serif;
+}
+
+.font-marcellus {
+  font-family: 'Marcellus SC', serif;
 }

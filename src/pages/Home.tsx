@@ -1,19 +1,11 @@
 
 import React, { useState, useMemo } from 'react';
 import { mockProfiles } from '../data/mockData';
-import { Profile, SearchFilters } from '../types';
+import { Profile } from '../types';
 import ProfileCard from '../components/ProfileCard';
 import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
-import { Badge } from '../components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../components/ui/select';
 import {
   Dialog,
   DialogContent,
@@ -21,8 +13,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '../components/ui/dialog';
-import { Search, Filter, Download, X, Users } from 'lucide-react';
-import { AREAS_JURIDICAS, AREAS_ADMINISTRATIVAS, CARGOS, UNIDADES, HABILIDADES_TECNICAS_ADMINISTRATIVAS, HABILIDADES_TECNICAS_JURIDICAS, HABILIDADES_TECNICAS_TI, IDIOMAS } from '../data/constants';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../components/ui/select';
+import { Search, Download, Users } from 'lucide-react';
 import { generateProfileReport } from '../utils/pdfReports';
 
 const PROFILES_PER_PAGE = 6;
@@ -30,8 +28,6 @@ const PROFILES_PER_PAGE = 6;
 const Home: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [filters, setFilters] = useState<SearchFilters>({});
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [exportCount, setExportCount] = useState<number | 'all'>('all');
   const [includeFilters, setIncludeFilters] = useState(true);
@@ -43,7 +39,7 @@ const Home: React.FC = () => {
     );
   }, []);
 
-  // Filtrar perfis
+  // Filtrar perfis apenas por busca livre
   const filteredProfiles = useMemo(() => {
     return sortedProfiles.filter(profile => {
       // Busca por termo livre
@@ -58,26 +54,9 @@ const Home: React.FC = () => {
         profile.biografia?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         profile.especializacoes?.toLowerCase().includes(searchTerm.toLowerCase());
 
-      // Filtros específicos
-      const matchesCargo = !filters.cargo || 
-        profile.cargo.some(cargo => cargo === filters.cargo);
-      
-      const matchesUnidade = !filters.unidade || 
-        profile.unidade.some(unidade => unidade === filters.unidade);
-      
-      const matchesArea = !filters.areaConhecimento || 
-        profile.areasConhecimento.includes(filters.areaConhecimento);
-      
-      const matchesHabilidade = !filters.habilidadeTecnica || 
-        profile.habilidadesTecnicas.includes(filters.habilidadeTecnica);
-      
-      const matchesIdioma = !filters.idioma || 
-        profile.idiomas.includes(filters.idioma);
-
-      return matchesSearch && matchesCargo && matchesUnidade && 
-             matchesArea && matchesHabilidade && matchesIdioma;
+      return matchesSearch;
     });
-  }, [sortedProfiles, searchTerm, filters]);
+  }, [sortedProfiles, searchTerm]);
 
   // Paginação
   const totalPages = Math.ceil(filteredProfiles.length / PROFILES_PER_PAGE);
@@ -87,10 +66,9 @@ const Home: React.FC = () => {
   // Reset página quando filtros mudam
   React.useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, filters]);
+  }, [searchTerm]);
 
-  const clearFilters = () => {
-    setFilters({});
+  const clearSearch = () => {
     setSearchTerm('');
     setCurrentPage(1);
   };
@@ -105,29 +83,17 @@ const Home: React.FC = () => {
     setIsExportOpen(false);
   };
 
-  const activeFiltersCount = Object.values(filters).filter(Boolean).length;
-
-  // Combine all technical skills for the filter
-  const allTechnicalSkills = [
-    ...HABILIDADES_TECNICAS_ADMINISTRATIVAS,
-    ...HABILIDADES_TECNICAS_JURIDICAS,
-    ...HABILIDADES_TECNICAS_TI
-  ];
-
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="text-center space-y-4">
-        <h1 className="text-3xl font-bold text-gray-900">
-          Páginas Amarelas do MPRJ
-        </h1>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
           Encontre especialistas e colaboradores em diversas áreas do conhecimento 
           no Ministério Público do Estado do Rio de Janeiro
         </p>
       </div>
 
-      {/* Busca e Filtros */}
+      {/* Busca */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
@@ -147,133 +113,6 @@ const Home: React.FC = () => {
                 className="pl-10"
               />
             </div>
-            <Dialog open={isFilterOpen} onOpenChange={setIsFilterOpen}>
-              <DialogTrigger asChild>
-                <Button variant="outline" className="flex items-center space-x-2">
-                  <Filter className="w-4 h-4" />
-                  <span>Filtros</span>
-                  {activeFiltersCount > 0 && (
-                    <Badge variant="secondary" className="text-xs">
-                      {activeFiltersCount}
-                    </Badge>
-                  )}
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-2xl">
-                <DialogHeader>
-                  <DialogTitle>Filtros de Busca</DialogTitle>
-                </DialogHeader>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium">Cargo</label>
-                    <Select
-                      value={filters.cargo || ''}
-                      onValueChange={(value) => 
-                        setFilters(prev => ({ ...prev, cargo: value || undefined }))
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione um cargo" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="">Todos</SelectItem>
-                        {CARGOS.map(cargo => (
-                          <SelectItem key={cargo} value={cargo}>{cargo}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-medium">Unidade</label>
-                    <Select
-                      value={filters.unidade || ''}
-                      onValueChange={(value) => 
-                        setFilters(prev => ({ ...prev, unidade: value || undefined }))
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione uma unidade" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="">Todas</SelectItem>
-                        {UNIDADES.map(unidade => (
-                          <SelectItem key={unidade} value={unidade}>{unidade}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-medium">Área de Conhecimento</label>
-                    <Select
-                      value={filters.areaConhecimento || ''}
-                      onValueChange={(value) => 
-                        setFilters(prev => ({ ...prev, areaConhecimento: value || undefined }))
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione uma área" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="">Todas</SelectItem>
-                        {[...AREAS_JURIDICAS, ...AREAS_ADMINISTRATIVAS].map(area => (
-                          <SelectItem key={area} value={area}>{area}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-medium">Habilidade Técnica</label>
-                    <Select
-                      value={filters.habilidadeTecnica || ''}
-                      onValueChange={(value) => 
-                        setFilters(prev => ({ ...prev, habilidadeTecnica: value || undefined }))
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione uma habilidade" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="">Todas</SelectItem>
-                        {allTechnicalSkills.map(habilidade => (
-                          <SelectItem key={habilidade} value={habilidade}>{habilidade}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-medium">Idioma</label>
-                    <Select
-                      value={filters.idioma || ''}
-                      onValueChange={(value) => 
-                        setFilters(prev => ({ ...prev, idioma: value || undefined }))
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione um idioma" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="">Todos</SelectItem>
-                        {IDIOMAS.map(idioma => (
-                          <SelectItem key={idioma} value={idioma}>{idioma}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div className="flex justify-between">
-                  <Button variant="outline" onClick={clearFilters}>
-                    Limpar Filtros
-                  </Button>
-                  <Button onClick={() => setIsFilterOpen(false)}>
-                    Aplicar Filtros
-                  </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
 
             <Dialog open={isExportOpen} onOpenChange={setIsExportOpen}>
               <DialogTrigger asChild>
@@ -333,23 +172,12 @@ const Home: React.FC = () => {
             </Dialog>
           </div>
 
-          {/* Filtros ativos */}
-          {activeFiltersCount > 0 && (
-            <div className="flex flex-wrap gap-2 items-center">
-              <span className="text-sm text-gray-600">Filtros ativos:</span>
-              {Object.entries(filters).map(([key, value]) => 
-                value && (
-                  <Badge key={key} variant="secondary" className="flex items-center space-x-1">
-                    <span>{value}</span>
-                    <X 
-                      className="w-3 h-3 cursor-pointer" 
-                      onClick={() => setFilters(prev => ({ ...prev, [key]: undefined }))}
-                    />
-                  </Badge>
-                )
-              )}
-              <Button variant="ghost" size="sm" onClick={clearFilters}>
-                Limpar todos
+          {/* Limpar busca */}
+          {searchTerm && (
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-gray-600">Buscando por: "{searchTerm}"</span>
+              <Button variant="ghost" size="sm" onClick={clearSearch}>
+                Limpar busca
               </Button>
             </div>
           )}
@@ -380,10 +208,10 @@ const Home: React.FC = () => {
             Nenhum especialista encontrado
           </h3>
           <p className="text-gray-600 mb-4">
-            Tente ajustar os filtros ou termos de busca
+            Tente ajustar os termos de busca
           </p>
-          <Button variant="outline" onClick={clearFilters}>
-            Limpar filtros
+          <Button variant="outline" onClick={clearSearch}>
+            Limpar busca
           </Button>
         </div>
       )}
