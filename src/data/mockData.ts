@@ -22,7 +22,7 @@ export const mockUsers: User[] = [
     id: '3',
     username: 'usuário0003',
     password: 'usu@rio0003',
-    name: 'Dr. Roberto Mendes',
+    name: 'Dra. Marina Yamamoto',
     matricula: '123003',
     role: 'user'
   },
@@ -30,7 +30,7 @@ export const mockUsers: User[] = [
     id: '4',
     username: 'usuário0004',
     password: 'usu@rio0004',
-    name: 'Dra. Mariana Costa',
+    name: 'Dr. Marcus Johnson',
     matricula: '123004',
     role: 'user'
   },
@@ -38,7 +38,7 @@ export const mockUsers: User[] = [
     id: '5',
     username: 'usuário0005',
     password: 'usu@rio0005',
-    name: 'Dr. José Fernando Lima',
+    name: 'Dr. Roberto Henrique Lima',
     matricula: '123005',
     role: 'user'
   },
@@ -54,7 +54,7 @@ export const mockUsers: User[] = [
     id: '7',
     username: 'usuário0007',
     password: 'usu@rio0007',
-    name: 'Maria das Graças Pereira',
+    name: 'Dr. Alexandre Pereira',
     matricula: '123007',
     role: 'user'
   },
@@ -62,7 +62,7 @@ export const mockUsers: User[] = [
     id: '8',
     username: 'usuário0008',
     password: 'usu@rio0008',
-    name: 'João Carlos Rodrigues',
+    name: 'Dr. Hiroshi Tanaka',
     matricula: '123008',
     role: 'user'
   },
@@ -70,7 +70,7 @@ export const mockUsers: User[] = [
     id: '9',
     username: 'usuário0009',
     password: 'usu@rio0009',
-    name: 'Luciana Almeida Santos',
+    name: 'Dra. Aisha Al-Zahra',
     matricula: '123009',
     role: 'user'
   },
@@ -78,7 +78,7 @@ export const mockUsers: User[] = [
     id: '10',
     username: 'usuário0010',
     password: 'usu@rio0010',
-    name: 'Pedro Henrique Souza',
+    name: 'Dr. Ricardo Almeida Santos',
     matricula: '123010',
     role: 'user'
   }
@@ -134,6 +134,7 @@ export const mockProfiles: Profile[] = [
       horarioPreferencial: '14h às 17h'
     },
     linkCurriculo: 'http://lattes.cnpq.br/carlos.silva',
+    fotoUrl: '/lovable-uploads/0727d710-b656-4d7c-860a-26b792b10a84.png',
     lastUpdated: new Date('2024-05-29'),
     aceiteTermos: true
   },
@@ -179,19 +180,20 @@ export const mockProfiles: Profile[] = [
     contato: {
       formaContato: 'Teams'
     },
+    fotoUrl: '/lovable-uploads/6e97a462-d2f9-47e7-a8bd-a0b982c06863.png',
     lastUpdated: new Date('2024-05-28'),
     aceiteTermos: true
   },
   {
     id: '3',
     userId: '3',
-    name: 'Dr. Roberto Mendes',
+    name: 'Dra. Marina Yamamoto',
     matricula: '123003',
-    cargo: ['Procurador de Justiça'],
+    cargo: ['Procuradora de Justiça'],
     unidade: ['1ª Promotoria de Justiça Criminal'],
-    email: 'roberto.mendes@mprj.mp.br',
+    email: 'marina.yamamoto@mprj.mp.br',
     telefone: '(21) 99876-5432',
-    biografia: 'Procurador com vasta experiência em direito processual penal.',
+    biografia: 'Procuradora com vasta experiência em direito processual penal.',
     areasConhecimento: ['Direito Processual Penal', 'Direito Penal'],
     especializacoes: 'Crimes organizados e tráfico de drogas',
     projetos: [],
@@ -209,11 +211,11 @@ export const mockProfiles: Profile[] = [
     experienciasProfissionais: [
       {
         tempoMPRJ: '12 anos',
-        experienciaAnterior: 'Delegado de Polícia Civil',
+        experienciaAnterior: 'Delegada de Polícia Civil',
         projetosInternos: 'Operação Calicute'
       }
     ],
-    idiomas: ['Inglês'],
+    idiomas: ['Inglês', 'Japonês'],
     disponibilidade: {
       tipoColaboracao: ['Consultoria interna'],
       disponibilidadeEstimada: 'Sob demanda (caso a caso)'
@@ -222,18 +224,19 @@ export const mockProfiles: Profile[] = [
       formaContato: 'Telefone',
       horarioPreferencial: '9h às 12h'
     },
+    fotoUrl: '/lovable-uploads/c54f190b-0325-45f2-aa59-6dedcb95726e.png',
     lastUpdated: new Date('2024-05-27'),
     aceiteTermos: true
   },
   {
     id: '4',
     userId: '4',
-    name: 'Dra. Mariana Costa',
+    name: 'Dr. Marcus Johnson',
     matricula: '123004',
-    cargo: ['Promotora de Justiça'],
+    cargo: ['Promotor de Justiça'],
     unidade: ['Promotoria do Meio Ambiente'],
-    email: 'mariana.costa@mprj.mp.br',
-    biografia: 'Promotora especialista em direito ambiental e urbanístico.',
+    email: 'marcus.johnson@mprj.mp.br',
+    biografia: 'Promotor especialista em direito ambiental e urbanístico.',
     areasConhecimento: ['Direito Ambiental', 'Direito Urbanístico'],
     projetos: [
       {
@@ -267,17 +270,18 @@ export const mockProfiles: Profile[] = [
     contato: {
       formaContato: 'E-mail'
     },
+    fotoUrl: '/lovable-uploads/5c24956a-cc0f-460e-9fa1-1ffefd55e576.png',
     lastUpdated: new Date('2024-05-26'),
     aceiteTermos: true
   },
   {
     id: '5',
     userId: '5',
-    name: 'Dr. José Fernando Lima',
+    name: 'Dr. Roberto Henrique Lima',
     matricula: '123005',
     cargo: ['Promotor de Justiça'],
     unidade: ['Promotoria do Consumidor'],
-    email: 'jose.lima@mprj.mp.br',
+    email: 'roberto.lima@mprj.mp.br',
     biografia: 'Promotor especializado em defesa do consumidor.',
     areasConhecimento: ['Direito do Consumidor', 'Direito Civil'],
     projetos: [],
@@ -306,6 +310,7 @@ export const mockProfiles: Profile[] = [
     contato: {
       formaContato: 'E-mail'
     },
+    fotoUrl: '/lovable-uploads/5785e26a-35aa-4cb7-8756-8076d98ebaf2.png',
     lastUpdated: new Date('2024-05-25'),
     aceiteTermos: true
   },
@@ -344,17 +349,18 @@ export const mockProfiles: Profile[] = [
     contato: {
       formaContato: 'E-mail'
     },
+    fotoUrl: '/lovable-uploads/d6e876aa-31ef-4c02-acef-6a1a97e86ada.png',
     lastUpdated: new Date('2024-05-24'),
     aceiteTermos: true
   },
   {
     id: '7',
     userId: '7',
-    name: 'Maria das Graças Pereira',
+    name: 'Dr. Alexandre Pereira',
     matricula: '123007',
     cargo: ['Servidor Efetivo', 'Analista'],
     unidade: ['Departamento de RH'],
-    email: 'maria.pereira@mprj.mp.br',
+    email: 'alexandre.pereira@mprj.mp.br',
     telefone: '(21) 97654-3210',
     biografia: 'Analista de Recursos Humanos com especialização em gestão de pessoas.',
     areasConhecimento: ['Gestão de Pessoas / Recursos Humanos', 'Psicologia Organizacional'],
@@ -392,17 +398,18 @@ export const mockProfiles: Profile[] = [
       formaContato: 'Teams',
       horarioPreferencial: '8h às 17h'
     },
+    fotoUrl: '/lovable-uploads/747bac21-c83d-48b7-b3e1-f71b3635d495.png',
     lastUpdated: new Date('2024-05-23'),
     aceiteTermos: true
   },
   {
     id: '8',
     userId: '8',
-    name: 'João Carlos Rodrigues',
+    name: 'Dr. Hiroshi Tanaka',
     matricula: '123008',
     cargo: ['Servidor Efetivo', 'Técnico'],
     unidade: ['Departamento de TI'],
-    email: 'joao.rodrigues@mprj.mp.br',
+    email: 'hiroshi.tanaka@mprj.mp.br',
     biografia: 'Técnico em TI especializado em infraestrutura e segurança da informação.',
     areasConhecimento: ['Tecnologia da Informação e Comunicação (TIC)', 'Segurança da Informação'],
     projetos: [],
@@ -423,7 +430,7 @@ export const mockProfiles: Profile[] = [
         experienciaAnterior: 'Suporte técnico em empresa privada'
       }
     ],
-    idiomas: ['Inglês'],
+    idiomas: ['Inglês', 'Japonês'],
     disponibilidade: {
       tipoColaboracao: ['Consultoria interna', 'Grupos de trabalho'],
       disponibilidadeEstimada: 'Até 2h/semana'
@@ -431,17 +438,18 @@ export const mockProfiles: Profile[] = [
     contato: {
       formaContato: 'E-mail'
     },
+    fotoUrl: '/lovable-uploads/fd16532f-c96e-4019-8ee1-3258a6a1f400.png',
     lastUpdated: new Date('2024-05-22'),
     aceiteTermos: true
   },
   {
     id: '9',
     userId: '9',
-    name: 'Luciana Almeida Santos',
+    name: 'Dra. Aisha Al-Zahra',
     matricula: '123009',
     cargo: ['Servidor Comissionado', 'Assessor'],
     unidade: ['Comunicação Social'],
-    email: 'luciana.santos@mprj.mp.br',
+    email: 'aisha.alzahra@mprj.mp.br',
     telefone: '(21) 96543-2109',
     biografia: 'Assessora de Comunicação Social com experiência em marketing institucional.',
     areasConhecimento: ['Comunicação Social', 'Marketing Institucional'],
@@ -470,7 +478,7 @@ export const mockProfiles: Profile[] = [
         projetosInternos: 'Reformulação do site institucional'
       }
     ],
-    idiomas: ['Inglês', 'Espanhol'],
+    idiomas: ['Inglês', 'Árabe'],
     disponibilidade: {
       tipoColaboracao: ['Capacitações/tutoria', 'Consultoria interna'],
       disponibilidadeEstimada: '2h a 4h/semana'
@@ -478,17 +486,18 @@ export const mockProfiles: Profile[] = [
     contato: {
       formaContato: 'Teams'
     },
+    fotoUrl: '/lovable-uploads/8de4caf3-e91d-4851-8767-4a49511d5ca8.png',
     lastUpdated: new Date('2024-05-21'),
     aceiteTermos: true
   },
   {
     id: '10',
     userId: '10',
-    name: 'Pedro Henrique Souza',
+    name: 'Dr. Ricardo Almeida Santos',
     matricula: '123010',
     cargo: ['Servidor Comissionado', 'Coordenador'],
     unidade: ['Controladoria'],
-    email: 'pedro.souza@mprj.mp.br',
+    email: 'ricardo.santos@mprj.mp.br',
     biografia: 'Coordenador de Controladoria com experiência em auditoria e compliance.',
     areasConhecimento: ['Controladoria e Auditoria', 'Compliance e Integridade'],
     projetos: [],
@@ -519,6 +528,7 @@ export const mockProfiles: Profile[] = [
       formaContato: 'E-mail',
       horarioPreferencial: '9h às 18h'
     },
+    fotoUrl: '/lovable-uploads/ffe5cc24-92ae-420f-8300-9f560b00a352.png',
     lastUpdated: new Date('2024-05-20'),
     aceiteTermos: true
   }
