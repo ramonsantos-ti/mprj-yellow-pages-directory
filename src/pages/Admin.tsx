@@ -13,6 +13,7 @@ import { Users, Search, UserCheck, UserX, Shield, Trash2, Undo2, Download, FileT
 import { generateProfileReport } from '../utils/pdfReports';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+
 const Admin: React.FC = () => {
   const [activeTab, setActiveTab] = useState('profiles');
   const [searchTerm, setSearchTerm] = useState('');
@@ -90,12 +91,22 @@ const Admin: React.FC = () => {
             <CardContent className="p-6">
               <div className="flex items-start justify-between">
                 <div className="flex items-start space-x-4">
-                  <Avatar className="w-12 h-12">
-                    <AvatarImage src={profile.fotoUrl} alt={profile.name} className="object-scale-down" />
-                    <AvatarFallback className="bg-red-100 text-red-900 font-semibold">
-                      {getInitials(profile.name)}
-                    </AvatarFallback>
-                  </Avatar>
+                  {/* Imagem em formato retângulo vertical com maior destaque */}
+                  <div className="w-16 h-24 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border">
+                    {profile.fotoUrl ? (
+                      <img 
+                        src={profile.fotoUrl} 
+                        alt={profile.name} 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-red-100 flex items-center justify-center">
+                        <span className="text-red-900 font-semibold text-sm">
+                          {getInitials(profile.name)}
+                        </span>
+                      </div>
+                    )}
+                  </div>
                   <div className="flex-1">
                     <div className="flex items-center space-x-2">
                       <h3 className="text-lg font-semibold text-gray-900">{profile.name}</h3>
