@@ -25,7 +25,7 @@ const Layout: React.FC<LayoutProps> = ({
               <img src="/lovable-uploads/9bdb3a99-0580-4f1a-90fd-bca0f42a713d.png" alt="MPRJ Logo" className="h-16 w-auto" />
               <div>
                 <h1 className="text-xl font-bold text-red-900"></h1>
-                <p className="text-sm text-gray-600">Ministério Público do Rio de Janeiro</p>
+                <p className="text-sm text-gray-600"></p>
               </div>
             </Link>
 
