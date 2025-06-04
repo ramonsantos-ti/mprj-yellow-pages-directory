@@ -1,4 +1,5 @@
 
+
 import { User, Profile } from '../types';
 
 export const mockUsers: User[] = [
@@ -6,7 +7,7 @@ export const mockUsers: User[] = [
     id: '1',
     username: 'usuário0001',
     password: 'usu@rio0001',
-    name: 'Dr. Carlos Eduardo Silva',
+    name: 'Carlos Eduardo Silva',
     matricula: '123001',
     role: 'user'
   },
@@ -14,7 +15,7 @@ export const mockUsers: User[] = [
     id: '2',
     username: 'usuário0002',
     password: 'usu@rio0002',
-    name: 'Dra. Ana Paula Santos',
+    name: 'Ana Paula Santos',
     matricula: '123002',
     role: 'admin'
   },
@@ -22,7 +23,7 @@ export const mockUsers: User[] = [
     id: '3',
     username: 'usuário0003',
     password: 'usu@rio0003',
-    name: 'Dra. Marina Yamamoto',
+    name: 'Marina Yamamoto',
     matricula: '123003',
     role: 'user'
   },
@@ -30,7 +31,7 @@ export const mockUsers: User[] = [
     id: '4',
     username: 'usuário0004',
     password: 'usu@rio0004',
-    name: 'Dr. Marcus Johnson',
+    name: 'Marcus Johnson',
     matricula: '123004',
     role: 'user'
   },
@@ -38,7 +39,7 @@ export const mockUsers: User[] = [
     id: '5',
     username: 'usuário0005',
     password: 'usu@rio0005',
-    name: 'Dr. Roberto Henrique Lima',
+    name: 'Roberto Henrique Lima',
     matricula: '123005',
     role: 'user'
   },
@@ -46,7 +47,7 @@ export const mockUsers: User[] = [
     id: '6',
     username: 'usuário0006',
     password: 'usu@rio0006',
-    name: 'Dra. Fernanda Oliveira',
+    name: 'Fernanda Oliveira',
     matricula: '123006',
     role: 'user'
   },
@@ -54,7 +55,7 @@ export const mockUsers: User[] = [
     id: '7',
     username: 'usuário0007',
     password: 'usu@rio0007',
-    name: 'Dr. Alexandre Pereira',
+    name: 'Alexandre Pereira',
     matricula: '123007',
     role: 'user'
   },
@@ -62,7 +63,7 @@ export const mockUsers: User[] = [
     id: '8',
     username: 'usuário0008',
     password: 'usu@rio0008',
-    name: 'Dr. Hiroshi Tanaka',
+    name: 'Hiroshi Tanaka',
     matricula: '123008',
     role: 'user'
   },
@@ -70,7 +71,7 @@ export const mockUsers: User[] = [
     id: '9',
     username: 'usuário0009',
     password: 'usu@rio0009',
-    name: 'Dra. Aisha Al-Zahra',
+    name: 'Aisha Al-Zahra',
     matricula: '123009',
     role: 'user'
   },
@@ -78,7 +79,7 @@ export const mockUsers: User[] = [
     id: '10',
     username: 'usuário0010',
     password: 'usu@rio0010',
-    name: 'Dr. Ricardo Almeida Santos',
+    name: 'Ricardo Almeida Santos',
     matricula: '123010',
     role: 'user'
   }
@@ -88,7 +89,7 @@ export const mockProfiles: Profile[] = [
   {
     id: '1',
     userId: '1',
-    name: 'Dr. Carlos Eduardo Silva',
+    name: 'Carlos Eduardo Silva',
     matricula: '123001',
     cargo: ['Procurador de Justiça'],
     unidade: ['Procuradoria Geral de Justiça'],
@@ -141,7 +142,7 @@ export const mockProfiles: Profile[] = [
   {
     id: '2',
     userId: '2',
-    name: 'Dra. Ana Paula Santos',
+    name: 'Ana Paula Santos',
     matricula: '123002',
     cargo: ['Promotora de Justiça'],
     unidade: ['Promotoria da Infância e Juventude'],
@@ -187,7 +188,7 @@ export const mockProfiles: Profile[] = [
   {
     id: '3',
     userId: '3',
-    name: 'Dra. Marina Yamamoto',
+    name: 'Marina Yamamoto',
     matricula: '123003',
     cargo: ['Procuradora de Justiça'],
     unidade: ['1ª Promotoria de Justiça Criminal'],
@@ -231,7 +232,7 @@ export const mockProfiles: Profile[] = [
   {
     id: '4',
     userId: '4',
-    name: 'Dr. Marcus Johnson',
+    name: 'Marcus Johnson',
     matricula: '123004',
     cargo: ['Promotor de Justiça'],
     unidade: ['Promotoria do Meio Ambiente'],
@@ -277,7 +278,7 @@ export const mockProfiles: Profile[] = [
   {
     id: '5',
     userId: '5',
-    name: 'Dr. Roberto Henrique Lima',
+    name: 'Roberto Henrique Lima',
     matricula: '123005',
     cargo: ['Promotor de Justiça'],
     unidade: ['Promotoria do Consumidor'],
@@ -317,7 +318,7 @@ export const mockProfiles: Profile[] = [
   {
     id: '6',
     userId: '6',
-    name: 'Dra. Fernanda Oliveira',
+    name: 'Fernanda Oliveira',
     matricula: '123006',
     cargo: ['Promotora de Justiça'],
     unidade: ['Promotoria Cível'],
@@ -356,7 +357,7 @@ export const mockProfiles: Profile[] = [
   {
     id: '7',
     userId: '7',
-    name: 'Dr. Alexandre Pereira',
+    name: 'Alexandre Pereira',
     matricula: '123007',
     cargo: ['Servidor Efetivo', 'Analista'],
     unidade: ['Departamento de RH'],
@@ -405,7 +406,7 @@ export const mockProfiles: Profile[] = [
   {
     id: '8',
     userId: '8',
-    name: 'Dr. Hiroshi Tanaka',
+    name: 'Hiroshi Tanaka',
     matricula: '123008',
     cargo: ['Servidor Efetivo', 'Técnico'],
     unidade: ['Departamento de TI'],
@@ -445,7 +446,7 @@ export const mockProfiles: Profile[] = [
   {
     id: '9',
     userId: '9',
-    name: 'Dra. Aisha Al-Zahra',
+    name: 'Aisha Al-Zahra',
     matricula: '123009',
     cargo: ['Servidor Comissionado', 'Assessor'],
     unidade: ['Comunicação Social'],
@@ -493,7 +494,7 @@ export const mockProfiles: Profile[] = [
   {
     id: '10',
     userId: '10',
-    name: 'Dr. Ricardo Almeida Santos',
+    name: 'Ricardo Almeida Santos',
     matricula: '123010',
     cargo: ['Servidor Comissionado', 'Coordenador'],
     unidade: ['Controladoria'],
