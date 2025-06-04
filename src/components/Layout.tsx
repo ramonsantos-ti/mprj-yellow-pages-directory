@@ -21,7 +21,7 @@ const Layout: React.FC<LayoutProps> = ({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             {/* Logo */}
-            <Link to="/" className="flex items-center space-x-3">
+            <Link to="/" className="flex items-center space-x-3 mx-0">
               <img src="/lovable-uploads/9bdb3a99-0580-4f1a-90fd-bca0f42a713d.png" alt="MPRJ Logo" className="h-16 w-auto" />
               <div>
                 <h1 className="text-xl font-bold text-red-900"></h1>
