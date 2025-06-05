@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -20,8 +21,8 @@ import { ptBR } from 'date-fns/locale';
 import { cn } from '../lib/utils';
 import KnowledgeAreaSelector from '../components/KnowledgeAreaSelector';
 import {
-  CARGOS_MPRJ,
-  UNIDADES_MPRJ,
+  CARGOS,
+  UNIDADES,
   HABILIDADES_TECNICAS,
   HABILIDADES_COMPORTAMENTAIS,
   IDIOMAS,
