@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Profile } from '../types';
@@ -65,12 +64,22 @@ const ProfileDetail: React.FC = () => {
       <Card>
         <CardHeader>
           <div className="flex items-start space-x-6">
-            <Avatar className="w-24 h-24">
-              <AvatarImage src={profile.fotoUrl} alt={profile.name} />
-              <AvatarFallback className="bg-red-100 text-red-900 font-semibold text-lg">
-                {getInitials(profile.name)}
-              </AvatarFallback>
-            </Avatar>
+            {/* Imagem em formato retângulo vertical */}
+            <div className="w-24 h-32 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border">
+              {profile.fotoUrl ? (
+                <img 
+                  src={profile.fotoUrl} 
+                  alt={profile.name} 
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-red-100 flex items-center justify-center">
+                  <span className="text-red-900 font-semibold text-lg">
+                    {getInitials(profile.name)}
+                  </span>
+                </div>
+              )}
+            </div>
             <div className="flex-1">
               <h2 className="text-2xl font-bold text-gray-900">{profile.name}</h2>
               <p className="text-lg text-gray-600 mb-2">Matrícula: {profile.matricula}</p>
