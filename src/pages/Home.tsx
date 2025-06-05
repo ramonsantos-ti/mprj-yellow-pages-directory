@@ -52,7 +52,7 @@ const Home: React.FC = () => {
       {/* Header */}
       <div className="text-center space-y-4">
         <div className="flex justify-center">
-          <img src="/lovable-uploads/df2ea65f-d8ab-47c4-91b8-23d9e1ac0f4c.png" alt="Páginas Amarelas do MPRJ" className="max-w-full h-auto" />
+          <img alt="Páginas Amarelas do MPRJ" className="max-w-full h-auto" src="/lovable-uploads/2aae1185-7d52-453a-942a-1ef1876196b1.jpg" />
         </div>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
           Encontre especialistas e colaboradores em diversas áreas do conhecimento 
