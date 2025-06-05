@@ -1,1053 +1,457 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { mockProfiles } from '../data/mockData';
+import { Profile } from '../types';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Textarea } from '../components/ui/textarea';
-import { Checkbox } from '../components/ui/checkbox';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { Badge } from '../components/ui/badge';
+import { Label } from '../components/ui/label';
 import { Separator } from '../components/ui/separator';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../components/ui/form';
-import { Alert, AlertDescription } from '../components/ui/alert';
-import { 
-  AREAS_JURIDICAS, 
-  AREAS_ADMINISTRATIVAS, 
-  HABILIDADES_TECNICAS_ADMINISTRATIVAS,
-  HABILIDADES_TECNICAS_JURIDICAS,
-  HABILIDADES_TECNICAS_TI,
+import { Badge } from '../components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import { Checkbox } from '../components/ui/checkbox';
+import { Calendar } from '../components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '../components/ui/popover';
+import { CalendarIcon, Plus, X, Upload, Save, ArrowLeft } from 'lucide-react';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import { cn } from '../lib/utils';
+import KnowledgeAreaSelector from '../components/KnowledgeAreaSelector';
+import {
+  CARGOS_MPRJ,
+  UNIDADES_MPRJ,
+  HABILIDADES_TECNICAS,
   HABILIDADES_COMPORTAMENTAIS,
   IDIOMAS,
-  CARGOS,
-  UNIDADES,
-  NIVEIS_FORMACAO,
   TIPOS_COLABORACAO,
   DISPONIBILIDADE_ESTIMADA,
-  FORMAS_CONTATO,
-  CERTIFICACOES
+  FORMAS_CONTATO
 } from '../data/constants';
-import { mockProfiles } from '../data/mockData';
-import { Save, Plus, X, AlertCircle, Upload, Camera } from 'lucide-react';
-import { toast } from 'sonner';
-import { validateEmail } from '../utils/pdfReports';
-
-const profileSchema = z.object({
-  name: z.string().min(1, 'Nome é obrigatório'),
-  matricula: z.string().min(1, 'Matrícula é obrigatória'),
-  cargo: z.array(z.string()).min(1, 'Pelo menos um cargo é obrigatório'),
-  unidade: z.array(z.string()).min(1, 'Pelo menos uma unidade é obrigatória'),
-  email: z.string().email('Email inválido').refine(validateEmail, 'Email deve ser do domínio @mprj.mp.br'),
-  telefone: z.string().optional(),
-  biografia: z.string().optional(),
-  areasConhecimento: z.array(z.string()).min(1, 'Pelo menos uma área de conhecimento é obrigatória'),
-  especializacoes: z.string().optional(),
-  temasInteresse: z.array(z.string()).min(1, 'Pelo menos um tema de interesse é obrigatório'),
-  habilidadesTecnicas: z.array(z.string()),
-  habilidadesComportamentais: z.array(z.string()),
-  idiomas: z.array(z.string()),
-  linkCurriculo: z.string().optional(),
-  certificacoes: z.array(z.string()).optional(),
-  publicacoes: z.string().optional(),
-  aceiteTermos: z.boolean().refine(val => val === true, 'Deve aceitar os termos')
-});
-
-type ProfileFormData = z.infer<typeof profileSchema>;
-
-// Enhanced validation function for Select values
-const isValidSelectValue = (value: any): value is string => {
-  const isValid = typeof value === 'string' && 
-                 value.trim().length > 0 && 
-                 /\S/.test(value.trim());
-  if (!isValid) {
-    console.error('Invalid select value detected:', value, typeof value);
-  }
-  return isValid;
-};
-
-// Helper function to safely filter arrays for Select components
-const safeFilterForSelect = (array: string[], arrayName: string) => {
-  const filtered = array.filter(item => {
-    const valid = isValidSelectValue(item);
-    if (!valid) {
-      console.warn(`Filtering out invalid ${arrayName} item:`, item);
-    }
-    return valid;
-  });
-  
-  console.log(`Safe filter for ${arrayName}: ${array.length} -> ${filtered.length}`);
-  return filtered;
-};
 
 const ProfileEdit: React.FC = () => {
-  const { user } = useAuth();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [projetos, setProjetos] = useState<Array<{nome: string, dataInicio: string, dataFim?: string, observacoes?: string}>>([]);
-  const [formacoes, setFormacoes] = useState<Array<{nivel: string, instituicao: string, curso: string, ano: number}>>([]);
-  const [tipoColaboracao, setTipoColaboracao] = useState<string[]>([]);
-  const [disponibilidadeEstimada, setDisponibilidadeEstimada] = useState('');
-  const [formaContato, setFormaContato] = useState('');
-  const [horarioPreferencial, setHorarioPreferencial] = useState('');
-  const [fotoFile, setFotoFile] = useState<File | null>(null);
-  const [fotoPreview, setFotoPreview] = useState<string>('');
 
-  // Buscar perfil existente do usuário
-  const userProfile = mockProfiles.find(p => p.userId === user?.id);
-
-  const form = useForm<ProfileFormData>({
-    resolver: zodResolver(profileSchema),
-    defaultValues: {
-      name: user?.name || '',
-      matricula: user?.matricula || '',
-      cargo: userProfile?.cargo || [],
-      unidade: userProfile?.unidade || [],
-      email: userProfile?.email || '',
-      telefone: userProfile?.telefone || '',
-      biografia: userProfile?.biografia || '',
-      areasConhecimento: userProfile?.areasConhecimento || [],
-      especializacoes: userProfile?.especializacoes || '',
-      temasInteresse: userProfile?.temasInteresse || [],
-      habilidadesTecnicas: userProfile?.habilidadesTecnicas || [],
-      habilidadesComportamentais: userProfile?.habilidadesComportamentais || [],
-      idiomas: userProfile?.idiomas || [],
-      linkCurriculo: userProfile?.linkCurriculo || '',
-      certificacoes: userProfile?.certificacoes || [],
-      publicacoes: userProfile?.publicacoes || '',
-      aceiteTermos: userProfile?.aceiteTermos || false
-    }
-  });
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors }
+  } = useForm<Profile>();
 
   useEffect(() => {
-    if (userProfile) {
-      setProjetos(userProfile.projetos.map(p => ({
-        nome: p.nome,
-        dataInicio: p.dataInicio.toISOString().split('T')[0],
-        dataFim: p.dataFim?.toISOString().split('T')[0],
-        observacoes: p.observacoes
-      })));
-      setFormacoes(userProfile.formacaoAcademica);
-      setTipoColaboracao(userProfile.disponibilidade.tipoColaboracao);
-      setDisponibilidadeEstimada(userProfile.disponibilidade.disponibilidadeEstimada);
-      setFormaContato(userProfile.contato.formaContato);
-      setHorarioPreferencial(userProfile.contato.horarioPreferencial || '');
-      setFotoPreview(userProfile.fotoUrl || '');
-    }
-  }, [userProfile]);
-
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
-        toast.error('Arquivo muito grande. Máximo 5MB.');
-        return;
-      }
+    const foundProfile = mockProfiles.find(p => p.id === id);
+    if (foundProfile) {
+      setProfile(foundProfile);
       
-      if (!file.type.startsWith('image/')) {
-        toast.error('Apenas imagens são permitidas.');
-        return;
-      }
-
-      setFotoFile(file);
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setFotoPreview(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
+      // Populate form with existing data
+      Object.keys(foundProfile).forEach(key => {
+        setValue(key as keyof Profile, foundProfile[key as keyof Profile]);
+      });
     }
+  }, [id, setValue]);
+
+  const watchedValues = watch();
+  
+  const getInitials = (name: string) => {
+    return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   };
 
-  const onSubmit = async (data: ProfileFormData) => {
+  const onSubmit = async (data: Profile) => {
     setIsLoading(true);
-    try {
-      // Simular salvamento
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      toast.success('Perfil atualizado com sucesso!');
-      navigate('/');
-    } catch (error) {
-      toast.error('Erro ao salvar perfil');
-    } finally {
-      setIsLoading(false);
-    }
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    console.log('Profile updated:', data);
+    setIsLoading(false);
+    navigate(`/profile/${id}`);
   };
 
-  const adicionarProjeto = () => {
-    setProjetos([...projetos, { nome: '', dataInicio: '' }]);
-  };
-
-  const removerProjeto = (index: number) => {
-    setProjetos(projetos.filter((_, i) => i !== index));
-  };
-
-  const adicionarFormacao = () => {
-    setFormacoes([...formacoes, { nivel: '', instituicao: '', curso: '', ano: new Date().getFullYear() }]);
-  };
-
-  const removerFormacao = (index: number) => {
-    setFormacoes(formacoes.filter((_, i) => i !== index));
-  };
-
-  if (!user) {
-    return (
-      <Alert>
-        <AlertCircle className="h-4 w-4" />
-        <AlertDescription>
-          Você precisa estar logado para acessar esta página.
-        </AlertDescription>
-      </Alert>
-    );
+  if (!profile) {
+    return <div>Perfil não encontrado</div>;
   }
 
-  // Safe filtered arrays for Select components
-  const safeCargos = safeFilterForSelect(CARGOS, 'CARGOS');
-  const safeUnidades = safeFilterForSelect(UNIDADES, 'UNIDADES');
-  const safeNiveisFormacao = safeFilterForSelect(NIVEIS_FORMACAO, 'NIVEIS_FORMACAO');
-  const safeTiposColaboracao = safeFilterForSelect(TIPOS_COLABORACAO, 'TIPOS_COLABORACAO');
-  const safeDisponibilidadeEstimada = safeFilterForSelect(DISPONIBILIDADE_ESTIMADA, 'DISPONIBILIDADE_ESTIMADA');
-  const safeFormasContato = safeFilterForSelect(FORMAS_CONTATO, 'FORMAS_CONTATO');
-  const safeCertificacoes = safeFilterForSelect(CERTIFICACOES, 'CERTIFICACOES');
+  const handleAddCargo = () => {
+    const newCargo = window.prompt('Digite o novo cargo:');
+    if (newCargo) {
+      setValue('cargo', [...(watchedValues.cargo || []), newCargo]);
+    }
+  };
 
-  // Debug log to check constants
-  console.log('Constants loaded and filtered:', {
-    CARGOS: safeCargos.length,
-    UNIDADES: safeUnidades.length,
-    AREAS_JURIDICAS: AREAS_JURIDICAS.length,
-    AREAS_ADMINISTRATIVAS: AREAS_ADMINISTRATIVAS.length,
-    NIVEIS_FORMACAO: safeNiveisFormacao.length,
-    TIPOS_COLABORACAO: safeTiposColaboracao.length,
-    DISPONIBILIDADE_ESTIMADA: safeDisponibilidadeEstimada.length,
-    FORMAS_CONTATO: safeFormasContato.length
-  });
+  const handleRemoveCargo = (cargoToRemove: string) => {
+    setValue('cargo', (watchedValues.cargo || []).filter(cargo => cargo !== cargoToRemove));
+  };
+
+  const handleAddUnidade = () => {
+    const newUnidade = window.prompt('Digite a nova unidade:');
+    if (newUnidade) {
+      setValue('unidade', [...(watchedValues.unidade || []), newUnidade]);
+    }
+  };
+
+  const handleRemoveUnidade = (unidadeToRemove: string) => {
+    setValue('unidade', (watchedValues.unidade || []).filter(unidade => unidade !== unidadeToRemove));
+  };
+
+  const handleAddHabilidadeTecnica = () => {
+    const newHabilidade = window.prompt('Digite a nova habilidade técnica:');
+    if (newHabilidade) {
+      setValue('habilidadesTecnicas', [...(watchedValues.habilidadesTecnicas || []), newHabilidade]);
+    }
+  };
+
+  const handleRemoveHabilidadeTecnica = (habilidadeToRemove: string) => {
+    setValue('habilidadesTecnicas', (watchedValues.habilidadesTecnicas || []).filter(habilidade => habilidade !== habilidadeToRemove));
+  };
+
+  const handleAddHabilidadeComportamental = () => {
+    const newHabilidade = window.prompt('Digite a nova habilidade comportamental:');
+    if (newHabilidade) {
+      setValue('habilidadesComportamentais', [...(watchedValues.habilidadesComportamentais || []), newHabilidade]);
+    }
+  };
+
+  const handleRemoveHabilidadeComportamental = (habilidadeToRemove: string) => {
+    setValue('habilidadesComportamentais', (watchedValues.habilidadesComportamentais || []).filter(habilidade => habilidade !== habilidadeToRemove));
+  };
+
+  const handleAddIdioma = () => {
+    const newIdioma = window.prompt('Digite o novo idioma:');
+    if (newIdioma) {
+      setValue('idiomas', [...(watchedValues.idiomas || []), newIdioma]);
+    }
+  };
+
+  const handleRemoveIdioma = (idiomaToRemove: string) => {
+    setValue('idiomas', (watchedValues.idiomas || []).filter(idioma => idioma !== idiomaToRemove));
+  };
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-red-900">
-          {userProfile ? 'Editar Perfil' : 'Completar Cadastro'}
-        </h1>
-        <Button onClick={() => navigate('/')} variant="outline">
-          Cancelar
-        </Button>
+        <div className="flex items-center space-x-4">
+          <Button
+            variant="outline"
+            onClick={() => navigate(`/profile/${id}`)}
+            className="flex items-center space-x-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Voltar ao Perfil</span>
+          </Button>
+          <h1 className="text-2xl font-bold text-gray-900">Editar Perfil</h1>
+        </div>
       </div>
 
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          
-          {/* Foto do Perfil */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Foto do Perfil</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center space-x-6">
-                <div className="w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center overflow-hidden">
-                  {fotoPreview ? (
-                    <img src={fotoPreview} alt="Preview" className="w-full h-full object-cover" />
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        {/* Informações Básicas */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Informações Básicas</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="flex flex-col md:flex-row md:items-start space-y-4 md:space-y-0 md:space-x-6">
+              {/* Foto em formato retangular vertical */}
+              <div className="flex flex-col items-center space-y-2">
+                <div className="w-32 h-40 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border">
+                  {profile.fotoUrl ? (
+                    <img 
+                      src={profile.fotoUrl} 
+                      alt={profile.name} 
+                      className="w-full h-full object-cover"
+                    />
                   ) : (
-                    <div className="text-center">
-                      <Camera className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                      <p className="text-sm text-gray-500">Sem foto</p>
-                    </div>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="foto-upload">
-                    <Button type="button" variant="outline" className="cursor-pointer" asChild>
-                      <span>
-                        <Upload className="w-4 h-4 mr-2" />
-                        Fazer Upload de Foto
+                    <div className="w-full h-full bg-red-100 flex items-center justify-center">
+                      <span className="text-red-900 font-semibold text-xl">
+                        {getInitials(profile.name)}
                       </span>
-                    </Button>
-                  </label>
-                  <input
-                    id="foto-upload"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileUpload}
-                    className="hidden"
-                  />
-                  <p className="text-sm text-gray-500">
-                    Formatos aceitos: JPG, PNG, GIF. Máximo 5MB.
-                  </p>
+                    </div>
+                  )}
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Informações Básicas */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Informações Básicas</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nome Completo *</FormLabel>
-                      <FormControl>
-                        <Input {...field} disabled />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="matricula"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Matrícula *</FormLabel>
-                      <FormControl>
-                        <Input {...field} disabled />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email Institucional * (@mprj.mp.br)</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="email" placeholder="nome@mprj.mp.br" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="telefone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Telefone Institucional</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="(21) 9999-9999" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <FormField
-                control={form.control}
-                name="biografia"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Biografia/Apresentação</FormLabel>
-                    <FormControl>
-                      <Textarea {...field} rows={4} placeholder="Fale um pouco sobre você..." />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </CardContent>
-          </Card>
-
-          {/* Cargo e Unidade */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Cargo e Lotação</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <FormField
-                control={form.control}
-                name="cargo"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Cargos *</FormLabel>
-                    <div className="space-y-2">
-                      <Select onValueChange={(value) => {
-                        console.log('Cargo selected:', value, 'Type:', typeof value);
-                        if (isValidSelectValue(value) && !field.value.includes(value)) {
-                          field.onChange([...field.value, value]);
-                        }
-                      }}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione um cargo" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {safeCargos.map((cargo, index) => (
-                            <SelectItem key={`cargo-${index}-${cargo}`} value={cargo}>
-                              {cargo}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <div className="flex flex-wrap gap-2">
-                        {field.value.map((cargo, index) => (
-                          <Badge key={index} variant="secondary" className="flex items-center space-x-1">
-                            <span>{cargo}</span>
-                            <X 
-                              className="w-3 h-3 cursor-pointer" 
-                              onClick={() => field.onChange(field.value.filter((_, i) => i !== index))}
-                            />
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="unidade"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Unidades *</FormLabel>
-                    <div className="space-y-2">
-                      <Select onValueChange={(value) => {
-                        console.log('Unidade selected:', value, 'Type:', typeof value);
-                        if (isValidSelectValue(value) && !field.value.includes(value)) {
-                          field.onChange([...field.value, value]);
-                        }
-                      }}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione uma unidade" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {safeUnidades.map((unidade, index) => (
-                            <SelectItem key={`unidade-${index}-${unidade}`} value={unidade}>
-                              {unidade}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <div className="flex flex-wrap gap-2">
-                        {field.value.map((unidade, index) => (
-                          <Badge key={index} variant="secondary" className="flex items-center space-x-1">
-                            <span>{unidade}</span>
-                            <X 
-                              className="w-3 h-3 cursor-pointer" 
-                              onClick={() => field.onChange(field.value.filter((_, i) => i !== index))}
-                            />
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </CardContent>
-          </Card>
-
-          {/* Conhecimentos */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Conhecimentos e Especialização</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <FormField
-                control={form.control}
-                name="areasConhecimento"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Áreas de Conhecimento *</FormLabel>
-                    <div className="space-y-4">
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-900 mb-3">Área Administrativa</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                          {AREAS_ADMINISTRATIVAS.map(area => (
-                            <div key={area} className="flex items-center space-x-2">
-                              <Checkbox
-                                checked={field.value.includes(area)}
-                                onCheckedChange={() => {
-                                  if (field.value.includes(area)) {
-                                    field.onChange(field.value.filter(a => a !== area));
-                                  } else {
-                                    field.onChange([...field.value, area]);
-                                  }
-                                }}
-                              />
-                              <span className="text-sm">{area}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                      
-                      <Separator />
-                      
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-900 mb-3">Área Jurídica</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                          {AREAS_JURIDICAS.map(area => (
-                            <div key={area} className="flex items-center space-x-2">
-                              <Checkbox
-                                checked={field.value.includes(area)}
-                                onCheckedChange={() => {
-                                  if (field.value.includes(area)) {
-                                    field.onChange(field.value.filter(a => a !== area));
-                                  } else {
-                                    field.onChange([...field.value, area]);
-                                  }
-                                }}
-                              />
-                              <span className="text-sm">{area}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="especializacoes"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Especializações e Temas Específicos</FormLabel>
-                    <FormControl>
-                      <Textarea {...field} rows={3} placeholder="Descreva suas especializações..." />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </CardContent>
-          </Card>
-
-          {/* Projetos */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <span>Projetos</span>
-                <Button type="button" onClick={adicionarProjeto} size="sm" variant="outline">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Adicionar
+                <Button variant="outline" size="sm" className="flex items-center space-x-2">
+                  <Upload className="w-4 h-4" />
+                  <span>Alterar Foto</span>
                 </Button>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {projetos.map((projeto, index) => (
-                <div key={index} className="border rounded-lg p-4 space-y-3">
-                  <div className="flex justify-between items-start">
-                    <h4 className="font-medium">Projeto {index + 1}</h4>
-                    <Button
-                      type="button"
-                      onClick={() => removerProjeto(index)}
-                      size="sm"
-                      variant="ghost"
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
+              </div>
+
+              <div className="flex-1 space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="name">Nome Completo *</Label>
+                    <Input
+                      id="name"
+                      {...register('name', { required: 'Nome é obrigatório' })}
+                      className={errors.name ? 'border-red-500' : ''}
+                    />
+                    {errors.name && (
+                      <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
+                    )}
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+
+                  <div>
+                    <Label htmlFor="matricula">Matrícula *</Label>
                     <Input
-                      placeholder="Nome do projeto"
-                      value={projeto.nome}
-                      onChange={(e) => {
-                        const novos = [...projetos];
-                        novos[index].nome = e.target.value;
-                        setProjetos(novos);
-                      }}
+                      id="matricula"
+                      {...register('matricula', { required: 'Matrícula é obrigatória' })}
+                      className={errors.matricula ? 'border-red-500' : ''}
                     />
+                    {errors.matricula && (
+                      <p className="text-red-500 text-sm mt-1">{errors.matricula.message}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <Label htmlFor="email">E-mail *</Label>
                     <Input
-                      type="date"
-                      placeholder="Data início"
-                      value={projeto.dataInicio}
-                      onChange={(e) => {
-                        const novos = [...projetos];
-                        novos[index].dataInicio = e.target.value;
-                        setProjetos(novos);
-                      }}
+                      id="email"
+                      type="email"
+                      {...register('email', { required: 'E-mail é obrigatório' })}
+                      className={errors.email ? 'border-red-500' : ''}
                     />
+                    {errors.email && (
+                      <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <Label htmlFor="telefone">Telefone</Label>
                     <Input
-                      type="date"
-                      placeholder="Data fim (opcional)"
-                      value={projeto.dataFim || ''}
-                      onChange={(e) => {
-                        const novos = [...projetos];
-                        novos[index].dataFim = e.target.value;
-                        setProjetos(novos);
-                      }}
+                      id="telefone"
+                      {...register('telefone')}
                     />
                   </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="biografia">Biografia</Label>
                   <Textarea
-                    placeholder="Observações sobre o projeto"
-                    value={projeto.observacoes || ''}
-                    onChange={(e) => {
-                      const novos = [...projetos];
-                      novos[index].observacoes = e.target.value;
-                      setProjetos(novos);
-                    }}
+                    id="biografia"
+                    {...register('biografia')}
+                    placeholder="Conte um pouco sobre você, sua experiência e interesses profissionais..."
+                    rows={4}
                   />
                 </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Conhecimentos e Especialização */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Conhecimentos e Especialização</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div>
+              <Label className="text-base font-medium">Áreas de Conhecimento</Label>
+              <p className="text-sm text-gray-600 mb-4">
+                Selecione suas áreas de conhecimento principais
+              </p>
+              <KnowledgeAreaSelector
+                selectedAreas={watchedValues.areasConhecimento || []}
+                onChange={(areas) => setValue('areasConhecimento', areas)}
+              />
+            </div>
+
+            <Separator />
+
+            <div>
+              <Label htmlFor="especializacoes">Especializações e Temas Específicos</Label>
+              <p className="text-sm text-gray-600 mb-2">
+                Descreva especializações específicas que não estão listadas nas opções acima
+              </p>
+              <Textarea
+                id="especializacoes"
+                {...register('especializacoes')}
+                placeholder="Ex: Mediação de conflitos, Análise de risco de crédito, Machine Learning aplicado ao direito..."
+                rows={3}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Cargos */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Cargos</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-gray-600">
+              Selecione os cargos que você ocupa ou já ocupou no MPRJ.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {watchedValues.cargo && watchedValues.cargo.map((cargo, index) => (
+                <Badge key={index} variant="secondary" className="flex items-center gap-1">
+                  {cargo}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-4 w-4 p-0 hover:bg-transparent"
+                    onClick={() => handleRemoveCargo(cargo)}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </Badge>
               ))}
-            </CardContent>
-          </Card>
+              <Button variant="outline" size="sm" onClick={handleAddCargo} className="flex items-center space-x-2">
+                <Plus className="w-4 h-4" />
+                <span>Adicionar Cargo</span>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
-          {/* Formação Acadêmica */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <span>Formação Acadêmica</span>
-                <Button type="button" onClick={adicionarFormacao} size="sm" variant="outline">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Adicionar
-                </Button>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {formacoes.map((formacao, index) => (
-                <div key={index} className="border rounded-lg p-4 space-y-3">
-                  <div className="flex justify-between items-start">
-                    <h4 className="font-medium">Formação {index + 1}</h4>
-                    <Button
-                      type="button"
-                      onClick={() => removerFormacao(index)}
-                      size="sm"
-                      variant="ghost"
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-                    <Select
-                      value={formacao.nivel}
-                      onValueChange={(value) => {
-                        console.log('Formacao nivel selected:', value, 'Type:', typeof value);
-                        if (isValidSelectValue(value)) {
-                          const novas = [...formacoes];
-                          novas[index].nivel = value;
-                          setFormacoes(novas);
-                        }
-                      }}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Nível" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {safeNiveisFormacao.map((nivel, nivelIndex) => (
-                          <SelectItem key={`nivel-${nivelIndex}-${nivel}`} value={nivel}>
-                            {nivel}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Input
-                      placeholder="Instituição"
-                      value={formacao.instituicao}
-                      onChange={(e) => {
-                        const novas = [...formacoes];
-                        novas[index].instituicao = e.target.value;
-                        setFormacoes(novas);
-                      }}
-                    />
-                    <Input
-                      placeholder="Curso"
-                      value={formacao.curso}
-                      onChange={(e) => {
-                        const novas = [...formacoes];
-                        novas[index].curso = e.target.value;
-                        setFormacoes(novas);
-                      }}
-                    />
-                    <Input
-                      type="number"
-                      placeholder="Ano"
-                      value={formacao.ano}
-                      onChange={(e) => {
-                        const novas = [...formacoes];
-                        novas[index].ano = parseInt(e.target.value);
-                        setFormacoes(novas);
-                      }}
-                    />
-                  </div>
-                </div>
+        {/* Unidades */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Unidades</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-gray-600">
+              Selecione as unidades onde você trabalha ou já trabalhou no MPRJ.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {watchedValues.unidade && watchedValues.unidade.map((unidade, index) => (
+                <Badge key={index} variant="secondary" className="flex items-center gap-1">
+                  {unidade}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-4 w-4 p-0 hover:bg-transparent"
+                    onClick={() => handleRemoveUnidade(unidade)}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </Badge>
               ))}
-            </CardContent>
-          </Card>
+              <Button variant="outline" size="sm" onClick={handleAddUnidade} className="flex items-center space-x-2">
+                <Plus className="w-4 h-4" />
+                <span>Adicionar Unidade</span>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
-          {/* Certificações */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Certificações Relevantes</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <FormField
-                control={form.control}
-                name="certificacoes"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Certificações (PMP, ITIL, ISO, etc.)</FormLabel>
-                    <div className="space-y-2">
-                      <Select onValueChange={(value) => {
-                        if (isValidSelectValue(value) && !field.value?.includes(value)) {
-                          field.onChange([...(field.value || []), value]);
-                        }
-                      }}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione uma certificação" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {safeCertificacoes.map((cert, index) => (
-                            <SelectItem key={`cert-${index}-${cert}`} value={cert}>
-                              {cert}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <div className="flex flex-wrap gap-2">
-                        {field.value?.map((cert, index) => (
-                          <Badge key={index} variant="secondary" className="flex items-center space-x-1">
-                            <span>{cert}</span>
-                            <X 
-                              className="w-3 h-3 cursor-pointer" 
-                              onClick={() => field.onChange(field.value?.filter((_, i) => i !== index))}
-                            />
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </CardContent>
-          </Card>
+        {/* Habilidades Técnicas */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Habilidades Técnicas</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-gray-600">
+              Liste suas habilidades técnicas (ex: linguagens de programação, ferramentas de análise de dados, etc.).
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {watchedValues.habilidadesTecnicas && watchedValues.habilidadesTecnicas.map((habilidade, index) => (
+                <Badge key={index} variant="secondary" className="flex items-center gap-1">
+                  {habilidade}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-4 w-4 p-0 hover:bg-transparent"
+                    onClick={() => handleRemoveHabilidadeTecnica(habilidade)}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </Badge>
+              ))}
+              <Button variant="outline" size="sm" onClick={handleAddHabilidadeTecnica} className="flex items-center space-x-2">
+                <Plus className="w-4 h-4" />
+                <span>Adicionar Habilidade</span>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
-          {/* Publicações e Trabalhos */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Publicações, Cursos Ministrados e Trabalhos de Destaque</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <FormField
-                control={form.control}
-                name="publicacoes"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Publicações e Trabalhos de Destaque</FormLabel>
-                    <FormControl>
-                      <Textarea 
-                        {...field} 
-                        rows={5} 
-                        placeholder="Liste suas publicações, cursos ministrados, trabalhos de destaque, etc..."
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </CardContent>
-          </Card>
+        {/* Habilidades Comportamentais */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Habilidades Comportamentais</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-gray-600">
+              Liste suas habilidades comportamentais (ex: liderança, comunicação, trabalho em equipe, etc.).
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {watchedValues.habilidadesComportamentais && watchedValues.habilidadesComportamentais.map((habilidade, index) => (
+                <Badge key={index} variant="secondary" className="flex items-center gap-1">
+                  {habilidade}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-4 w-4 p-0 hover:bg-transparent"
+                    onClick={() => handleRemoveHabilidadeComportamental(habilidade)}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </Badge>
+              ))}
+              <Button variant="outline" size="sm" onClick={handleAddHabilidadeComportamental} className="flex items-center space-x-2">
+                <Plus className="w-4 h-4" />
+                <span>Adicionar Habilidade</span>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
-          {/* Habilidades */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Habilidades</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <FormField
-                control={form.control}
-                name="habilidadesTecnicas"
-                render={({ field }) => (
-                  <FormItem>
-                    <div className="space-y-6">
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-900 mb-3">Área Administrativa</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                          {HABILIDADES_TECNICAS_ADMINISTRATIVAS.map(habilidade => (
-                            <div key={habilidade} className="flex items-center space-x-2">
-                              <Checkbox
-                                checked={field.value.includes(habilidade)}
-                                onCheckedChange={() => {
-                                  if (field.value.includes(habilidade)) {
-                                    field.onChange(field.value.filter(h => h !== habilidade));
-                                  } else {
-                                    field.onChange([...field.value, habilidade]);
-                                  }
-                                }}
-                              />
-                              <span className="text-sm">{habilidade}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                      
-                      <Separator />
-                      
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-900 mb-3">Área Jurídica</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                          {HABILIDADES_TECNICAS_JURIDICAS.map(habilidade => (
-                            <div key={habilidade} className="flex items-center space-x-2">
-                              <Checkbox
-                                checked={field.value.includes(habilidade)}
-                                onCheckedChange={() => {
-                                  if (field.value.includes(habilidade)) {
-                                    field.onChange(field.value.filter(h => h !== habilidade));
-                                  } else {
-                                    field.onChange([...field.value, habilidade]);
-                                  }
-                                }}
-                              />
-                              <span className="text-sm">{habilidade}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
+        {/* Idiomas */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Idiomas</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-gray-600">
+              Liste os idiomas que você domina.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {watchedValues.idiomas && watchedValues.idiomas.map((idioma, index) => (
+                <Badge key={index} variant="secondary" className="flex items-center gap-1">
+                  {idioma}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-4 w-4 p-0 hover:bg-transparent"
+                    onClick={() => handleRemoveIdioma(idioma)}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </Badge>
+              ))}
+              <Button variant="outline" size="sm" onClick={handleAddIdioma} className="flex items-center space-x-2">
+                <Plus className="w-4 h-4" />
+                <span>Adicionar Idioma</span>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
-                      <Separator />
-                      
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-900 mb-3">Tecnologia da Informação</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                          {HABILIDADES_TECNICAS_TI.map(habilidade => (
-                            <div key={habilidade} className="flex items-center space-x-2">
-                              <Checkbox
-                                checked={field.value.includes(habilidade)}
-                                onCheckedChange={() => {
-                                  if (field.value.includes(habilidade)) {
-                                    field.onChange(field.value.filter(h => h !== habilidade));
-                                  } else {
-                                    field.onChange([...field.value, habilidade]);
-                                  }
-                                }}
-                              />
-                              <span className="text-sm">{habilidade}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="habilidadesComportamentais"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Habilidades Comportamentais</FormLabel>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                      {HABILIDADES_COMPORTAMENTAIS.map(habilidade => (
-                        <div key={habilidade} className="flex items-center space-x-2">
-                          <Checkbox
-                            checked={field.value.includes(habilidade)}
-                            onCheckedChange={() => {
-                              if (field.value.includes(habilidade)) {
-                                field.onChange(field.value.filter(h => h !== habilidade));
-                              } else {
-                                field.onChange([...field.value, habilidade]);
-                              }
-                            }}
-                          />
-                          <span className="text-sm">{habilidade}</span>
-                        </div>
-                      ))}
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="idiomas"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Idiomas</FormLabel>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                      {IDIOMAS.map(idioma => (
-                        <div key={idioma} className="flex items-center space-x-2">
-                          <Checkbox
-                            checked={field.value.includes(idioma)}
-                            onCheckedChange={() => {
-                              if (field.value.includes(idioma)) {
-                                field.onChange(field.value.filter(i => i !== idioma));
-                              } else {
-                                field.onChange([...field.value, idioma]);
-                              }
-                            }}
-                          />
-                          <span className="text-sm">{idioma}</span>
-                        </div>
-                      ))}
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </CardContent>
-          </Card>
-
-          {/* Disponibilidade */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Disponibilidade para Colaboração</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <label className="text-sm font-medium text-gray-900">Tipo de Colaboração</label>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
-                  {safeTiposColaboracao.map(tipo => (
-                    <div key={tipo} className="flex items-center space-x-2">
-                      <Checkbox
-                        checked={tipoColaboracao.includes(tipo)}
-                        onCheckedChange={() => {
-                          if (tipoColaboracao.includes(tipo)) {
-                            setTipoColaboracao(tipoColaboracao.filter(t => t !== tipo));
-                          } else {
-                            setTipoColaboracao([...tipoColaboracao, tipo]);
-                          }
-                        }}
-                      />
-                      <span className="text-sm">{tipo}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="text-sm font-medium text-gray-900">Disponibilidade Estimada</label>
-                <Select value={disponibilidadeEstimada} onValueChange={(value) => {
-                  console.log('Disponibilidade selected:', value, 'Type:', typeof value);
-                  if (isValidSelectValue(value)) {
-                    setDisponibilidadeEstimada(value);
-                  }
-                }}>
-                  <SelectTrigger className="mt-2">
-                    <SelectValue placeholder="Selecione sua disponibilidade" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {safeDisponibilidadeEstimada.map((disponibilidade, dispIndex) => (
-                      <SelectItem key={`disp-${dispIndex}-${disponibilidade}`} value={disponibilidade}>
-                        {disponibilidade}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Preferências de Contato */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Preferências de Contato</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <label className="text-sm font-medium text-gray-900">Forma Preferencial de Contato</label>
-                <Select value={formaContato} onValueChange={(value) => {
-                  console.log('Forma contato selected:', value, 'Type:', typeof value);
-                  if (isValidSelectValue(value)) {
-                    setFormaContato(value);
-                  }
-                }}>
-                  <SelectTrigger className="mt-2">
-                    <SelectValue placeholder="Selecione a forma de contato" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {safeFormasContato.map((forma, formaIndex) => (
-                      <SelectItem key={`forma-${formaIndex}-${forma}`} value={forma}>
-                        {forma}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <label className="text-sm font-medium text-gray-900">Horário Preferencial</label>
-                <Input
-                  className="mt-2"
-                  placeholder="Ex: manhã, tarde, 14h às 16h"
-                  value={horarioPreferencial}
-                  onChange={(e) => setHorarioPreferencial(e.target.value)}
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Currículo e Termos */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Informações Adicionais</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <FormField
-                control={form.control}
-                name="linkCurriculo"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Link do Currículo (Lattes/LinkedIn)</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="https://..." />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="aceiteTermos"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel>
-                        Declaro que as informações prestadas neste formulário são verdadeiras, 
-                        atualizadas e de minha responsabilidade. Comprometo-me a atualizá-las 
-                        sempre que houver mudanças relevantes. *
-                      </FormLabel>
-                      <FormMessage />
-                    </div>
-                  </FormItem>
-                )}
-              />
-            </CardContent>
-          </Card>
-
-          {/* Botões */}
-          <div className="flex justify-end space-x-4">
-            <Button type="button" variant="outline" onClick={() => navigate('/')}>
-              Cancelar
-            </Button>
-            <Button type="submit" disabled={isLoading} className="bg-amber-900 hover:bg-amber-800">
-              {isLoading ? (
-                'Salvando...'
-              ) : (
-                <>
-                  <Save className="w-4 h-4 mr-2" />
-                  Salvar Perfil
-                </>
-              )}
-            </Button>
-          </div>
-        </form>
-      </Form>
+        {/* Botões de ação */}
+        <div className="flex justify-end space-x-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => navigate(`/profile/${id}`)}
+          >
+            Cancelar
+          </Button>
+          <Button type="submit" disabled={isLoading} className="bg-red-900 hover:bg-red-800">
+            {isLoading ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                Salvando...
+              </>
+            ) : (
+              <>
+                <Save className="w-4 h-4 mr-2" />
+                Salvar Alterações
+              </>
+            )}
+          </Button>
+        </div>
+      </form>
     </div>
   );
 };
