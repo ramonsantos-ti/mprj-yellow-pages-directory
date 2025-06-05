@@ -18,7 +18,14 @@ export const KNOWLEDGE_AREAS = {
     'Direito Internacional',
     'Direito Digital',
     'Direito Bancário',
-    'Direito Imobiliário'
+    'Direito Imobiliário',
+    'Direito Previdenciário',
+    'Direito Sanitário',
+    'Direito Urbanístico',
+    'Direito de Família',
+    'Direito das Sucessões',
+    'Direito Marítimo',
+    'Direito Aeronáutico'
   ],
   'Tecnologia da Informação': [
     'Desenvolvimento de Sistemas',
@@ -38,7 +45,13 @@ export const KNOWLEDGE_AREAS = {
     'Mobile Development',
     'Web Development',
     'UX/UI Design',
-    'Quality Assurance'
+    'Quality Assurance',
+    'Big Data',
+    'Internet das Coisas (IoT)',
+    'Blockchain',
+    'Robótica',
+    'Automação de Processos',
+    'ERP/CRM'
   ],
   'Administração': [
     'Gestão de Pessoas',
@@ -58,7 +71,13 @@ export const KNOWLEDGE_AREAS = {
     'Gestão de Riscos',
     'Governança Corporativa',
     'Gestão Documental',
-    'Patrimônio'
+    'Patrimônio',
+    'Recursos Humanos',
+    'Vendas',
+    'Customer Success',
+    'Operações',
+    'Estratégia Empresarial',
+    'Empreendedorismo'
   ],
   'Comunicação': [
     'Jornalismo',
@@ -72,7 +91,14 @@ export const KNOWLEDGE_AREAS = {
     'Audiovisual',
     'Eventos',
     'Redes Sociais',
-    'Comunicação Institucional'
+    'Comunicação Institucional',
+    'Publicidade',
+    'Branding',
+    'Comunicação Visual',
+    'Editoração',
+    'Radiojornalismo',
+    'Telejornalismo',
+    'Comunicação Digital'
   ],
   'Psicologia': [
     'Psicologia Organizacional',
@@ -82,7 +108,14 @@ export const KNOWLEDGE_AREAS = {
     'Neuropsicologia',
     'Psicopedagogia',
     'Terapia Familiar',
-    'Avaliação Psicológica'
+    'Avaliação Psicológica',
+    'Psicologia do Desenvolvimento',
+    'Psicologia Cognitiva',
+    'Psicologia do Esporte',
+    'Psicologia Hospitalar',
+    'Psicologia Escolar',
+    'Psicoterapia',
+    'Psicanálise'
   ],
   'Serviço Social': [
     'Assistência Social',
@@ -90,7 +123,101 @@ export const KNOWLEDGE_AREAS = {
     'Direitos Sociais',
     'Proteção Social',
     'Terceiro Setor',
-    'Desenvolvimento Comunitário'
+    'Desenvolvimento Comunitário',
+    'Serviço Social Empresarial',
+    'Gerontologia Social',
+    'Saúde Coletiva',
+    'Habitação Social',
+    'Segurança Alimentar'
+  ],
+  'Educação': [
+    'Pedagogia',
+    'Educação Infantil',
+    'Ensino Fundamental',
+    'Ensino Médio',
+    'Ensino Superior',
+    'Educação à Distância',
+    'Gestão Educacional',
+    'Coordenação Pedagógica',
+    'Orientação Educacional',
+    'Educação Especial',
+    'Educação de Jovens e Adultos',
+    'Tecnologia Educacional',
+    'Avaliação Educacional'
+  ],
+  'Saúde': [
+    'Medicina',
+    'Enfermagem',
+    'Farmácia',
+    'Odontologia',
+    'Fisioterapia',
+    'Nutrição',
+    'Psicologia da Saúde',
+    'Medicina do Trabalho',
+    'Saúde Pública',
+    'Epidemiologia',
+    'Vigilância Sanitária',
+    'Gestão em Saúde',
+    'Biossegurança'
+  ],
+  'Engenharia': [
+    'Engenharia Civil',
+    'Engenharia Elétrica',
+    'Engenharia Mecânica',
+    'Engenharia de Produção',
+    'Engenharia Ambiental',
+    'Engenharia de Software',
+    'Engenharia Química',
+    'Engenharia de Segurança',
+    'Engenharia de Materiais',
+    'Engenharia Naval',
+    'Arquitetura',
+    'Urbanismo'
+  ],
+  'Ciências Humanas': [
+    'História',
+    'Geografia',
+    'Filosofia',
+    'Sociologia',
+    'Antropologia',
+    'Ciência Política',
+    'Relações Internacionais',
+    'Arqueologia',
+    'Linguística',
+    'Literatura'
+  ],
+  'Ciências Exatas': [
+    'Matemática',
+    'Física',
+    'Química',
+    'Estatística',
+    'Astronomia',
+    'Geologia',
+    'Meteorologia',
+    'Oceanografia'
+  ],
+  'Economia e Finanças': [
+    'Economia',
+    'Finanças',
+    'Mercado de Capitais',
+    'Banking',
+    'Seguros',
+    'Previdência',
+    'Análise de Investimentos',
+    'Controladoria',
+    'Planejamento Financeiro',
+    'Economia Comportamental'
+  ],
+  'Arquitetura e Design': [
+    'Arquitetura',
+    'Design de Interiores',
+    'Design Gráfico',
+    'Design Industrial',
+    'Design de Produto',
+    'Paisagismo',
+    'Urbanismo',
+    'Design de Moda',
+    'Design Digital'
   ]
 };
 
