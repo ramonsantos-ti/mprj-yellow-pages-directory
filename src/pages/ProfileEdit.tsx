@@ -34,6 +34,7 @@ import { mockProfiles } from '../data/mockData';
 import { Save, Plus, X, AlertCircle, Upload, Camera } from 'lucide-react';
 import { toast } from 'sonner';
 import { validateEmail } from '../utils/pdfReports';
+import InterestAreaSelector from '../components/InterestAreaSelector';
 
 const profileSchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório'),
@@ -43,7 +44,7 @@ const profileSchema = z.object({
   email: z.string().email('Email inválido').refine(validateEmail, 'Email deve ser do domínio @mprj.mp.br'),
   telefone: z.string().optional(),
   biografia: z.string().optional(),
-  areasConhecimento: z.array(z.string()).min(1, 'Pelo menos uma área de conhecimento é obrigatória'),
+  areasInteresse: z.array(z.string()).min(1, 'Pelo menos uma área de interesse é obrigatória'),
   especializacoes: z.string().optional(),
   temasInteresse: z.array(z.string()).min(1, 'Pelo menos um tema de interesse é obrigatório'),
   habilidadesTecnicas: z.array(z.string()),
@@ -108,7 +109,7 @@ const ProfileEdit: React.FC = () => {
       email: userProfile?.email || '',
       telefone: userProfile?.telefone || '',
       biografia: userProfile?.biografia || '',
-      areasConhecimento: userProfile?.areasConhecimento || [],
+      areasInteresse: userProfile?.areasConhecimento || [],
       especializacoes: userProfile?.especializacoes || '',
       temasInteresse: userProfile?.temasInteresse || [],
       habilidadesTecnicas: userProfile?.habilidadesTecnicas || [],
@@ -450,67 +451,13 @@ const ProfileEdit: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* Conhecimentos */}
+          {/* Áreas de Interesse */}
           <Card>
             <CardHeader>
-              <CardTitle>Conhecimentos e Especialização</CardTitle>
+              <CardTitle>Áreas de Interesse</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <FormField
-                control={form.control}
-                name="areasConhecimento"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Áreas de Conhecimento *</FormLabel>
-                    <div className="space-y-4">
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-900 mb-3">Área Administrativa</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                          {AREAS_ADMINISTRATIVAS.map(area => (
-                            <div key={area} className="flex items-center space-x-2">
-                              <Checkbox
-                                checked={field.value.includes(area)}
-                                onCheckedChange={() => {
-                                  if (field.value.includes(area)) {
-                                    field.onChange(field.value.filter(a => a !== area));
-                                  } else {
-                                    field.onChange([...field.value, area]);
-                                  }
-                                }}
-                              />
-                              <span className="text-sm">{area}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                      
-                      <Separator />
-                      
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-900 mb-3">Área Jurídica</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                          {AREAS_JURIDICAS.map(area => (
-                            <div key={area} className="flex items-center space-x-2">
-                              <Checkbox
-                                checked={field.value.includes(area)}
-                                onCheckedChange={() => {
-                                  if (field.value.includes(area)) {
-                                    field.onChange(field.value.filter(a => a !== area));
-                                  } else {
-                                    field.onChange([...field.value, area]);
-                                  }
-                                }}
-                              />
-                              <span className="text-sm">{area}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <InterestAreaSelector form={form} fieldName="areasInteresse" />
 
               <FormField
                 control={form.control}
