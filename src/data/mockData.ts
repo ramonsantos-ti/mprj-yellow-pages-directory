@@ -1,5 +1,3 @@
-
-
 import { User, Profile } from '../types';
 
 export const mockUsers: User[] = [
@@ -107,8 +105,6 @@ export const mockProfiles: Profile[] = [
       }
     ],
     temasInteresse: ['Direito Penal', 'Criminologia e Política Criminal'],
-    habilidadesTecnicas: ['Análise de Dados', 'Microsoft Office', 'Gestão de Projetos'],
-    habilidadesComportamentais: ['Liderança', 'Comunicação', 'Pensamento Crítico'],
     formacaoAcademica: [
       {
         nivel: 'Doutorado',
@@ -157,8 +153,6 @@ export const mockProfiles: Profile[] = [
       }
     ],
     temasInteresse: ['Direito da Infância e Juventude'],
-    habilidadesTecnicas: ['Microsoft Office', 'Power BI'],
-    habilidadesComportamentais: ['Empatia', 'Comunicação', 'Trabalho em Equipe'],
     formacaoAcademica: [
       {
         nivel: 'Mestrado',
@@ -199,8 +193,6 @@ export const mockProfiles: Profile[] = [
     especializacoes: 'Crimes organizados e tráfico de drogas',
     projetos: [],
     temasInteresse: ['Direito Processual Penal', 'Criminologia e Política Criminal'],
-    habilidadesTecnicas: ['Análise de Dados', 'SQL'],
-    habilidadesComportamentais: ['Resolução de Problemas', 'Tomada de Decisão'],
     formacaoAcademica: [
       {
         nivel: 'Especialização',
@@ -247,8 +239,6 @@ export const mockProfiles: Profile[] = [
       }
     ],
     temasInteresse: ['Direito Ambiental', 'Sustentabilidade e Responsabilidade Socioambiental'],
-    habilidadesTecnicas: ['GIS', 'Microsoft Office', 'AutoCAD'],
-    habilidadesComportamentais: ['Inovação', 'Proatividade', 'Organização'],
     formacaoAcademica: [
       {
         nivel: 'Doutorado',
@@ -287,8 +277,6 @@ export const mockProfiles: Profile[] = [
     areasConhecimento: ['Direito do Consumidor', 'Direito Civil'],
     projetos: [],
     temasInteresse: ['Direito do Consumidor'],
-    habilidadesTecnicas: ['Microsoft Office', 'Excel Avançado'],
-    habilidadesComportamentais: ['Negociação', 'Relacionamento Interpessoal'],
     formacaoAcademica: [
       {
         nivel: 'Mestrado',
@@ -327,8 +315,6 @@ export const mockProfiles: Profile[] = [
     areasConhecimento: ['Direito Civil', 'Direito Administrativo'],
     projetos: [],
     temasInteresse: ['Direito Civil', 'Direito Administrativo'],
-    habilidadesTecnicas: ['Microsoft Office', 'Gestão de Processos'],
-    habilidadesComportamentais: ['Organização', 'Ética Profissional'],
     formacaoAcademica: [
       {
         nivel: 'Especialização',
@@ -373,8 +359,6 @@ export const mockProfiles: Profile[] = [
       }
     ],
     temasInteresse: ['Gestão de Pessoas / Recursos Humanos', 'Qualidade de Vida no Trabalho'],
-    habilidadesTecnicas: ['Excel Avançado', 'Power BI', 'SPSS'],
-    habilidadesComportamentais: ['Empatia', 'Liderança', 'Comunicação'],
     formacaoAcademica: [
       {
         nivel: 'Mestrado',
@@ -415,8 +399,6 @@ export const mockProfiles: Profile[] = [
     areasConhecimento: ['Tecnologia da Informação e Comunicação (TIC)', 'Segurança da Informação'],
     projetos: [],
     temasInteresse: ['Segurança da Informação', 'Infraestrutura e Suporte Técnico em TI'],
-    habilidadesTecnicas: ['Python', 'SQL', 'Linux', 'Windows Server'],
-    habilidadesComportamentais: ['Resolução de Problemas', 'Adaptabilidade'],
     formacaoAcademica: [
       {
         nivel: 'Graduação',
@@ -462,8 +444,6 @@ export const mockProfiles: Profile[] = [
       }
     ],
     temasInteresse: ['Comunicação Social', 'Marketing Institucional'],
-    habilidadesTecnicas: ['Photoshop', 'Illustrator', 'WordPress', 'SEO'],
-    habilidadesComportamentais: ['Criatividade', 'Comunicação', 'Inovação'],
     formacaoAcademica: [
       {
         nivel: 'Especialização',
@@ -503,8 +483,6 @@ export const mockProfiles: Profile[] = [
     areasConhecimento: ['Controladoria e Auditoria', 'Compliance e Integridade'],
     projetos: [],
     temasInteresse: ['Controladoria e Auditoria', 'Compliance e Integridade'],
-    habilidadesTecnicas: ['Excel Avançado', 'Power BI', 'SAP', 'Tableau'],
-    habilidadesComportamentais: ['Ética Profissional', 'Pensamento Crítico', 'Organização'],
     formacaoAcademica: [
       {
         nivel: 'MBA',

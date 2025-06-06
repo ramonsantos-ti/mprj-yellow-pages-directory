@@ -32,9 +32,6 @@ export const generateProfileReport = (profiles: Profile[], reportType: string) =
     case 'formacao':
       generateFormacaoReport(doc, profiles, currentY);
       break;
-    case 'habilidades':
-      generateHabilidadesReport(doc, profiles, currentY);
-      break;
     case 'idiomas':
       generateIdiomasReport(doc, profiles, currentY);
       break;
@@ -125,34 +122,6 @@ const generateFormacaoReport = (doc: jsPDF, profiles: Profile[], startY: number)
       }
       doc.setFontSize(10);
       doc.text(`${nivel}: ${count} pessoas`, 25, currentY);
-      currentY += 7;
-    });
-};
-
-const generateHabilidadesReport = (doc: jsPDF, profiles: Profile[], startY: number) => {
-  let currentY = startY;
-  const habilidadesStats: { [key: string]: number } = {};
-
-  profiles.forEach(profile => {
-    profile.habilidadesTecnicas.forEach(habilidade => {
-      habilidadesStats[habilidade] = (habilidadesStats[habilidade] || 0) + 1;
-    });
-  });
-
-  doc.setFontSize(12);
-  doc.text('Distribuição por Habilidades Técnicas:', 20, currentY);
-  currentY += 10;
-
-  Object.entries(habilidadesStats)
-    .sort(([,a], [,b]) => b - a)
-    .slice(0, 20) // Top 20 skills
-    .forEach(([habilidade, count]) => {
-      if (currentY > 270) {
-        doc.addPage();
-        currentY = 20;
-      }
-      doc.setFontSize(10);
-      doc.text(`${habilidade}: ${count} pessoas`, 25, currentY);
       currentY += 7;
     });
 };
