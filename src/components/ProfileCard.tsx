@@ -83,9 +83,9 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
           )}
         </div>
 
-        {/* Áreas de Conhecimento */}
+        {/* Áreas de Interesse */}
         <div>
-          <h4 className="text-sm font-medium text-gray-900 mb-2">Áreas de Conhecimento</h4>
+          <h4 className="text-sm font-medium text-gray-900 mb-2">Áreas de Interesse</h4>
           <div className="flex flex-wrap gap-1">
             {profile.areasConhecimento.slice(0, 3).map((area, index) => (
               <Badge key={index} className="text-xs bg-red-100 text-red-900 hover:bg-red-200">

@@ -48,11 +48,16 @@ const Home: React.FC = () => {
     generateProfileReport(profilesToExport, 'geral');
     setIsExportOpen(false);
   };
-  return <div className="space-y-6">
+  return (
+    <div className="space-y-6">
       {/* Header */}
       <div className="text-center space-y-4">
         <div className="flex justify-center">
-          <img alt="Páginas Amarelas do MPRJ" className="max-w-full h-auto" src="/lovable-uploads/2aae1185-7d52-453a-942a-1ef1876196b1.jpg" />
+          <img 
+            alt="Páginas Amarelas do MPRJ" 
+            className="max-w-full h-auto" 
+            src="/lovable-uploads/2aae1185-7d52-453a-942a-1ef1876196b1.jpg" 
+          />
         </div>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
           Encontre especialistas e colaboradores em diversas áreas do conhecimento 
@@ -69,11 +74,15 @@ const Home: React.FC = () => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Barra de busca */}
           <div className="flex space-x-2">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input placeholder="Busque por nome, área de conhecimento, habilidades..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-10" />
+              <Input
+                placeholder="Busque por nome, área de interesse, habilidades..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
             </div>
 
             <Dialog open={isExportOpen} onOpenChange={setIsExportOpen}>
@@ -162,6 +171,7 @@ const Home: React.FC = () => {
             Próxima
           </Button>
         </div>}
-    </div>;
+    </div>
+  );
 };
 export default Home;
