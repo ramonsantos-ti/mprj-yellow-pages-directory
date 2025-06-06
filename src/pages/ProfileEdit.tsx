@@ -1,27 +1,14 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Textarea } from '../components/ui/textarea';
-import { Checkbox } from '../components/ui/checkbox';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { Badge } from '../components/ui/badge';
-import { Separator } from '../components/ui/separator';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../components/ui/form';
+import { Form } from '../components/ui/form';
 import { Alert, AlertDescription } from '../components/ui/alert';
 import { 
-  AREAS_JURIDICAS, 
-  AREAS_ADMINISTRATIVAS, 
-  HABILIDADES_TECNICAS_ADMINISTRATIVAS,
-  HABILIDADES_TECNICAS_JURIDICAS,
-  HABILIDADES_TECNICAS_TI,
-  HABILIDADES_COMPORTAMENTAIS,
-  IDIOMAS,
   CARGOS,
   UNIDADES,
   NIVEIS_FORMACAO,
@@ -31,10 +18,21 @@ import {
   CERTIFICACOES
 } from '../data/constants';
 import { mockProfiles } from '../data/mockData';
-import { Save, Plus, X, AlertCircle, Upload, Camera } from 'lucide-react';
+import { Save, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { validateEmail } from '../utils/pdfReports';
 import InterestAreaSelector from '../components/InterestAreaSelector';
+import PhotoUpload from '../components/profile/PhotoUpload';
+import BasicInfo from '../components/profile/BasicInfo';
+import CargoUnidade from '../components/profile/CargoUnidade';
+import ProjectsManager from '../components/profile/ProjectsManager';
+import AcademicFormation from '../components/profile/AcademicFormation';
+import SkillsSection from '../components/profile/SkillsSection';
+import AvailabilitySection from '../components/profile/AvailabilitySection';
+import ContactPreferences from '../components/profile/ContactPreferences';
+import CertificationsSection from '../components/profile/CertificationsSection';
+import PublicationsSection from '../components/profile/PublicationsSection';
+import AdditionalInfo from '../components/profile/AdditionalInfo';
 
 const profileSchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório'),
@@ -176,22 +174,6 @@ const ProfileEdit: React.FC = () => {
     }
   };
 
-  const adicionarProjeto = () => {
-    setProjetos([...projetos, { nome: '', dataInicio: '' }]);
-  };
-
-  const removerProjeto = (index: number) => {
-    setProjetos(projetos.filter((_, i) => i !== index));
-  };
-
-  const adicionarFormacao = () => {
-    setFormacoes([...formacoes, { nivel: '', instituicao: '', curso: '', ano: new Date().getFullYear() }]);
-  };
-
-  const removerFormacao = (index: number) => {
-    setFormacoes(formacoes.filter((_, i) => i !== index));
-  };
-
   if (!user) {
     return (
       <Alert>
@@ -212,18 +194,6 @@ const ProfileEdit: React.FC = () => {
   const safeFormasContato = safeFilterForSelect(FORMAS_CONTATO, 'FORMAS_CONTATO');
   const safeCertificacoes = safeFilterForSelect(CERTIFICACOES, 'CERTIFICACOES');
 
-  // Debug log to check constants
-  console.log('Constants loaded and filtered:', {
-    CARGOS: safeCargos.length,
-    UNIDADES: safeUnidades.length,
-    AREAS_JURIDICAS: AREAS_JURIDICAS.length,
-    AREAS_ADMINISTRATIVAS: AREAS_ADMINISTRATIVAS.length,
-    NIVEIS_FORMACAO: safeNiveisFormacao.length,
-    TIPOS_COLABORACAO: safeTiposColaboracao.length,
-    DISPONIBILIDADE_ESTIMADA: safeDisponibilidadeEstimada.length,
-    FORMAS_CONTATO: safeFormasContato.length
-  });
-
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
@@ -238,746 +208,65 @@ const ProfileEdit: React.FC = () => {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           
-          {/* Foto do Perfil */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Foto do Perfil</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center space-x-6">
-                <div className="w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center overflow-hidden">
-                  {fotoPreview ? (
-                    <img src={fotoPreview} alt="Preview" className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="text-center">
-                      <Camera className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                      <p className="text-sm text-gray-500">Sem foto</p>
-                    </div>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="foto-upload">
-                    <Button type="button" variant="outline" className="cursor-pointer" asChild>
-                      <span>
-                        <Upload className="w-4 h-4 mr-2" />
-                        Fazer Upload de Foto
-                      </span>
-                    </Button>
-                  </label>
-                  <input
-                    id="foto-upload"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileUpload}
-                    className="hidden"
-                  />
-                  <p className="text-sm text-gray-500">
-                    Formatos aceitos: JPG, PNG, GIF. Máximo 5MB.
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <PhotoUpload 
+            fotoPreview={fotoPreview}
+            onFileUpload={handleFileUpload}
+          />
 
-          {/* Informações Básicas */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Informações Básicas</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nome Completo *</FormLabel>
-                      <FormControl>
-                        <Input {...field} disabled />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="matricula"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Matrícula *</FormLabel>
-                      <FormControl>
-                        <Input {...field} disabled />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+          <BasicInfo form={form} />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email Institucional * (@mprj.mp.br)</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="email" placeholder="nome@mprj.mp.br" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="telefone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Telefone Institucional</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="(21) 9999-9999" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+          <CargoUnidade 
+            form={form}
+            safeCargos={safeCargos}
+            safeUnidades={safeUnidades}
+            isValidSelectValue={isValidSelectValue}
+          />
 
-              <FormField
-                control={form.control}
-                name="biografia"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Biografia/Apresentação</FormLabel>
-                    <FormControl>
-                      <Textarea {...field} rows={4} placeholder="Fale um pouco sobre você..." />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </CardContent>
-          </Card>
+          <InterestAreaSelector form={form} fieldName="areasInteresse" />
 
-          {/* Cargo e Unidade */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Cargo e Lotação</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <FormField
-                control={form.control}
-                name="cargo"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Cargos *</FormLabel>
-                    <div className="space-y-2">
-                      <Select onValueChange={(value) => {
-                        console.log('Cargo selected:', value, 'Type:', typeof value);
-                        if (isValidSelectValue(value) && !field.value.includes(value)) {
-                          field.onChange([...field.value, value]);
-                        }
-                      }}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione um cargo" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {safeCargos.map((cargo, index) => (
-                            <SelectItem key={`cargo-${index}-${cargo}`} value={cargo}>
-                              {cargo}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <div className="flex flex-wrap gap-2">
-                        {field.value.map((cargo, index) => (
-                          <Badge key={index} variant="secondary" className="flex items-center space-x-1">
-                            <span>{cargo}</span>
-                            <X 
-                              className="w-3 h-3 cursor-pointer" 
-                              onClick={() => field.onChange(field.value.filter((_, i) => i !== index))}
-                            />
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+          <ProjectsManager 
+            projetos={projetos}
+            setProjetos={setProjetos}
+          />
 
-              <FormField
-                control={form.control}
-                name="unidade"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Unidades *</FormLabel>
-                    <div className="space-y-2">
-                      <Select onValueChange={(value) => {
-                        console.log('Unidade selected:', value, 'Type:', typeof value);
-                        if (isValidSelectValue(value) && !field.value.includes(value)) {
-                          field.onChange([...field.value, value]);
-                        }
-                      }}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione uma unidade" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {safeUnidades.map((unidade, index) => (
-                            <SelectItem key={`unidade-${index}-${unidade}`} value={unidade}>
-                              {unidade}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <div className="flex flex-wrap gap-2">
-                        {field.value.map((unidade, index) => (
-                          <Badge key={index} variant="secondary" className="flex items-center space-x-1">
-                            <span>{unidade}</span>
-                            <X 
-                              className="w-3 h-3 cursor-pointer" 
-                              onClick={() => field.onChange(field.value.filter((_, i) => i !== index))}
-                            />
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </CardContent>
-          </Card>
+          <AcademicFormation 
+            formacoes={formacoes}
+            setFormacoes={setFormacoes}
+            safeNiveisFormacao={safeNiveisFormacao}
+            isValidSelectValue={isValidSelectValue}
+          />
 
-          {/* Áreas de Interesse */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Áreas de Interesse</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <InterestAreaSelector form={form} fieldName="areasInteresse" />
+          <CertificationsSection 
+            form={form}
+            safeCertificacoes={safeCertificacoes}
+            isValidSelectValue={isValidSelectValue}
+          />
 
-              <FormField
-                control={form.control}
-                name="especializacoes"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Especializações e Temas Específicos</FormLabel>
-                    <FormControl>
-                      <Textarea {...field} rows={3} placeholder="Descreva suas especializações..." />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </CardContent>
-          </Card>
+          <PublicationsSection form={form} />
 
-          {/* Projetos */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <span>Projetos</span>
-                <Button type="button" onClick={adicionarProjeto} size="sm" variant="outline">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Adicionar
-                </Button>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {projetos.map((projeto, index) => (
-                <div key={index} className="border rounded-lg p-4 space-y-3">
-                  <div className="flex justify-between items-start">
-                    <h4 className="font-medium">Projeto {index + 1}</h4>
-                    <Button
-                      type="button"
-                      onClick={() => removerProjeto(index)}
-                      size="sm"
-                      variant="ghost"
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <Input
-                      placeholder="Nome do projeto"
-                      value={projeto.nome}
-                      onChange={(e) => {
-                        const novos = [...projetos];
-                        novos[index].nome = e.target.value;
-                        setProjetos(novos);
-                      }}
-                    />
-                    <Input
-                      type="date"
-                      placeholder="Data início"
-                      value={projeto.dataInicio}
-                      onChange={(e) => {
-                        const novos = [...projetos];
-                        novos[index].dataInicio = e.target.value;
-                        setProjetos(novos);
-                      }}
-                    />
-                    <Input
-                      type="date"
-                      placeholder="Data fim (opcional)"
-                      value={projeto.dataFim || ''}
-                      onChange={(e) => {
-                        const novos = [...projetos];
-                        novos[index].dataFim = e.target.value;
-                        setProjetos(novos);
-                      }}
-                    />
-                  </div>
-                  <Textarea
-                    placeholder="Observações sobre o projeto"
-                    value={projeto.observacoes || ''}
-                    onChange={(e) => {
-                      const novos = [...projetos];
-                      novos[index].observacoes = e.target.value;
-                      setProjetos(novos);
-                    }}
-                  />
-                </div>
-              ))}
-            </CardContent>
-          </Card>
+          <SkillsSection form={form} />
 
-          {/* Formação Acadêmica */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <span>Formação Acadêmica</span>
-                <Button type="button" onClick={adicionarFormacao} size="sm" variant="outline">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Adicionar
-                </Button>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {formacoes.map((formacao, index) => (
-                <div key={index} className="border rounded-lg p-4 space-y-3">
-                  <div className="flex justify-between items-start">
-                    <h4 className="font-medium">Formação {index + 1}</h4>
-                    <Button
-                      type="button"
-                      onClick={() => removerFormacao(index)}
-                      size="sm"
-                      variant="ghost"
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-                    <Select
-                      value={formacao.nivel}
-                      onValueChange={(value) => {
-                        console.log('Formacao nivel selected:', value, 'Type:', typeof value);
-                        if (isValidSelectValue(value)) {
-                          const novas = [...formacoes];
-                          novas[index].nivel = value;
-                          setFormacoes(novas);
-                        }
-                      }}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Nível" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {safeNiveisFormacao.map((nivel, nivelIndex) => (
-                          <SelectItem key={`nivel-${nivelIndex}-${nivel}`} value={nivel}>
-                            {nivel}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Input
-                      placeholder="Instituição"
-                      value={formacao.instituicao}
-                      onChange={(e) => {
-                        const novas = [...formacoes];
-                        novas[index].instituicao = e.target.value;
-                        setFormacoes(novas);
-                      }}
-                    />
-                    <Input
-                      placeholder="Curso"
-                      value={formacao.curso}
-                      onChange={(e) => {
-                        const novas = [...formacoes];
-                        novas[index].curso = e.target.value;
-                        setFormacoes(novas);
-                      }}
-                    />
-                    <Input
-                      type="number"
-                      placeholder="Ano"
-                      value={formacao.ano}
-                      onChange={(e) => {
-                        const novas = [...formacoes];
-                        novas[index].ano = parseInt(e.target.value);
-                        setFormacoes(novas);
-                      }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
+          <AvailabilitySection 
+            tipoColaboracao={tipoColaboracao}
+            setTipoColaboracao={setTipoColaboracao}
+            disponibilidadeEstimada={disponibilidadeEstimada}
+            setDisponibilidadeEstimada={setDisponibilidadeEstimada}
+            safeTiposColaboracao={safeTiposColaboracao}
+            safeDisponibilidadeEstimada={safeDisponibilidadeEstimada}
+            isValidSelectValue={isValidSelectValue}
+          />
 
-          {/* Certificações */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Certificações Relevantes</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <FormField
-                control={form.control}
-                name="certificacoes"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Certificações (PMP, ITIL, ISO, etc.)</FormLabel>
-                    <div className="space-y-2">
-                      <Select onValueChange={(value) => {
-                        if (isValidSelectValue(value) && !field.value?.includes(value)) {
-                          field.onChange([...(field.value || []), value]);
-                        }
-                      }}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione uma certificação" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {safeCertificacoes.map((cert, index) => (
-                            <SelectItem key={`cert-${index}-${cert}`} value={cert}>
-                              {cert}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <div className="flex flex-wrap gap-2">
-                        {field.value?.map((cert, index) => (
-                          <Badge key={index} variant="secondary" className="flex items-center space-x-1">
-                            <span>{cert}</span>
-                            <X 
-                              className="w-3 h-3 cursor-pointer" 
-                              onClick={() => field.onChange(field.value?.filter((_, i) => i !== index))}
-                            />
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </CardContent>
-          </Card>
+          <ContactPreferences 
+            formaContato={formaContato}
+            setFormaContato={setFormaContato}
+            horarioPreferencial={horarioPreferencial}
+            setHorarioPreferencial={setHorarioPreferencial}
+            safeFormasContato={safeFormasContato}
+            isValidSelectValue={isValidSelectValue}
+          />
 
-          {/* Publicações e Trabalhos */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Publicações, Cursos Ministrados e Trabalhos de Destaque</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <FormField
-                control={form.control}
-                name="publicacoes"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Publicações e Trabalhos de Destaque</FormLabel>
-                    <FormControl>
-                      <Textarea 
-                        {...field} 
-                        rows={5} 
-                        placeholder="Liste suas publicações, cursos ministrados, trabalhos de destaque, etc..."
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </CardContent>
-          </Card>
+          <AdditionalInfo form={form} />
 
-          {/* Habilidades */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Habilidades</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <FormField
-                control={form.control}
-                name="habilidadesTecnicas"
-                render={({ field }) => (
-                  <FormItem>
-                    <div className="space-y-6">
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-900 mb-3">Área Administrativa</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                          {HABILIDADES_TECNICAS_ADMINISTRATIVAS.map(habilidade => (
-                            <div key={habilidade} className="flex items-center space-x-2">
-                              <Checkbox
-                                checked={field.value.includes(habilidade)}
-                                onCheckedChange={() => {
-                                  if (field.value.includes(habilidade)) {
-                                    field.onChange(field.value.filter(h => h !== habilidade));
-                                  } else {
-                                    field.onChange([...field.value, habilidade]);
-                                  }
-                                }}
-                              />
-                              <span className="text-sm">{habilidade}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                      
-                      <Separator />
-                      
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-900 mb-3">Área Jurídica</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                          {HABILIDADES_TECNICAS_JURIDICAS.map(habilidade => (
-                            <div key={habilidade} className="flex items-center space-x-2">
-                              <Checkbox
-                                checked={field.value.includes(habilidade)}
-                                onCheckedChange={() => {
-                                  if (field.value.includes(habilidade)) {
-                                    field.onChange(field.value.filter(h => h !== habilidade));
-                                  } else {
-                                    field.onChange([...field.value, habilidade]);
-                                  }
-                                }}
-                              />
-                              <span className="text-sm">{habilidade}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      <Separator />
-                      
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-900 mb-3">Tecnologia da Informação</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                          {HABILIDADES_TECNICAS_TI.map(habilidade => (
-                            <div key={habilidade} className="flex items-center space-x-2">
-                              <Checkbox
-                                checked={field.value.includes(habilidade)}
-                                onCheckedChange={() => {
-                                  if (field.value.includes(habilidade)) {
-                                    field.onChange(field.value.filter(h => h !== habilidade));
-                                  } else {
-                                    field.onChange([...field.value, habilidade]);
-                                  }
-                                }}
-                              />
-                              <span className="text-sm">{habilidade}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="habilidadesComportamentais"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Habilidades Comportamentais</FormLabel>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                      {HABILIDADES_COMPORTAMENTAIS.map(habilidade => (
-                        <div key={habilidade} className="flex items-center space-x-2">
-                          <Checkbox
-                            checked={field.value.includes(habilidade)}
-                            onCheckedChange={() => {
-                              if (field.value.includes(habilidade)) {
-                                field.onChange(field.value.filter(h => h !== habilidade));
-                              } else {
-                                field.onChange([...field.value, habilidade]);
-                              }
-                            }}
-                          />
-                          <span className="text-sm">{habilidade}</span>
-                        </div>
-                      ))}
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="idiomas"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Idiomas</FormLabel>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                      {IDIOMAS.map(idioma => (
-                        <div key={idioma} className="flex items-center space-x-2">
-                          <Checkbox
-                            checked={field.value.includes(idioma)}
-                            onCheckedChange={() => {
-                              if (field.value.includes(idioma)) {
-                                field.onChange(field.value.filter(i => i !== idioma));
-                              } else {
-                                field.onChange([...field.value, idioma]);
-                              }
-                            }}
-                          />
-                          <span className="text-sm">{idioma}</span>
-                        </div>
-                      ))}
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </CardContent>
-          </Card>
-
-          {/* Disponibilidade */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Disponibilidade para Colaboração</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <label className="text-sm font-medium text-gray-900">Tipo de Colaboração</label>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
-                  {safeTiposColaboracao.map(tipo => (
-                    <div key={tipo} className="flex items-center space-x-2">
-                      <Checkbox
-                        checked={tipoColaboracao.includes(tipo)}
-                        onCheckedChange={() => {
-                          if (tipoColaboracao.includes(tipo)) {
-                            setTipoColaboracao(tipoColaboracao.filter(t => t !== tipo));
-                          } else {
-                            setTipoColaboracao([...tipoColaboracao, tipo]);
-                          }
-                        }}
-                      />
-                      <span className="text-sm">{tipo}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="text-sm font-medium text-gray-900">Disponibilidade Estimada</label>
-                <Select value={disponibilidadeEstimada} onValueChange={(value) => {
-                  console.log('Disponibilidade selected:', value, 'Type:', typeof value);
-                  if (isValidSelectValue(value)) {
-                    setDisponibilidadeEstimada(value);
-                  }
-                }}>
-                  <SelectTrigger className="mt-2">
-                    <SelectValue placeholder="Selecione sua disponibilidade" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {safeDisponibilidadeEstimada.map((disponibilidade, dispIndex) => (
-                      <SelectItem key={`disp-${dispIndex}-${disponibilidade}`} value={disponibilidade}>
-                        {disponibilidade}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Preferências de Contato */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Preferências de Contato</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <label className="text-sm font-medium text-gray-900">Forma Preferencial de Contato</label>
-                <Select value={formaContato} onValueChange={(value) => {
-                  console.log('Forma contato selected:', value, 'Type:', typeof value);
-                  if (isValidSelectValue(value)) {
-                    setFormaContato(value);
-                  }
-                }}>
-                  <SelectTrigger className="mt-2">
-                    <SelectValue placeholder="Selecione a forma de contato" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {safeFormasContato.map((forma, formaIndex) => (
-                      <SelectItem key={`forma-${formaIndex}-${forma}`} value={forma}>
-                        {forma}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <label className="text-sm font-medium text-gray-900">Horário Preferencial</label>
-                <Input
-                  className="mt-2"
-                  placeholder="Ex: manhã, tarde, 14h às 16h"
-                  value={horarioPreferencial}
-                  onChange={(e) => setHorarioPreferencial(e.target.value)}
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Currículo e Termos */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Informações Adicionais</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <FormField
-                control={form.control}
-                name="linkCurriculo"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Link do Currículo (Lattes/LinkedIn)</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="https://..." />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="aceiteTermos"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel>
-                        Declaro que as informações prestadas neste formulário são verdadeiras, 
-                        atualizadas e de minha responsabilidade. Comprometo-me a atualizá-las 
-                        sempre que houver mudanças relevantes. *
-                      </FormLabel>
-                      <FormMessage />
-                    </div>
-                  </FormItem>
-                )}
-              />
-            </CardContent>
-          </Card>
-
-          {/* Botões */}
           <div className="flex justify-end space-x-4">
             <Button type="button" variant="outline" onClick={() => navigate('/')}>
               Cancelar
