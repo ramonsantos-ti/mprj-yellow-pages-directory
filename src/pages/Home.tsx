@@ -9,7 +9,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Search, Download, Users } from 'lucide-react';
 import { generateProfileReport } from '../utils/pdfReports';
+
 const PROFILES_PER_PAGE = 6;
+
 const Home: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -26,7 +28,10 @@ const Home: React.FC = () => {
     return sortedProfiles.filter(profile => {
       if (!searchTerm) return true;
       const searchLower = searchTerm.toLowerCase();
-      return profile.name.toLowerCase().includes(searchLower) || profile.areasConhecimento.some(area => area.toLowerCase().includes(searchLower)) || profile.habilidadesTecnicas.some(skill => skill.toLowerCase().includes(searchLower)) || profile.biografia?.toLowerCase().includes(searchLower) || profile.especializacoes?.toLowerCase().includes(searchLower);
+      return profile.name.toLowerCase().includes(searchLower) || 
+             profile.areasConhecimento.some(area => area.toLowerCase().includes(searchLower)) || 
+             profile.biografia?.toLowerCase().includes(searchLower) || 
+             profile.especializacoes?.toLowerCase().includes(searchLower);
     });
   }, [sortedProfiles, searchTerm]);
 
@@ -78,7 +83,7 @@ const Home: React.FC = () => {
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
-                placeholder="Busque por nome, área de interesse, habilidades..."
+                placeholder="Busque por nome, área de interesse..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -174,4 +179,5 @@ const Home: React.FC = () => {
     </div>
   );
 };
+
 export default Home;

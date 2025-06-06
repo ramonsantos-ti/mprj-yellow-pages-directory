@@ -8,6 +8,9 @@ import { z } from 'zod';
 import { Button } from '../components/ui/button';
 import { Form } from '../components/ui/form';
 import { Alert, AlertDescription } from '../components/ui/alert';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { FormField, FormItem, FormLabel, FormMessage } from '../components/ui/form';
+import { Checkbox } from '../components/ui/checkbox';
 import { 
   CARGOS,
   UNIDADES,
@@ -15,7 +18,8 @@ import {
   TIPOS_COLABORACAO,
   DISPONIBILIDADE_ESTIMADA,
   FORMAS_CONTATO,
-  CERTIFICACOES
+  CERTIFICACOES,
+  IDIOMAS
 } from '../data/constants';
 import { mockProfiles } from '../data/mockData';
 import { Save, AlertCircle } from 'lucide-react';
@@ -27,7 +31,6 @@ import BasicInfo from '../components/profile/BasicInfo';
 import CargoUnidade from '../components/profile/CargoUnidade';
 import ProjectsManager from '../components/profile/ProjectsManager';
 import AcademicFormation from '../components/profile/AcademicFormation';
-import SkillsSection from '../components/profile/SkillsSection';
 import AvailabilitySection from '../components/profile/AvailabilitySection';
 import ContactPreferences from '../components/profile/ContactPreferences';
 import CertificationsSection from '../components/profile/CertificationsSection';
@@ -45,8 +48,6 @@ const profileSchema = z.object({
   areasInteresse: z.array(z.string()).min(1, 'Pelo menos uma área de interesse é obrigatória'),
   especializacoes: z.string().optional(),
   temasInteresse: z.array(z.string()).min(1, 'Pelo menos um tema de interesse é obrigatório'),
-  habilidadesTecnicas: z.array(z.string()),
-  habilidadesComportamentais: z.array(z.string()),
   idiomas: z.array(z.string()),
   linkCurriculo: z.string().optional(),
   certificacoes: z.array(z.string()).optional(),
@@ -110,8 +111,6 @@ const ProfileEdit: React.FC = () => {
       areasInteresse: userProfile?.areasConhecimento || [],
       especializacoes: userProfile?.especializacoes || '',
       temasInteresse: userProfile?.temasInteresse || [],
-      habilidadesTecnicas: userProfile?.habilidadesTecnicas || [],
-      habilidadesComportamentais: userProfile?.habilidadesComportamentais || [],
       idiomas: userProfile?.idiomas || [],
       linkCurriculo: userProfile?.linkCurriculo || '',
       certificacoes: userProfile?.certificacoes || [],
@@ -244,7 +243,41 @@ const ProfileEdit: React.FC = () => {
 
           <PublicationsSection form={form} />
 
-          <SkillsSection form={form} />
+          {/* Idiomas Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Idiomas</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <FormField
+                control={form.control}
+                name="idiomas"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Idiomas</FormLabel>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                      {IDIOMAS.map(idioma => (
+                        <div key={idioma} className="flex items-center space-x-2">
+                          <Checkbox
+                            checked={field.value.includes(idioma)}
+                            onCheckedChange={() => {
+                              if (field.value.includes(idioma)) {
+                                field.onChange(field.value.filter(i => i !== idioma));
+                              } else {
+                                field.onChange([...field.value, idioma]);
+                              }
+                            }}
+                          />
+                          <span className="text-sm">{idioma}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </CardContent>
+          </Card>
 
           <AvailabilitySection 
             tipoColaboracao={tipoColaboracao}

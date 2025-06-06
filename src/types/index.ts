@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   username: string;
@@ -25,8 +24,6 @@ export interface Profile {
   especializacoes?: string;
   projetos: Project[];
   temasInteresse: string[];
-  habilidadesTecnicas: string[];
-  habilidadesComportamentais: string[];
   formacaoAcademica: FormacaoAcademica[];
   experienciasProfissionais: ExperienciaProfissional[];
   idiomas: string[];

@@ -152,12 +152,12 @@ const ProfileDetail: React.FC = () => {
         </Card>
       )}
 
-      {/* Áreas de Conhecimento */}
+      {/* Áreas de Interesse */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <BookOpen className="w-5 h-5" />
-            <span>Áreas de Conhecimento</span>
+            <span>Áreas de Interesse</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -202,39 +202,6 @@ const ProfileDetail: React.FC = () => {
           </CardContent>
         </Card>
       )}
-
-      {/* Habilidades */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Habilidades Técnicas</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-2">
-              {profile.habilidadesTecnicas.map((habilidade, index) => (
-                <Badge key={index} variant="secondary">
-                  {habilidade}
-                </Badge>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Habilidades Comportamentais</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-2">
-              {profile.habilidadesComportamentais.map((habilidade, index) => (
-                <Badge key={index} variant="secondary">
-                  {habilidade}
-                </Badge>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
 
       {/* Formação e Experiência */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
