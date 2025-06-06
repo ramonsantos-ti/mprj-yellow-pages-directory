@@ -14,8 +14,9 @@ import { Badge } from '../components/ui/badge';
 import { Separator } from '../components/ui/separator';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../components/ui/form';
 import { Alert, AlertDescription } from '../components/ui/alert';
-import KnowledgeAreaSelector from '../components/KnowledgeAreaSelector';
 import { 
+  AREAS_JURIDICAS, 
+  AREAS_ADMINISTRATIVAS, 
   HABILIDADES_TECNICAS_ADMINISTRATIVAS,
   HABILIDADES_TECNICAS_JURIDICAS,
   HABILIDADES_TECNICAS_TI,
@@ -210,6 +211,18 @@ const ProfileEdit: React.FC = () => {
   const safeFormasContato = safeFilterForSelect(FORMAS_CONTATO, 'FORMAS_CONTATO');
   const safeCertificacoes = safeFilterForSelect(CERTIFICACOES, 'CERTIFICACOES');
 
+  // Debug log to check constants
+  console.log('Constants loaded and filtered:', {
+    CARGOS: safeCargos.length,
+    UNIDADES: safeUnidades.length,
+    AREAS_JURIDICAS: AREAS_JURIDICAS.length,
+    AREAS_ADMINISTRATIVAS: AREAS_ADMINISTRATIVAS.length,
+    NIVEIS_FORMACAO: safeNiveisFormacao.length,
+    TIPOS_COLABORACAO: safeTiposColaboracao.length,
+    DISPONIBILIDADE_ESTIMADA: safeDisponibilidadeEstimada.length,
+    FORMAS_CONTATO: safeFormasContato.length
+  });
+
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
@@ -361,6 +374,7 @@ const ProfileEdit: React.FC = () => {
                     <FormLabel>Cargos *</FormLabel>
                     <div className="space-y-2">
                       <Select onValueChange={(value) => {
+                        console.log('Cargo selected:', value, 'Type:', typeof value);
                         if (isValidSelectValue(value) && !field.value.includes(value)) {
                           field.onChange([...field.value, value]);
                         }
@@ -401,6 +415,7 @@ const ProfileEdit: React.FC = () => {
                     <FormLabel>Unidades *</FormLabel>
                     <div className="space-y-2">
                       <Select onValueChange={(value) => {
+                        console.log('Unidade selected:', value, 'Type:', typeof value);
                         if (isValidSelectValue(value) && !field.value.includes(value)) {
                           field.onChange([...field.value, value]);
                         }
@@ -435,22 +450,83 @@ const ProfileEdit: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* Conhecimentos - Novo componente */}
-          <FormField
-            control={form.control}
-            name="areasConhecimento"
-            render={({ field }) => (
-              <FormItem>
-                <KnowledgeAreaSelector
-                  selectedAreas={field.value}
-                  onAreasChange={field.onChange}
-                  especializacoes={form.watch('especializacoes')}
-                  onEspecializacoesChange={(text) => form.setValue('especializacoes', text)}
-                />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {/* Conhecimentos */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Conhecimentos e Especialização</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <FormField
+                control={form.control}
+                name="areasConhecimento"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Áreas de Conhecimento *</FormLabel>
+                    <div className="space-y-4">
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-900 mb-3">Área Administrativa</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                          {AREAS_ADMINISTRATIVAS.map(area => (
+                            <div key={area} className="flex items-center space-x-2">
+                              <Checkbox
+                                checked={field.value.includes(area)}
+                                onCheckedChange={() => {
+                                  if (field.value.includes(area)) {
+                                    field.onChange(field.value.filter(a => a !== area));
+                                  } else {
+                                    field.onChange([...field.value, area]);
+                                  }
+                                }}
+                              />
+                              <span className="text-sm">{area}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <Separator />
+                      
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-900 mb-3">Área Jurídica</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                          {AREAS_JURIDICAS.map(area => (
+                            <div key={area} className="flex items-center space-x-2">
+                              <Checkbox
+                                checked={field.value.includes(area)}
+                                onCheckedChange={() => {
+                                  if (field.value.includes(area)) {
+                                    field.onChange(field.value.filter(a => a !== area));
+                                  } else {
+                                    field.onChange([...field.value, area]);
+                                  }
+                                }}
+                              />
+                              <span className="text-sm">{area}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="especializacoes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Especializações e Temas Específicos</FormLabel>
+                    <FormControl>
+                      <Textarea {...field} rows={3} placeholder="Descreva suas especializações..." />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </CardContent>
+          </Card>
 
           {/* Projetos */}
           <Card>
@@ -551,6 +627,7 @@ const ProfileEdit: React.FC = () => {
                     <Select
                       value={formacao.nivel}
                       onValueChange={(value) => {
+                        console.log('Formacao nivel selected:', value, 'Type:', typeof value);
                         if (isValidSelectValue(value)) {
                           const novas = [...formacoes];
                           novas[index].nivel = value;
@@ -849,6 +926,7 @@ const ProfileEdit: React.FC = () => {
               <div>
                 <label className="text-sm font-medium text-gray-900">Disponibilidade Estimada</label>
                 <Select value={disponibilidadeEstimada} onValueChange={(value) => {
+                  console.log('Disponibilidade selected:', value, 'Type:', typeof value);
                   if (isValidSelectValue(value)) {
                     setDisponibilidadeEstimada(value);
                   }
@@ -877,6 +955,7 @@ const ProfileEdit: React.FC = () => {
               <div>
                 <label className="text-sm font-medium text-gray-900">Forma Preferencial de Contato</label>
                 <Select value={formaContato} onValueChange={(value) => {
+                  console.log('Forma contato selected:', value, 'Type:', typeof value);
                   if (isValidSelectValue(value)) {
                     setFormaContato(value);
                   }
