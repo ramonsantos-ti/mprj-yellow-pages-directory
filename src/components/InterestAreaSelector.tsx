@@ -3,13 +3,13 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { FormField, FormItem, FormLabel, FormMessage } from './ui/form';
-import { Checkbox } from './ui/checkbox';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
-import { Separator } from './ui/separator';
 import { INTEREST_AREAS, MainInterestArea } from '../data/interestAreas';
 import { UseFormReturn } from 'react-hook-form';
-import { X, ChevronDown, ChevronUp, Plus } from 'lucide-react';
+import { X, Plus } from 'lucide-react';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from './ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 
 interface InterestAreaSelectorProps {
   form: UseFormReturn<any>;
@@ -17,31 +17,15 @@ interface InterestAreaSelectorProps {
 }
 
 const InterestAreaSelector: React.FC<InterestAreaSelectorProps> = ({ form, fieldName }) => {
-  const [expandedAreas, setExpandedAreas] = useState<Set<MainInterestArea>>(new Set());
   const [customArea, setCustomArea] = useState('');
   const [showCustomInput, setShowCustomInput] = useState(false);
+  const [open, setOpen] = useState(false);
 
-  const toggleAreaExpansion = (area: MainInterestArea) => {
-    const newExpanded = new Set(expandedAreas);
-    if (newExpanded.has(area)) {
-      newExpanded.delete(area);
-    } else {
-      newExpanded.add(area);
-    }
-    setExpandedAreas(newExpanded);
-  };
-
-  const addMainArea = (mainArea: MainInterestArea, field: any) => {
-    if (!field.value.includes(mainArea)) {
-      field.onChange([...field.value, mainArea]);
-    }
-  };
-
-  const addSpecificArea = (specificArea: string, field: any) => {
-    if (!field.value.includes(specificArea)) {
-      field.onChange([...field.value, specificArea]);
-    }
-  };
+  // Criar lista de todas as áreas (gerais + específicas) para autocompletar
+  const allAreas = [
+    ...(Object.keys(INTEREST_AREAS) as MainInterestArea[]),
+    ...Object.values(INTEREST_AREAS).flat()
+  ];
 
   const addCustomArea = (field: any) => {
     if (customArea.trim() && !field.value.includes(customArea.trim())) {
@@ -49,6 +33,13 @@ const InterestAreaSelector: React.FC<InterestAreaSelectorProps> = ({ form, field
       setCustomArea('');
       setShowCustomInput(false);
     }
+  };
+
+  const selectFromList = (area: string, field: any) => {
+    if (!field.value.includes(area)) {
+      field.onChange([...field.value, area]);
+    }
+    setOpen(false);
   };
 
   const removeArea = (areaToRemove: string, field: any) => {
@@ -70,7 +61,6 @@ const InterestAreaSelector: React.FC<InterestAreaSelectorProps> = ({ form, field
               
               {/* Áreas Selecionadas */}
               <div className="mb-6">
-                <h4 className="text-sm font-medium text-gray-900 mb-3">Áreas Selecionadas</h4>
                 <div className="flex flex-wrap gap-2 min-h-[2.5rem] p-3 border border-gray-200 rounded-md bg-gray-50">
                   {field.value.length === 0 ? (
                     <span className="text-gray-500 text-sm">Nenhuma área selecionada</span>
@@ -88,89 +78,69 @@ const InterestAreaSelector: React.FC<InterestAreaSelectorProps> = ({ form, field
                 </div>
               </div>
 
-              {/* Áreas Principais */}
-              <div className="space-y-4">
-                <h4 className="text-sm font-medium text-gray-900">Selecione as Áreas de Interesse</h4>
+              {/* Campo de inserção com autocompletar */}
+              <div className="space-y-3">
+                <h5 className="text-sm font-medium text-gray-700">Insira as áreas aqui</h5>
                 
-                {/* Áreas Gerais */}
-                <div className="space-y-3">
-                  <h5 className="text-sm font-medium text-gray-700">Áreas Gerais</h5>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    {(Object.keys(INTEREST_AREAS) as MainInterestArea[]).map(mainArea => (
-                      <div key={mainArea} className="space-y-2">
-                        <div className="flex items-center justify-between p-2 border border-gray-200 rounded-md bg-white hover:bg-gray-50">
-                          <div className="flex items-center space-x-2">
-                            <Checkbox
-                              checked={field.value.includes(mainArea)}
-                              onCheckedChange={() => addMainArea(mainArea, field)}
-                            />
-                            <span className="text-sm font-medium">{mainArea}</span>
-                          </div>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => toggleAreaExpansion(mainArea)}
-                            className="h-6 w-6 p-0"
-                          >
-                            {expandedAreas.has(mainArea) ? (
-                              <ChevronUp className="w-4 h-4" />
-                            ) : (
-                              <ChevronDown className="w-4 h-4" />
-                            )}
-                          </Button>
-                        </div>
-                        
-                        {/* Subáreas */}
-                        {expandedAreas.has(mainArea) && (
-                          <div className="ml-4 p-3 border border-gray-100 rounded-md bg-gray-50">
-                            <div className="grid grid-cols-1 gap-2">
-                              {INTEREST_AREAS[mainArea].map(specificArea => (
-                                <div key={specificArea} className="flex items-center space-x-2">
-                                  <Checkbox
-                                    checked={field.value.includes(specificArea)}
-                                    onCheckedChange={() => addSpecificArea(specificArea, field)}
-                                  />
-                                  <span className="text-sm">{specificArea}</span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <Separator />
-
-                {/* Área Personalizada */}
-                <div className="space-y-3">
-                  <h5 className="text-sm font-medium text-gray-700">Área Personalizada</h5>
-                  
-                  {!showCustomInput ? (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setShowCustomInput(true)}
-                      className="flex items-center space-x-2"
-                    >
-                      <Plus className="w-4 h-4" />
-                      <span>Adicionar Área Personalizada</span>
-                    </Button>
-                  ) : (
+                {!showCustomInput ? (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setShowCustomInput(true)}
+                    className="flex items-center space-x-2"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>Adicionar área</span>
+                  </Button>
+                ) : (
+                  <div className="space-y-2">
                     <div className="flex space-x-2">
-                      <Input
-                        placeholder="Digite uma área de interesse..."
-                        value={customArea}
-                        onChange={(e) => setCustomArea(e.target.value)}
-                        onKeyPress={(e) => {
-                          if (e.key === 'Enter') {
-                            e.preventDefault();
-                            addCustomArea(field);
-                          }
-                        }}
-                      />
+                      <div className="flex-1">
+                        <Popover open={open} onOpenChange={setOpen}>
+                          <PopoverTrigger asChild>
+                            <Input
+                              placeholder="Digite uma área de interesse..."
+                              value={customArea}
+                              onChange={(e) => {
+                                setCustomArea(e.target.value);
+                                setOpen(e.target.value.length > 0);
+                              }}
+                              onKeyPress={(e) => {
+                                if (e.key === 'Enter') {
+                                  e.preventDefault();
+                                  addCustomArea(field);
+                                }
+                              }}
+                            />
+                          </PopoverTrigger>
+                          {open && customArea.length > 0 && (
+                            <PopoverContent className="w-full p-0" align="start">
+                              <Command>
+                                <CommandList>
+                                  <CommandEmpty>Nenhuma área encontrada.</CommandEmpty>
+                                  <CommandGroup>
+                                    {allAreas
+                                      .filter(area => 
+                                        area.toLowerCase().includes(customArea.toLowerCase()) &&
+                                        !field.value.includes(area)
+                                      )
+                                      .slice(0, 10)
+                                      .map((area) => (
+                                        <CommandItem
+                                          key={area}
+                                          onSelect={() => selectFromList(area, field)}
+                                        >
+                                          {area}
+                                        </CommandItem>
+                                      ))
+                                    }
+                                  </CommandGroup>
+                                </CommandList>
+                              </Command>
+                            </PopoverContent>
+                          )}
+                        </Popover>
+                      </div>
                       <Button
                         type="button"
                         onClick={() => addCustomArea(field)}
@@ -184,13 +154,14 @@ const InterestAreaSelector: React.FC<InterestAreaSelectorProps> = ({ form, field
                         onClick={() => {
                           setShowCustomInput(false);
                           setCustomArea('');
+                          setOpen(false);
                         }}
                       >
                         Cancelar
                       </Button>
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
               
               <FormMessage />
