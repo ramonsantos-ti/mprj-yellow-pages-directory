@@ -36,6 +36,7 @@ export interface Profile {
   isActive?: boolean;
   certificacoes?: string[];
   publicacoes?: string;
+  role?: 'admin' | 'user';
 }
 
 export interface Project {
