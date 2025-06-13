@@ -1,3 +1,4 @@
+
 export interface User {
   id: string;
   username: string;
@@ -16,6 +17,7 @@ export interface Profile {
   name: string;
   matricula: string;
   cargo: string[];
+  funcao?: string[]; // New optional field for functions
   unidade: string[];
   telefone?: string;
   email: string;
@@ -72,6 +74,7 @@ export interface ContatoPreferencia {
 
 export interface SearchFilters {
   cargo?: string;
+  funcao?: string; // New filter for functions
   unidade?: string;
   areaConhecimento?: string;
   habilidadeTecnica?: string;

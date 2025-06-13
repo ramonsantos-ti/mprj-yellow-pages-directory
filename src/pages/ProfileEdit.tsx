@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -13,6 +12,7 @@ import { FormField, FormItem, FormLabel, FormMessage } from '../components/ui/fo
 import { Checkbox } from '../components/ui/checkbox';
 import { 
   CARGOS,
+  FUNCOES,
   UNIDADES,
   NIVEIS_FORMACAO,
   TIPOS_COLABORACAO,
@@ -41,6 +41,7 @@ const profileSchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório'),
   matricula: z.string().min(1, 'Matrícula é obrigatória'),
   cargo: z.array(z.string()).min(1, 'Pelo menos um cargo é obrigatório'),
+  funcao: z.array(z.string()).optional().default([]),
   unidade: z.array(z.string()).min(1, 'Pelo menos uma unidade é obrigatória'),
   email: z.string().email('Email inválido').refine(validateEmail, 'Email deve ser do domínio @mprj.mp.br'),
   telefone: z.string().optional(),
@@ -104,6 +105,7 @@ const ProfileEdit: React.FC = () => {
       name: user?.name || '',
       matricula: user?.matricula || '',
       cargo: userProfile?.cargo || [],
+      funcao: userProfile?.funcao || [],
       unidade: userProfile?.unidade || [],
       email: userProfile?.email || '',
       telefone: userProfile?.telefone || '',
@@ -186,6 +188,7 @@ const ProfileEdit: React.FC = () => {
 
   // Safe filtered arrays for Select components
   const safeCargos = safeFilterForSelect(CARGOS, 'CARGOS');
+  const safeFuncoes = safeFilterForSelect(FUNCOES, 'FUNCOES');
   const safeUnidades = safeFilterForSelect(UNIDADES, 'UNIDADES');
   const safeNiveisFormacao = safeFilterForSelect(NIVEIS_FORMACAO, 'NIVEIS_FORMACAO');
   const safeTiposColaboracao = safeFilterForSelect(TIPOS_COLABORACAO, 'TIPOS_COLABORACAO');
@@ -217,6 +220,7 @@ const ProfileEdit: React.FC = () => {
           <CargoUnidade 
             form={form}
             safeCargos={safeCargos}
+            safeFuncoes={safeFuncoes}
             safeUnidades={safeUnidades}
             isValidSelectValue={isValidSelectValue}
           />

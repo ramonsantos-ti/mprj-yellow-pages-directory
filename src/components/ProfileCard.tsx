@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Profile } from '../types';
@@ -52,6 +53,15 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
                 </Badge>
               ))}
             </div>
+            {profile.funcao && profile.funcao.length > 0 && (
+              <div className="flex flex-wrap gap-1 mt-1">
+                {profile.funcao.map((funcao, index) => (
+                  <Badge key={index} variant="outline" className="text-xs">
+                    {funcao}
+                  </Badge>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </CardHeader>

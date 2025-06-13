@@ -83,13 +83,22 @@ const ProfileDetail: React.FC = () => {
             <div className="flex-1">
               <h2 className="text-2xl font-bold text-gray-900">{profile.name}</h2>
               <p className="text-lg text-gray-600 mb-2">Matrícula: {profile.matricula}</p>
-              <div className="flex flex-wrap gap-2 mb-4">
+              <div className="flex flex-wrap gap-2 mb-2">
                 {profile.cargo.map((cargo, index) => (
                   <Badge key={index} className="bg-red-900 text-white">
                     {cargo}
                   </Badge>
                 ))}
               </div>
+              {profile.funcao && profile.funcao.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {profile.funcao.map((funcao, index) => (
+                    <Badge key={index} variant="outline" className="border-red-900 text-red-900">
+                      {funcao}
+                    </Badge>
+                  ))}
+                </div>
+              )}
               <div className="flex items-center space-x-4 text-sm text-gray-600">
                 <div className="flex items-center space-x-1">
                   <Calendar className="w-4 h-4" />
