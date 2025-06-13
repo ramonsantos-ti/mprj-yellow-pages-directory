@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Profile } from '../types';
@@ -24,8 +23,8 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
     <Card className="h-full hover:shadow-lg transition-shadow duration-200">
       <CardHeader className="pb-4">
         <div className="flex items-start space-x-4">
-          {/* Imagem em formato retângulo vertical com maior destaque */}
-          <div className="w-20 h-28 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border">
+          {/* Increased photo size from w-20 h-28 to w-30 h-42 (50% increase) */}
+          <div className="w-30 h-42 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border">
             {profile.fotoUrl ? (
               <img 
                 src={profile.fotoUrl} 
@@ -34,7 +33,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
               />
             ) : (
               <div className="w-full h-full bg-red-100 flex items-center justify-center">
-                <span className="text-red-900 font-semibold text-lg">
+                <span className="text-red-900 font-semibold text-xl">
                   {getInitials(profile.name)}
                 </span>
               </div>

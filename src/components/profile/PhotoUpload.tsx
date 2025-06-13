@@ -17,12 +17,13 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ fotoPreview, onFileUpload }) 
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex items-center space-x-6">
-          <div className="w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center overflow-hidden">
+          {/* Increased photo size from w-32 h-32 to w-48 h-48 (50% increase) */}
+          <div className="w-48 h-48 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center overflow-hidden">
             {fotoPreview ? (
               <img src={fotoPreview} alt="Preview" className="w-full h-full object-cover" />
             ) : (
               <div className="text-center">
-                <Camera className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                <Camera className="w-12 h-12 text-gray-400 mx-auto mb-2" />
                 <p className="text-sm text-gray-500">Sem foto</p>
               </div>
             )}

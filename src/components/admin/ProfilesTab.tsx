@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Profile } from '../../types';
 import { Card, CardContent } from '../ui/card';
@@ -64,7 +63,8 @@ const ProfilesTab: React.FC<ProfilesTabProps> = ({
             <CardContent className="p-6">
               <div className="flex items-start justify-between">
                 <div className="flex items-start space-x-4">
-                  <div className="w-16 h-24 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border">
+                  {/* Increased photo size from w-16 h-24 to w-24 h-36 (50% increase) */}
+                  <div className="w-24 h-36 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border">
                     {profile.fotoUrl ? (
                       <img 
                         src={profile.fotoUrl} 
@@ -73,7 +73,7 @@ const ProfilesTab: React.FC<ProfilesTabProps> = ({
                       />
                     ) : (
                       <div className="w-full h-full bg-red-100 flex items-center justify-center">
-                        <span className="text-red-900 font-semibold text-sm">
+                        <span className="text-red-900 font-semibold text-base">
                           {getInitials(profile.name)}
                         </span>
                       </div>

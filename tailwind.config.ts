@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -18,6 +19,16 @@ export default {
 			}
 		},
 		extend: {
+			width: {
+				'30': '7.5rem', // 120px - for 50% increase from w-20 (80px)
+				'36': '9rem',   // 144px - for 50% increase from w-24 (96px)
+				'48': '12rem'   // 192px - for 50% increase from w-32 (128px)
+			},
+			height: {
+				'42': '10.5rem', // 168px - for 50% increase from h-28 (112px)
+				'36': '9rem',    // 144px - for 50% increase from h-24 (96px)
+				'48': '12rem'    // 192px - for 50% increase from h-32 (128px)
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',

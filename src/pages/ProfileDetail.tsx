@@ -64,8 +64,8 @@ const ProfileDetail: React.FC = () => {
       <Card>
         <CardHeader>
           <div className="flex items-start space-x-6">
-            {/* Imagem em formato retângulo vertical */}
-            <div className="w-24 h-32 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border">
+            {/* Increased photo size from w-24 h-32 to w-36 h-48 (50% increase) */}
+            <div className="w-36 h-48 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border">
               {profile.fotoUrl ? (
                 <img 
                   src={profile.fotoUrl} 
@@ -74,7 +74,7 @@ const ProfileDetail: React.FC = () => {
                 />
               ) : (
                 <div className="w-full h-full bg-red-100 flex items-center justify-center">
-                  <span className="text-red-900 font-semibold text-lg">
+                  <span className="text-red-900 font-semibold text-2xl">
                     {getInitials(profile.name)}
                   </span>
                 </div>
