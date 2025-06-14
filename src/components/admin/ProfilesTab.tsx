@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Profile } from '../../types';
 import { Card, CardContent } from '../ui/card';
@@ -192,16 +191,41 @@ const ProfilesTab: React.FC<ProfilesTabProps> = ({
                     </AlertDialogContent>
                   </AlertDialog>
                   
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => promoteToAdmin(profile.id)}
-                    className="flex items-center space-x-1"
-                    showAdminStyle={profile.role === 'admin'}
-                  >
-                    <Shield className="w-4 h-4" />
-                    <span>Admin</span>
-                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex items-center space-x-1"
+                        showAdminStyle={profile.role === 'admin'}
+                      >
+                        <Shield className="w-4 h-4" />
+                        <span>Admin</span>
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>
+                          {profile.role === 'admin' ? 'Remover Privilégios de Administrador' : 'Promover a Administrador'}
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                          {profile.role === 'admin' 
+                            ? `Tem certeza que deseja remover os privilégios de administrador de ${profile.name}? Esta pessoa perderá o acesso ao painel de administração.`
+                            : `Tem certeza que deseja promover ${profile.name} a administrador? Esta pessoa terá acesso total ao painel de administração.`
+                          }
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => promoteToAdmin(profile.id)}
+                          className={profile.role === 'admin' ? "bg-red-600 hover:bg-red-700" : ""}
+                        >
+                          {profile.role === 'admin' ? 'Remover Privilégios' : 'Promover'}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                   
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
