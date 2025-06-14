@@ -2,9 +2,9 @@
 import React, { useState, useMemo } from 'react';
 import { useProfiles } from '../hooks/useProfiles';
 import ProfileCard from '../components/ProfileCard';
-import SearchFilters from '../components/SearchFilters';
 import { Badge } from '../components/ui/badge';
 import { Card, CardContent } from '../components/ui/card';
+import { Input } from '../components/ui/input';
 import { Search, Users, Loader2, AlertCircle } from 'lucide-react';
 
 const Home: React.FC = () => {
@@ -23,7 +23,7 @@ const Home: React.FC = () => {
         profile.areasConhecimento.some(area => 
           area.toLowerCase().includes(searchTerm.toLowerCase())
         ) ||
-        profile.especializacoes.toLowerCase().includes(searchTerm.toLowerCase());
+        (profile.especializacoes && profile.especializacoes.toLowerCase().includes(searchTerm.toLowerCase()));
 
       const matchesAreas = selectedAreas.length === 0 || 
         selectedAreas.some(area => profile.areasConhecimento.includes(area));
@@ -93,19 +93,97 @@ const Home: React.FC = () => {
         </div>
       </div>
 
-      <SearchFilters
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        selectedAreas={selectedAreas}
-        setSelectedAreas={setSelectedAreas}
-        selectedCargos={selectedCargos}
-        setSelectedCargos={setSelectedCargos}
-        selectedUnidades={selectedUnidades}
-        setSelectedUnidades={setSelectedUnidades}
-        allAreas={allAreas}
-        allCargos={allCargos}
-        allUnidades={allUnidades}
-      />
+      {/* Search and Filters */}
+      <Card>
+        <CardContent className="pt-6">
+          <div className="space-y-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Buscar por nome, email, matrícula ou área de conhecimento..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            
+            {/* Filter badges */}
+            <div className="space-y-3">
+              {allAreas.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">Áreas de Conhecimento:</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {allAreas.slice(0, 10).map((area) => (
+                      <Badge
+                        key={area}
+                        variant={selectedAreas.includes(area) ? "default" : "outline"}
+                        className={`cursor-pointer ${selectedAreas.includes(area) ? 'bg-red-600' : ''}`}
+                        onClick={() => {
+                          setSelectedAreas(prev => 
+                            prev.includes(area) 
+                              ? prev.filter(a => a !== area)
+                              : [...prev, area]
+                          );
+                        }}
+                      >
+                        {area}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {allCargos.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">Cargos:</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {allCargos.slice(0, 10).map((cargo) => (
+                      <Badge
+                        key={cargo}
+                        variant={selectedCargos.includes(cargo) ? "default" : "outline"}
+                        className={`cursor-pointer ${selectedCargos.includes(cargo) ? 'bg-red-600' : ''}`}
+                        onClick={() => {
+                          setSelectedCargos(prev => 
+                            prev.includes(cargo) 
+                              ? prev.filter(c => c !== cargo)
+                              : [...prev, cargo]
+                          );
+                        }}
+                      >
+                        {cargo}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {allUnidades.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">Unidades:</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {allUnidades.slice(0, 10).map((unidade) => (
+                      <Badge
+                        key={unidade}
+                        variant={selectedUnidades.includes(unidade) ? "default" : "outline"}
+                        className={`cursor-pointer ${selectedUnidades.includes(unidade) ? 'bg-red-600' : ''}`}
+                        onClick={() => {
+                          setSelectedUnidades(prev => 
+                            prev.includes(unidade) 
+                              ? prev.filter(u => u !== unidade)
+                              : [...prev, unidade]
+                          );
+                        }}
+                      >
+                        {unidade}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {filteredProfiles.length === 0 ? (
         <div className="text-center py-12">

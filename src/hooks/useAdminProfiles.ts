@@ -65,12 +65,26 @@ export const useAdminProfiles = () => {
           curso: f.curso,
           ano: f.ano
         })) || [],
+        experienciasProfissionais: profile.professional_experiences?.map((e: any) => ({
+          tempoMPRJ: e.tempo_mprj || '',
+          experienciaAnterior: e.experiencia_anterior || '',
+          projetosInternos: e.projetos_internos || '',
+          publicacoes: e.publicacoes || ''
+        })) || [],
         disponibilidade: profile.availability?.[0] ? {
           tipoColaboracao: profile.availability[0].tipo_colaboracao || [],
-          disponibilidadeEstimada: profile.availability[0].disponibilidade_estimada || '',
+          disponibilidadeEstimada: profile.availability[0].disponibilidade_estimada || ''
+        } : {
+          tipoColaboracao: [],
+          disponibilidadeEstimada: ''
+        },
+        contato: profile.availability?.[0] ? {
           formaContato: profile.availability[0].forma_contato || 'email',
           horarioPreferencial: profile.availability[0].horario_preferencial || ''
-        } : undefined
+        } : {
+          formaContato: 'email',
+          horarioPreferencial: ''
+        }
       }));
 
       setProfiles(transformedProfiles);
@@ -202,8 +216,8 @@ export const useAdminProfiles = () => {
         .from('audit_logs')
         .insert({
           action,
-          user_name: user?.user_metadata?.name || user?.email || 'Unknown',
-          user_matricula: user?.user_metadata?.matricula || '',
+          user_name: user?.email || 'Unknown',
+          user_matricula: '',
           details,
           entity_type: 'Perfil'
         });

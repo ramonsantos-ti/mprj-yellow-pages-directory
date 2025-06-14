@@ -1,3 +1,4 @@
+
 export interface User {
   id: string;
   username: string;
@@ -42,6 +43,7 @@ export interface Profile {
 }
 
 export interface Project {
+  id?: string;
   nome: string;
   dataInicio: Date;
   dataFim?: Date;
@@ -49,6 +51,7 @@ export interface Project {
 }
 
 export interface FormacaoAcademica {
+  id?: string;
   nivel: string;
   instituicao: string;
   curso: string;

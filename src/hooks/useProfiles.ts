@@ -63,12 +63,26 @@ export const useProfiles = () => {
           curso: f.curso,
           ano: f.ano
         })) || [],
+        experienciasProfissionais: profile.professional_experiences?.map((e: any) => ({
+          tempoMPRJ: e.tempo_mprj || '',
+          experienciaAnterior: e.experiencia_anterior || '',
+          projetosInternos: e.projetos_internos || '',
+          publicacoes: e.publicacoes || ''
+        })) || [],
         disponibilidade: profile.availability?.[0] ? {
           tipoColaboracao: profile.availability[0].tipo_colaboracao || [],
-          disponibilidadeEstimada: profile.availability[0].disponibilidade_estimada || '',
+          disponibilidadeEstimada: profile.availability[0].disponibilidade_estimada || ''
+        } : {
+          tipoColaboracao: [],
+          disponibilidadeEstimada: ''
+        },
+        contato: profile.availability?.[0] ? {
           formaContato: profile.availability[0].forma_contato || 'email',
           horarioPreferencial: profile.availability[0].horario_preferencial || ''
-        } : undefined
+        } : {
+          formaContato: 'email',
+          horarioPreferencial: ''
+        }
       }));
 
       setProfiles(transformedProfiles);

@@ -95,12 +95,26 @@ const ProfileDetail: React.FC = () => {
           curso: f.curso,
           ano: f.ano
         })) || [],
+        experienciasProfissionais: data.professional_experiences?.map((e: any) => ({
+          tempoMPRJ: e.tempo_mprj || '',
+          experienciaAnterior: e.experiencia_anterior || '',
+          projetosInternos: e.projetos_internos || '',
+          publicacoes: e.publicacoes || ''
+        })) || [],
         disponibilidade: data.availability?.[0] ? {
           tipoColaboracao: data.availability[0].tipo_colaboracao || [],
-          disponibilidadeEstimada: data.availability[0].disponibilidade_estimada || '',
+          disponibilidadeEstimada: data.availability[0].disponibilidade_estimada || ''
+        } : {
+          tipoColaboracao: [],
+          disponibilidadeEstimada: ''
+        },
+        contato: data.availability?.[0] ? {
           formaContato: data.availability[0].forma_contato || 'email',
           horarioPreferencial: data.availability[0].horario_preferencial || ''
-        } : undefined
+        } : {
+          formaContato: 'email',
+          horarioPreferencial: ''
+        }
       };
 
       setProfile(transformedProfile);
@@ -356,7 +370,7 @@ const ProfileDetail: React.FC = () => {
         )}
 
         {/* Certifications */}
-        {profile.certificacoes.length > 0 && (
+        {profile.certificacoes && profile.certificacoes.length > 0 && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
@@ -408,13 +422,13 @@ const ProfileDetail: React.FC = () => {
               
               <div>
                 <h4 className="font-medium text-gray-900 mb-2">Forma de Contato Preferencial</h4>
-                <Badge variant="outline">{profile.disponibilidade.formaContato}</Badge>
+                <Badge variant="outline">{profile.contato.formaContato}</Badge>
               </div>
               
-              {profile.disponibilidade.horarioPreferencial && (
+              {profile.contato.horarioPreferencial && (
                 <div>
                   <h4 className="font-medium text-gray-900 mb-2">Horário Preferencial</h4>
-                  <p className="text-gray-700">{profile.disponibilidade.horarioPreferencial}</p>
+                  <p className="text-gray-700">{profile.contato.horarioPreferencial}</p>
                 </div>
               )}
             </div>
