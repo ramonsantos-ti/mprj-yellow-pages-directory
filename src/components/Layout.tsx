@@ -1,21 +1,21 @@
+
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from './ui/button';
 import { LogOut, User, Settings, Home } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
+
 interface LayoutProps {
   children: React.ReactNode;
 }
-const Layout: React.FC<LayoutProps> = ({
-  children
-}) => {
-  const {
-    user,
-    logout
-  } = useAuth();
+
+const Layout: React.FC<LayoutProps> = ({ children }) => {
+  const { user, logout } = useAuth();
   const location = useLocation();
-  return <div className="min-h-screen bg-gray-50">
+
+  return (
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white shadow-sm border-b-4 border-red-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -39,7 +39,8 @@ const Layout: React.FC<LayoutProps> = ({
 
             {/* User Menu */}
             <div className="flex items-center space-x-4">
-              {user ? <DropdownMenu>
+              {user ? (
+                <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" className="flex items-center space-x-2 border-red-900 text-red-900 hover:bg-red-50">
                       <User className="w-4 h-4" />
@@ -47,28 +48,35 @@ const Layout: React.FC<LayoutProps> = ({
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">
-                    <DropdownMenuItem asChild>
-                      <Link to="/profile" className="flex items-center space-x-2">
+                    <DropdownMenuItem>
+                      <Link to="/profile" className="flex items-center space-x-2 w-full">
                         <User className="w-4 h-4" />
                         <span>Meu Perfil</span>
                       </Link>
                     </DropdownMenuItem>
-                    {user.role === 'admin' && <DropdownMenuItem asChild>
-                        <Link to="/admin" className="flex items-center space-x-2">
+                    {user.role === 'admin' && (
+                      <DropdownMenuItem>
+                        <Link to="/admin" className="flex items-center space-x-2 w-full">
                           <Settings className="w-4 h-4" />
                           <span>Administração</span>
                         </Link>
-                      </DropdownMenuItem>}
-                    <DropdownMenuItem onClick={logout} className="flex items-center space-x-2">
-                      <LogOut className="w-4 h-4" />
-                      <span>Sair</span>
+                      </DropdownMenuItem>
+                    )}
+                    <DropdownMenuItem onClick={logout}>
+                      <div className="flex items-center space-x-2">
+                        <LogOut className="w-4 h-4" />
+                        <span>Sair</span>
+                      </div>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
-                </DropdownMenu> : <Link to="/login">
+                </DropdownMenu>
+              ) : (
+                <Link to="/login">
                   <Button className="bg-red-900 hover:bg-red-800">
                     Login
                   </Button>
-                </Link>}
+                </Link>
+              )}
             </div>
           </div>
         </div>
@@ -90,6 +98,8 @@ const Layout: React.FC<LayoutProps> = ({
           </div>
         </div>
       </footer>
-    </div>;
+    </div>
+  );
 };
+
 export default Layout;
