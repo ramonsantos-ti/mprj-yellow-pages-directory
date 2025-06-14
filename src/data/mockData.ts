@@ -1,3 +1,4 @@
+
 import { User, Profile } from '../types';
 
 // Mock users data
@@ -873,11 +874,11 @@ export const mockProfiles: Profile[] = [
     name: 'Fernando Almeida Junior',
     matricula: 'MPRJ12357',
     cargo: ['Procurador de Justiça'],
-    funcao: ['Procurador-Geral Adjunto'],
+    funcao: ['Coordenador'],
     unidade: ['Procuradoria-Geral de Justiça Adjunta para Assuntos Administrativos'],
     telefone: '(21) 99999-9632',
     email: 'fernando.almeida@mprj.mp.br',
-    biografia: 'Procurador-Geral Adjunto com mais de 25 anos de experiência no Ministério Público. Especialista em gestão administrativa e modernização de processos institucionais.',
+    biografia: 'Procurador de Justiça com mais de 25 anos de experiência no Ministério Público. Especialista em gestão administrativa e modernização de processos institucionais.',
     areasConhecimento: ['Direito Administrativo', 'Gestão Pública', 'Modernização Institucional', 'Liderança Estratégica'],
     especializacoes: 'Doutorado em Direito Administrativo pela USP, MBA Executivo em Administração Pública pela FGV',
     projetos: [
