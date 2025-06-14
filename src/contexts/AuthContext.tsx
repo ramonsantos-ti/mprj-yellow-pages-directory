@@ -1,12 +1,23 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User } from '../types';
-import { mockUsers } from '../data/mockData';
+import { User as SupabaseUser, Session } from '@supabase/supabase-js';
+import { supabase } from '../integrations/supabase/client';
+
+interface User {
+  id: string;
+  email: string;
+  name: string;
+  matricula: string;
+  role: 'admin' | 'user';
+  profileId?: string;
+}
 
 interface AuthContextType {
   user: User | null;
-  login: (username: string, password: string) => boolean;
-  logout: () => void;
+  session: Session | null;
+  login: (email: string, password: string) => Promise<{ error?: string }>;
+  signup: (email: string, password: string, name: string, matricula: string) => Promise<{ error?: string }>;
+  logout: () => Promise<void>;
   isLoading: boolean;
 }
 
@@ -22,110 +33,160 @@ export const useAuth = () => {
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem('mprj_user');
-    if (storedUser) {
-      const parsedUser = JSON.parse(storedUser);
-      // Ensure usuario01 is always admin
-      if (parsedUser.username === 'usuario01') {
-        parsedUser.role = 'admin';
-      }
-      setUser(parsedUser);
-    }
-    setIsLoading(false);
-  }, []);
+  // Fetch user profile data from Supabase
+  const fetchUserProfile = async (supabaseUser: SupabaseUser): Promise<User | null> => {
+    try {
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', supabaseUser.id)
+        .single();
 
-  // Listen for storage changes to sync user role updates across tabs
-  useEffect(() => {
-    const handleStorageChange = () => {
-      console.log('AuthContext: Storage event detected, checking for profile updates');
-      if (user) {
-        const profiles = localStorage.getItem('mprj_profiles');
-        if (profiles) {
-          const parsedProfiles = JSON.parse(profiles);
-          
-          // Try to find the profile by multiple criteria to ensure we find the right one
-          const userProfile = parsedProfiles.find((p: any) => 
-            p.userId === user.id || 
-            p.matricula === user.matricula ||
-            p.email === user.name || // In case email is stored as name
-            p.name === user.name
-          );
-          
-          console.log('AuthContext: Current user:', user);
-          console.log('AuthContext: Found user profile:', userProfile);
-          
-          if (userProfile && userProfile.role && userProfile.role !== user.role) {
-            console.log(`AuthContext: User role changed from ${user.role} to ${userProfile.role}`);
-            const updatedUser = { ...user, role: userProfile.role };
-            setUser(updatedUser);
-            localStorage.setItem('mprj_user', JSON.stringify(updatedUser));
-            
-            // Force a page reload to ensure the protected route re-evaluates
-            if (userProfile.role === 'user' && window.location.pathname === '/admin') {
-              window.location.href = '/';
-            }
-          }
-        }
+      if (error) {
+        console.error('Error fetching user profile:', error);
+        return null;
       }
-    };
 
-    // Listen for both storage events and manual dispatch events
-    const handleManualStorageChange = () => handleStorageChange();
-    
-    window.addEventListener('storage', handleStorageChange);
-    window.addEventListener('storage', handleManualStorageChange);
-    
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('storage', handleManualStorageChange);
-    };
-  }, [user]);
-
-  const login = (username: string, password: string): boolean => {
-    const foundUser = mockUsers.find(u => u.username === username && u.password === password);
-    if (foundUser) {
-      // Check if there's an existing profile for this user that might have admin role
-      const profiles = localStorage.getItem('mprj_profiles');
-      let userRole = foundUser.role;
-      
-      if (profiles) {
-        const parsedProfiles = JSON.parse(profiles);
-        const userProfile = parsedProfiles.find((p: any) => 
-          p.userId === foundUser.id || 
-          p.matricula === foundUser.matricula ||
-          p.name === foundUser.name
-        );
-        
-        if (userProfile && userProfile.role) {
-          userRole = userProfile.role;
-        }
-      }
-      
-      // Ensure usuario01 is always admin
-      const finalRole = username === 'usuario01' ? 'admin' as const : userRole;
-      
-      const userWithRole = { 
-        ...foundUser, 
-        role: finalRole
+      return {
+        id: supabaseUser.id,
+        email: profile.email,
+        name: profile.name,
+        matricula: profile.matricula,
+        role: profile.role || 'user',
+        profileId: profile.id
       };
-      
-      setUser(userWithRole);
-      localStorage.setItem('mprj_user', JSON.stringify(userWithRole));
-      return true;
+    } catch (error) {
+      console.error('Error in fetchUserProfile:', error);
+      return null;
     }
-    return false;
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('mprj_user');
+  // Initialize auth state
+  useEffect(() => {
+    console.log('AuthContext: Initializing auth state');
+
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log('AuthContext: Auth state changed:', event, session?.user?.email);
+        
+        setSession(session);
+        
+        if (session?.user) {
+          // Fetch user profile with a small delay to ensure database is ready
+          setTimeout(async () => {
+            const userProfile = await fetchUserProfile(session.user);
+            setUser(userProfile);
+            setIsLoading(false);
+          }, 100);
+        } else {
+          setUser(null);
+          setIsLoading(false);
+        }
+      }
+    );
+
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('AuthContext: Checking existing session:', session?.user?.email);
+      if (session?.user) {
+        fetchUserProfile(session.user).then(userProfile => {
+          setUser(userProfile);
+          setSession(session);
+          setIsLoading(false);
+        });
+      } else {
+        setIsLoading(false);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  const login = async (email: string, password: string): Promise<{ error?: string }> => {
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        console.error('Login error:', error);
+        return { error: error.message };
+      }
+
+      console.log('Login successful:', data.user?.email);
+      return {};
+    } catch (error) {
+      console.error('Login error:', error);
+      return { error: 'Erro inesperado durante o login' };
+    }
+  };
+
+  const signup = async (email: string, password: string, name: string, matricula: string): Promise<{ error?: string }> => {
+    try {
+      const redirectUrl = `${window.location.origin}/`;
+      
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: redirectUrl,
+          data: {
+            name: name,
+            matricula: matricula
+          }
+        }
+      });
+
+      if (error) {
+        console.error('Signup error:', error);
+        return { error: error.message };
+      }
+
+      // If user was created successfully, update their profile
+      if (data.user) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update({
+            name: name,
+            matricula: matricula
+          })
+          .eq('user_id', data.user.id);
+
+        if (profileError) {
+          console.error('Profile update error:', profileError);
+        }
+      }
+
+      console.log('Signup successful:', data.user?.email);
+      return {};
+    } catch (error) {
+      console.error('Signup error:', error);
+      return { error: 'Erro inesperado durante o cadastro' };
+    }
+  };
+
+  const logout = async (): Promise<void> => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Logout error:', error);
+      }
+      setUser(null);
+      setSession(null);
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, session, login, signup, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

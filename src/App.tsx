@@ -8,7 +8,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Home from "./pages/Home";
-import Login from "./pages/Login";
+import Auth from "./pages/Auth";
 import ProfileDetail from "./pages/ProfileDetail";
 import ProfileEdit from "./pages/ProfileEdit";
 import Admin from "./pages/Admin";
@@ -24,7 +24,7 @@ const App = () => (
       <AuthProvider>
         <BrowserRouter>
           <Routes>
-            <Route path="/login" element={<Login />} />
+            <Route path="/auth" element={<Auth />} />
             <Route path="/profile/:id" element={
               <Layout>
                 <ProfileDetail />
@@ -32,7 +32,9 @@ const App = () => (
             } />
             <Route path="/profile" element={
               <Layout>
-                <ProfileEdit />
+                <ProtectedRoute>
+                  <ProfileEdit />
+                </ProtectedRoute>
               </Layout>
             } />
             <Route path="/admin" element={
