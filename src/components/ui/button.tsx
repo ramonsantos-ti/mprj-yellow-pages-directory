@@ -54,8 +54,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         {...props}
       >
-        {showAdminStyle && <Crown className="w-4 h-4" />}
-        {children}
+        <React.Fragment>
+          {showAdminStyle && <Crown className="w-4 h-4" />}
+          {children}
+        </React.Fragment>
       </Comp>
     )
   }
