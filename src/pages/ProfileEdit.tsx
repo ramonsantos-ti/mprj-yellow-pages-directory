@@ -312,11 +312,13 @@ const ProfileEdit: React.FC = () => {
                 )}
               </div>
               <div className="space-y-2">
-                <label htmlFor="foto-upload">
-                  <Button type="button" variant="outline" className="cursor-pointer" asChild>
-                    <span>Fazer Upload de Foto</span>
-                  </Button>
-                </label>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => document.getElementById('foto-upload')?.click()}
+                >
+                  Fazer Upload de Foto
+                </Button>
                 <input
                   id="foto-upload"
                   type="file"
@@ -324,6 +326,9 @@ const ProfileEdit: React.FC = () => {
                   onChange={handleFileUpload}
                   className="hidden"
                 />
+                <p className="text-sm text-gray-500">
+                  Formatos aceitos: JPG, PNG, GIF. Máximo 5MB.
+                </p>
               </div>
             </div>
           </CardContent>
