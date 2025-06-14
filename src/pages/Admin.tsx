@@ -1,9 +1,11 @@
+
 import React, { useState, useMemo, useEffect } from 'react';
 import { mockProfiles } from '../data/mockData';
 import { Profile } from '../types';
-import { AuditLog, StandardMessage } from '../types/admin';
+import { StandardMessage } from '../types/admin';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { generateProfileReport } from '../utils/pdfReports';
+import { useAuditLog } from '../hooks/useAuditLog';
 import ProfilesTab from '../components/admin/ProfilesTab';
 import AuditTab from '../components/admin/AuditTab';
 import NotificationsTab from '../components/admin/NotificationsTab';
@@ -13,7 +15,7 @@ import AnalyticsTab from '../components/admin/AnalyticsTab';
 const Admin: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [profiles, setProfiles] = useState<Profile[]>([]);
-  const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
+  const { auditLogs, addAuditLog } = useAuditLog();
   const [standardMessages, setStandardMessages] = useState<StandardMessage[]>([
     {
       id: '1',
@@ -71,18 +73,22 @@ const Admin: React.FC = () => {
   const allUnidades = [...new Set(profiles.flatMap(p => p.unidade || []))];
   const allAreas = [...new Set(profiles.flatMap(p => p.areasConhecimento || []))];
 
-  const addAuditLog = (action: string, user: string, details: string) => {
-    const newLog: AuditLog = {
-      id: Date.now().toString(),
-      action,
-      user,
-      details,
-      timestamp: new Date()
-    };
-    setAuditLogs(prev => [newLog, ...prev]);
-  };
-
   const updateProfile = (profileId: string, updatedData: Partial<Profile>) => {
+    const profile = profiles.find(p => p.id === profileId);
+    const previousData = profile ? {
+      name: profile.name,
+      email: profile.email,
+      cargo: profile.cargo?.join(', '),
+      unidade: profile.unidade?.join(', ')
+    } : {};
+    
+    const newData = {
+      name: updatedData.name || profile?.name,
+      email: updatedData.email || profile?.email,
+      cargo: updatedData.cargo?.join(', '),
+      unidade: updatedData.unidade?.join(', ')
+    };
+
     setProfiles(prev => {
       const updatedProfiles = prev.map(profile => 
         profile.id === profileId 
@@ -98,11 +104,22 @@ const Admin: React.FC = () => {
       return updatedProfiles;
     });
     
-    const profile = profiles.find(p => p.id === profileId);
-    addAuditLog('profile_edit', 'Admin', `Perfil ${profile?.name} editado pelo administrador`);
+    addAuditLog(
+      'Perfil editado',
+      'Admin',
+      `Perfil ${profile?.name} foi editado pelo administrador`,
+      'Perfil',
+      profileId,
+      JSON.stringify(previousData),
+      JSON.stringify(newData)
+    );
   };
 
   const toggleProfileStatus = (profileId: string) => {
+    const profile = profiles.find(p => p.id === profileId);
+    const previousStatus = profile?.isActive !== false ? 'Ativo' : 'Inativo';
+    const newStatus = profile?.isActive !== false ? 'Inativo' : 'Ativo';
+    
     setProfiles(prev => {
       const updatedProfiles = prev.map(profile => 
         profile.id === profileId 
@@ -117,12 +134,22 @@ const Admin: React.FC = () => {
       return updatedProfiles;
     });
     
-    const profile = profiles.find(p => p.id === profileId);
-    const newStatus = profile?.isActive !== false ? 'desativado' : 'ativado';
-    addAuditLog('status_change', 'Admin', `Perfil ${profile?.name} ${newStatus}`);
+    addAuditLog(
+      newStatus === 'Ativo' ? 'Perfil ativado' : 'Perfil desativado',
+      'Admin',
+      `Status do perfil ${profile?.name} alterado`,
+      'Perfil',
+      profileId,
+      previousStatus,
+      newStatus
+    );
   };
 
   const promoteToAdmin = (profileId: string) => {
+    const profile = profiles.find(p => p.id === profileId);
+    const previousRole = profile?.role === 'admin' ? 'Administrador' : 'Usuário';
+    const newRole = profile?.role === 'admin' ? 'Usuário' : 'Administrador';
+    
     setProfiles(prev => {
       const updatedProfiles = prev.map(profile => 
         profile.id === profileId 
@@ -158,15 +185,32 @@ const Admin: React.FC = () => {
       return updatedProfiles;
     });
     
-    const profile = profiles.find(p => p.id === profileId);
-    const action = profile?.role === 'admin' ? 'removido de administrador' : 'promovido a administrador';
-    addAuditLog('role_change', 'Admin', `Perfil ${profile?.name} ${action}`);
+    addAuditLog(
+      newRole === 'Administrador' ? 'Usuário promovido a admin' : 'Admin rebaixado a usuário',
+      'Admin',
+      `Papel do usuário ${profile?.name} alterado`,
+      'Perfil',
+      profileId,
+      previousRole,
+      newRole
+    );
   };
 
   const deleteProfile = (profileId: string) => {
     const profile = profiles.find(p => p.id === profileId);
+    const profileData = profile ? `${profile.name} (${profile.email})` : 'Perfil desconhecido';
+    
     setProfiles(prev => prev.filter(profile => profile.id !== profileId));
-    addAuditLog('delete', 'Admin', `Perfil ${profile?.name} excluído`);
+    
+    addAuditLog(
+      'Perfil excluído',
+      'Admin',
+      `Perfil ${profile?.name} foi excluído permanentemente`,
+      'Perfil',
+      profileId,
+      profileData,
+      'Excluído'
+    );
   };
 
   const sendNotification = () => {
@@ -193,7 +237,15 @@ const Admin: React.FC = () => {
     }
     
     // Register in audit log
-    addAuditLog('notification_sent', 'Admin', `Notificação "${messageSubject}" enviada para ${recipients.length} destinatários`);
+    addAuditLog(
+      'Notificação enviada',
+      'Admin',
+      `Notificação "${messageSubject}" enviada`,
+      'Notificação',
+      undefined,
+      `${recipients.length} destinatários`,
+      `Assunto: ${messageSubject}`
+    );
     
     // Clear form
     setMessageSubject('');
@@ -205,6 +257,16 @@ const Admin: React.FC = () => {
 
   const generateReport = (reportType: string) => {
     generateProfileReport(profiles, reportType);
+    
+    addAuditLog(
+      'Relatório gerado',
+      'Admin',
+      `Relatório de tipo "${reportType}" foi gerado`,
+      'Relatório',
+      undefined,
+      undefined,
+      `Tipo: ${reportType}, ${profiles.length} perfis incluídos`
+    );
   };
 
   return (

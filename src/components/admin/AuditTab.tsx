@@ -1,9 +1,10 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Input } from '../ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { History } from 'lucide-react';
+import { Badge } from '../ui/badge';
+import { History, User, Clock, Edit, Trash2, Plus, Eye } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { AuditLog } from '../../types/admin';
@@ -13,51 +14,140 @@ interface AuditTabProps {
 }
 
 const AuditTab: React.FC<AuditTabProps> = ({ auditLogs }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [actionFilter, setActionFilter] = useState('');
+
+  const getActionIcon = (action: string) => {
+    if (action.includes('criado') || action.includes('adicionado')) return <Plus className="w-4 h-4 text-green-600" />;
+    if (action.includes('editado') || action.includes('atualizado')) return <Edit className="w-4 h-4 text-blue-600" />;
+    if (action.includes('excluído') || action.includes('removido')) return <Trash2 className="w-4 h-4 text-red-600" />;
+    if (action.includes('visualizado')) return <Eye className="w-4 h-4 text-gray-600" />;
+    return <History className="w-4 h-4 text-gray-600" />;
+  };
+
+  const getActionColor = (action: string) => {
+    if (action.includes('criado') || action.includes('adicionado')) return 'bg-green-100 text-green-800';
+    if (action.includes('editado') || action.includes('atualizado')) return 'bg-blue-100 text-blue-800';
+    if (action.includes('excluído') || action.includes('removido')) return 'bg-red-100 text-red-800';
+    if (action.includes('visualizado')) return 'bg-gray-100 text-gray-800';
+    return 'bg-gray-100 text-gray-800';
+  };
+
+  const filteredLogs = auditLogs.filter(log => {
+    const matchesSearch = log.action.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         log.user.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         log.details.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesAction = !actionFilter || log.action.toLowerCase().includes(actionFilter.toLowerCase());
+    
+    return matchesSearch && matchesAction;
+  });
+
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center space-x-2">
           <History className="w-5 h-5" />
           <span>Logs de Auditoria</span>
+          <Badge variant="secondary">{filteredLogs.length} registros</Badge>
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           <div className="flex space-x-4">
-            <Input placeholder="Buscar por usuário ou ação..." className="flex-1" />
-            <Select>
+            <Input 
+              placeholder="Buscar por usuário, ação ou detalhes..." 
+              className="flex-1"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <Select value={actionFilter} onValueChange={setActionFilter}>
               <SelectTrigger className="w-48">
-                <SelectValue placeholder="Tipo de ação" />
+                <SelectValue placeholder="Filtrar por ação" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="status_change">Mudança de Status</SelectItem>
-                <SelectItem value="role_change">Mudança de Papel</SelectItem>
-                <SelectItem value="delete">Exclusão</SelectItem>
-                <SelectItem value="notification_sent">Notificação Enviada</SelectItem>
+                <SelectItem value="">Todas as ações</SelectItem>
+                <SelectItem value="criado">Criação</SelectItem>
+                <SelectItem value="editado">Edição</SelectItem>
+                <SelectItem value="excluído">Exclusão</SelectItem>
+                <SelectItem value="ativado">Ativação</SelectItem>
+                <SelectItem value="desativado">Desativação</SelectItem>
+                <SelectItem value="promovido">Promoção</SelectItem>
+                <SelectItem value="notificação">Notificação</SelectItem>
               </SelectContent>
             </Select>
           </div>
-          <div className="border rounded-lg">
-            {auditLogs.length > 0 ? (
+          
+          <div className="border rounded-lg max-h-[600px] overflow-y-auto">
+            {filteredLogs.length > 0 ? (
               <div className="divide-y">
-                {auditLogs.map(log => (
-                  <div key={log.id} className="p-4">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <p className="font-medium">{log.action}</p>
-                        <p className="text-sm text-gray-600">{log.details}</p>
-                        <p className="text-xs text-gray-400">Por: {log.user}</p>
+                {filteredLogs.map(log => (
+                  <div key={log.id} className="p-4 hover:bg-gray-50">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start space-x-3 flex-1">
+                        {getActionIcon(log.action)}
+                        <div className="flex-1 space-y-2">
+                          <div className="flex items-center space-x-2">
+                            <Badge className={getActionColor(log.action)}>
+                              {log.action}
+                            </Badge>
+                            <span className="text-sm text-gray-600">
+                              em {log.entityType}
+                            </span>
+                          </div>
+                          
+                          <p className="text-sm font-medium text-gray-900">
+                            {log.details}
+                          </p>
+                          
+                          {(log.previousValue || log.newValue) && (
+                            <div className="text-xs space-y-1 bg-gray-50 p-2 rounded">
+                              {log.previousValue && (
+                                <div>
+                                  <span className="font-medium text-red-700">Antes:</span>
+                                  <span className="ml-1 text-gray-600">{log.previousValue}</span>
+                                </div>
+                              )}
+                              {log.newValue && (
+                                <div>
+                                  <span className="font-medium text-green-700">Depois:</span>
+                                  <span className="ml-1 text-gray-600">{log.newValue}</span>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                          
+                          <div className="flex items-center space-x-4 text-xs text-gray-500">
+                            <div className="flex items-center space-x-1">
+                              <User className="w-3 h-3" />
+                              <span>{log.user}</span>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              <Clock className="w-3 h-3" />
+                              <span>
+                                {format(log.timestamp, "dd/MM/yyyy 'às' HH:mm:ss", { locale: ptBR })}
+                              </span>
+                            </div>
+                            {log.entityId && (
+                              <span className="text-gray-400">ID: {log.entityId}</span>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                      <span className="text-xs text-gray-400">
-                        {format(log.timestamp, "dd/MM/yyyy HH:mm", { locale: ptBR })}
-                      </span>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="p-4 text-center text-gray-500">
-                Nenhum log de auditoria encontrado
+              <div className="p-8 text-center text-gray-500">
+                <History className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                <p className="text-lg font-medium">Nenhum log encontrado</p>
+                <p className="text-sm">
+                  {searchTerm || actionFilter 
+                    ? 'Tente ajustar os filtros de busca'
+                    : 'As ações realizadas no sistema aparecerão aqui'
+                  }
+                </p>
               </div>
             )}
           </div>

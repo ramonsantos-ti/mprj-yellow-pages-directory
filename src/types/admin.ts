@@ -4,7 +4,11 @@ export interface AuditLog {
   action: string;
   user: string;
   details: string;
+  previousValue?: string;
+  newValue?: string;
   timestamp: Date;
+  entityType: string;
+  entityId?: string;
 }
 
 export interface StandardMessage {

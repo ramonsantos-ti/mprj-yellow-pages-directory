@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Profile } from '../types';
 import { mockProfiles } from '../data/mockData';
+import { useAuditLog } from '../hooks/useAuditLog';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -28,6 +29,7 @@ const ProfileEdit: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { addAuditLog } = useAuditLog();
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -215,6 +217,7 @@ const ProfileEdit: React.FC = () => {
       };
 
       let updatedProfiles: Profile[];
+      let isNewProfile = false;
       
       if (profile) {
         // Update existing profile and clear updatedByAdmin flag
@@ -228,8 +231,20 @@ const ProfileEdit: React.FC = () => {
               } 
             : p
         );
+
+        // Log the profile update
+        addAuditLog(
+          'Perfil atualizado pelo usuário',
+          user?.name || 'Usuário',
+          `${user?.name} atualizou seu próprio perfil`,
+          'Perfil',
+          profile.id,
+          `Perfil existente de ${profile.name}`,
+          'Perfil atualizado com novas informações'
+        );
       } else {
         // Create new profile
+        isNewProfile = true;
         const newProfile: Profile = {
           id: Date.now().toString(),
           userId: user.id,
@@ -245,6 +260,17 @@ const ProfileEdit: React.FC = () => {
         };
         
         updatedProfiles = [...profiles, newProfile];
+
+        // Log the profile creation
+        addAuditLog(
+          'Perfil criado',
+          user?.name || 'Usuário',
+          `${user?.name} criou um novo perfil no sistema`,
+          'Perfil',
+          newProfile.id,
+          'Nenhum perfil anterior',
+          `Novo perfil para ${name}`
+        );
       }
       
       // Save to localStorage
@@ -261,7 +287,7 @@ const ProfileEdit: React.FC = () => {
       window.dispatchEvent(new Event('storage'));
       
       toast({
-        title: "Perfil salvo com sucesso!",
+        title: isNewProfile ? "Perfil criado com sucesso!" : "Perfil salvo com sucesso!",
         description: "Suas informações foram atualizadas.",
       });
       
