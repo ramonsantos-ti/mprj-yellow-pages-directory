@@ -30,11 +30,24 @@ export const useAuditLog = () => {
     newValue?: string,
     userMatricula?: string
   ) => {
+    // Get current user info to ensure we have the real name
+    const currentUser = JSON.parse(localStorage.getItem('mprj_user') || '{}');
+    const profiles = JSON.parse(localStorage.getItem('mprj_profiles') || '[]');
+    const currentUserProfile = profiles.find((p: any) => 
+      p.userId === currentUser.id || 
+      p.matricula === currentUser.matricula ||
+      p.email === currentUser.email
+    );
+    
+    // Use the profile name or current user name, never "admin" or fallback values
+    const actualUserName = currentUserProfile?.name || currentUser.name || user;
+    const actualUserMatricula = currentUserProfile?.matricula || currentUser.matricula || userMatricula;
+
     const newLog: AuditLog = {
       id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
       action,
-      user,
-      userMatricula,
+      user: actualUserName,
+      userMatricula: actualUserMatricula,
       details,
       previousValue,
       newValue,
