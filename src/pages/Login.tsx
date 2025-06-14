@@ -42,9 +42,13 @@ const Login: React.FC = () => {
       <div className="max-w-md w-full space-y-8">
         {/* Header */}
         <div className="text-center">
-          <div className="w-16 h-16 bg-amber-900 rounded-lg flex items-center justify-center mx-auto mb-4">
-            <span className="text-white font-bold text-2xl">MP</span>
-          </div>
+          <Link to="/" className="inline-block mb-4">
+            <img 
+              src="/lovable-uploads/9bdb3a99-0580-4f1a-90fd-bca0f42a713d.png" 
+              alt="MPRJ Logo" 
+              className="h-16 w-auto mx-auto hover:opacity-80 transition-opacity"
+            />
+          </Link>
           <h2 className="text-3xl font-bold text-gray-900">
             Acesso ao Sistema
           </h2>
