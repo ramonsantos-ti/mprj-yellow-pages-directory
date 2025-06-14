@@ -4,10 +4,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Input } from '../ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Badge } from '../ui/badge';
-import { History, User, Clock, Edit, Trash2, Plus, Eye } from 'lucide-react';
+import { Button } from '../ui/button';
+import { Checkbox } from '../ui/checkbox';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
+import { History, User, Clock, Edit, Trash2, Plus, Eye, Download, FileText, FileSpreadsheet } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { AuditLog } from '../../types/admin';
+import { exportAuditLogsToPDF, exportAuditLogsToXLS } from '../../utils/auditExports';
 
 interface AuditTabProps {
   auditLogs: AuditLog[];
@@ -16,6 +20,7 @@ interface AuditTabProps {
 const AuditTab: React.FC<AuditTabProps> = ({ auditLogs }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [actionFilter, setActionFilter] = useState('');
+  const [selectedLogs, setSelectedLogs] = useState<string[]>([]);
 
   const getActionIcon = (action: string) => {
     if (action.includes('criado') || action.includes('adicionado')) return <Plus className="w-4 h-4 text-green-600" />;
@@ -43,13 +48,91 @@ const AuditTab: React.FC<AuditTabProps> = ({ auditLogs }) => {
     return matchesSearch && matchesAction;
   });
 
+  const handleSelectLog = (logId: string, checked: boolean) => {
+    if (checked) {
+      setSelectedLogs(prev => [...prev, logId]);
+    } else {
+      setSelectedLogs(prev => prev.filter(id => id !== logId));
+    }
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedLogs(filteredLogs.map(log => log.id));
+    } else {
+      setSelectedLogs([]);
+    }
+  };
+
+  const exportSelectedToPDF = () => {
+    const logsToExport = filteredLogs.filter(log => selectedLogs.includes(log.id));
+    exportAuditLogsToPDF(logsToExport, 'selecionados');
+  };
+
+  const exportSelectedToXLS = () => {
+    const logsToExport = filteredLogs.filter(log => selectedLogs.includes(log.id));
+    exportAuditLogsToXLS(logsToExport, 'selecionados');
+  };
+
+  const exportAllToPDF = () => {
+    exportAuditLogsToPDF(filteredLogs, 'todos');
+  };
+
+  const exportAllToXLS = () => {
+    exportAuditLogsToXLS(filteredLogs, 'todos');
+  };
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center space-x-2">
-          <History className="w-5 h-5" />
-          <span>Logs de Auditoria</span>
-          <Badge variant="secondary">{filteredLogs.length} registros</Badge>
+        <CardTitle className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <History className="w-5 h-5" />
+            <span>Logs de Auditoria</span>
+            <Badge variant="secondary">{filteredLogs.length} registros</Badge>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            {selectedLogs.length > 0 && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <Download className="w-4 h-4 mr-2" />
+                    Exportar Selecionados ({selectedLogs.length})
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onClick={exportSelectedToPDF}>
+                    <FileText className="w-4 h-4 mr-2" />
+                    Exportar PDF
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={exportSelectedToXLS}>
+                    <FileSpreadsheet className="w-4 h-4 mr-2" />
+                    Exportar Excel
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Download className="w-4 h-4 mr-2" />
+                  Exportar Todos
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={exportAllToPDF}>
+                  <FileText className="w-4 h-4 mr-2" />
+                  Exportar PDF ({filteredLogs.length} logs)
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={exportAllToXLS}>
+                  <FileSpreadsheet className="w-4 h-4 mr-2" />
+                  Exportar Excel ({filteredLogs.length} logs)
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -81,10 +164,26 @@ const AuditTab: React.FC<AuditTabProps> = ({ auditLogs }) => {
           <div className="border rounded-lg max-h-[600px] overflow-y-auto">
             {filteredLogs.length > 0 ? (
               <div className="divide-y">
+                <div className="p-4 bg-gray-50 border-b">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      checked={selectedLogs.length === filteredLogs.length && filteredLogs.length > 0}
+                      onCheckedChange={handleSelectAll}
+                    />
+                    <span className="text-sm font-medium">
+                      Selecionar todos ({filteredLogs.length} logs)
+                    </span>
+                  </div>
+                </div>
+                
                 {filteredLogs.map(log => (
                   <div key={log.id} className="p-4 hover:bg-gray-50">
                     <div className="flex items-start justify-between">
                       <div className="flex items-start space-x-3 flex-1">
+                        <Checkbox
+                          checked={selectedLogs.includes(log.id)}
+                          onCheckedChange={(checked) => handleSelectLog(log.id, checked as boolean)}
+                        />
                         {getActionIcon(log.action)}
                         <div className="flex-1 space-y-2">
                           <div className="flex items-center space-x-2">
