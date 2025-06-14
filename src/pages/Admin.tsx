@@ -128,7 +128,7 @@ const Admin: React.FC = () => {
         profile.id === profileId 
           ? { 
               ...profile, 
-              role: profile.role === 'admin' ? 'user' : 'admin',
+              role: (profile.role === 'admin' ? 'user' : 'admin') as 'admin' | 'user',
               lastUpdated: new Date()
             } 
           : profile
