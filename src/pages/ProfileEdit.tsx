@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -5,6 +6,9 @@ import { Profile } from '../types';
 import { mockProfiles } from '../data/mockData';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Textarea } from '../components/ui/textarea';
+import { Label } from '../components/ui/label';
 import { useToast } from '../hooks/use-toast';
 import { 
   CARGOS, 
@@ -294,7 +298,7 @@ const ProfileEdit: React.FC = () => {
       </div>
 
       <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
-        {/* Photo Upload - keeping existing simplified implementation */}
+        {/* Photo Upload */}
         <Card>
           <CardHeader>
             <CardTitle>Foto do Perfil</CardTitle>
@@ -324,6 +328,73 @@ const ProfileEdit: React.FC = () => {
                   className="hidden"
                 />
               </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Basic Information */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Informações Básicas</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">Nome Completo</Label>
+                <Input
+                  id="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Seu nome completo"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="matricula">Matrícula</Label>
+                <Input
+                  id="matricula"
+                  value={matricula}
+                  onChange={(e) => setMatricula(e.target.value)}
+                  placeholder="Sua matrícula"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="seu.email@mprj.mp.br"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="telefone">Telefone</Label>
+                <Input
+                  id="telefone"
+                  value={telefone}
+                  onChange={(e) => setTelefone(e.target.value)}
+                  placeholder="(21) 99999-9999"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="biografia">Biografia</Label>
+              <Textarea
+                id="biografia"
+                value={biografia}
+                onChange={(e) => setBiografia(e.target.value)}
+                placeholder="Conte um pouco sobre você, sua experiência e áreas de interesse..."
+                rows={4}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="curriculo">Link do Currículo</Label>
+              <Input
+                id="curriculo"
+                value={linkCurriculo}
+                onChange={(e) => setLinkCurriculo(e.target.value)}
+                placeholder="https://..."
+              />
             </div>
           </CardContent>
         </Card>
