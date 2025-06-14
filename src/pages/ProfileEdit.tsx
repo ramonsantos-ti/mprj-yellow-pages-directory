@@ -96,7 +96,7 @@ const ProfileEdit: React.FC = () => {
             // Set default values for new profile
             setName(user.name);
             setMatricula(user.matricula);
-            setEmail(user.username);
+            setEmail(user.email || '');
           }
         }
       } else {
@@ -119,7 +119,7 @@ const ProfileEdit: React.FC = () => {
             // Set default values for new profile
             setName(user.name);
             setMatricula(user.matricula);
-            setEmail(user.username);
+            setEmail(user.email || '');
           }
         }
       }
@@ -130,7 +130,7 @@ const ProfileEdit: React.FC = () => {
       setFotoPreview(userProfile.fotoUrl || '');
       setName(userProfile.name || user?.name || '');
       setMatricula(userProfile.matricula || user?.matricula || '');
-      setEmail(userProfile.email || user?.username || '');
+      setEmail(userProfile.email || user?.email || '');
       setTelefone(userProfile.telefone || '');
       setBiografia(userProfile.biografia || '');
       setCargo(Array.isArray(userProfile.cargo) ? userProfile.cargo : []);
