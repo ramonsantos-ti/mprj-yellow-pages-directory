@@ -1,5 +1,4 @@
-
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { mockProfiles } from '../data/mockData';
 import { Profile } from '../types';
 import { AuditLog, StandardMessage } from '../types/admin';
@@ -13,7 +12,7 @@ import AnalyticsTab from '../components/admin/AnalyticsTab';
 
 const Admin: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [profiles, setProfiles] = useState<Profile[]>(mockProfiles);
+  const [profiles, setProfiles] = useState<Profile[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [standardMessages, setStandardMessages] = useState<StandardMessage[]>([
     {
@@ -32,6 +31,21 @@ const Admin: React.FC = () => {
   const [recipientType, setRecipientType] = useState('group');
   const [messageSubject, setMessageSubject] = useState('');
   const [messageContent, setMessageContent] = useState('');
+
+  // Load profiles from localStorage or use mock data
+  useEffect(() => {
+    const savedProfiles = localStorage.getItem('mprj_profiles');
+    if (savedProfiles) {
+      setProfiles(JSON.parse(savedProfiles));
+    } else {
+      setProfiles(mockProfiles);
+    }
+  }, []);
+
+  // Save profiles to localStorage whenever profiles change
+  useEffect(() => {
+    localStorage.setItem('mprj_profiles', JSON.stringify(profiles));
+  }, [profiles]);
 
   // Sort profiles to show recently updated first
   const sortedProfiles = useMemo(() => {
@@ -63,12 +77,22 @@ const Admin: React.FC = () => {
   };
 
   const toggleProfileStatus = (profileId: string) => {
-    setProfiles(prev => prev.map(profile => 
-      profile.id === profileId ? { ...profile, isActive: !profile.isActive } : profile
-    ));
+    setProfiles(prev => {
+      const updatedProfiles = prev.map(profile => 
+        profile.id === profileId 
+          ? { 
+              ...profile, 
+              isActive: profile.isActive !== false ? false : true,
+              lastUpdated: new Date()
+            } 
+          : profile
+      );
+      return updatedProfiles;
+    });
     
     const profile = profiles.find(p => p.id === profileId);
-    addAuditLog('status_change', 'Admin', `Perfil ${profile?.name} ${profile?.isActive ? 'desativado' : 'ativado'}`);
+    const newStatus = profile?.isActive !== false ? 'desativado' : 'ativado';
+    addAuditLog('status_change', 'Admin', `Perfil ${profile?.name} ${newStatus}`);
   };
 
   const promoteToAdmin = (profileId: string) => {

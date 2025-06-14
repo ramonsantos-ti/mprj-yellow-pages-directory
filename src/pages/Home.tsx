@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from 'react';
+
+import React, { useState, useMemo, useEffect } from 'react';
 import { mockProfiles } from '../data/mockData';
 import { Profile } from '../types';
 import ProfileCard from '../components/ProfileCard';
@@ -17,11 +18,22 @@ const Home: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [exportCount, setExportCount] = useState<number | 'all'>('all');
+  const [profiles, setProfiles] = useState<Profile[]>([]);
+
+  // Load profiles from localStorage or use mock data
+  useEffect(() => {
+    const savedProfiles = localStorage.getItem('mprj_profiles');
+    if (savedProfiles) {
+      setProfiles(JSON.parse(savedProfiles));
+    } else {
+      setProfiles(mockProfiles);
+    }
+  }, []);
 
   // Filtrar apenas perfis ativos e ordenar por data de atualização (mais recente primeiro)
   const activeProfiles = useMemo(() => {
-    return mockProfiles.filter(profile => profile.isActive !== false);
-  }, []);
+    return profiles.filter(profile => profile.isActive !== false);
+  }, [profiles]);
 
   const sortedProfiles = useMemo(() => {
     return [...activeProfiles].sort((a, b) => new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime());
