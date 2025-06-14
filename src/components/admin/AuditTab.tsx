@@ -219,7 +219,10 @@ const AuditTab: React.FC<AuditTabProps> = ({ auditLogs }) => {
                           <div className="flex items-center space-x-4 text-xs text-gray-500">
                             <div className="flex items-center space-x-1">
                               <User className="w-3 h-3" />
-                              <span>{log.user}</span>
+                              <span>
+                                {log.user}
+                                {log.userMatricula && ` (Mat: ${log.userMatricula})`}
+                              </span>
                             </div>
                             <div className="flex items-center space-x-1">
                               <Clock className="w-3 h-3" />

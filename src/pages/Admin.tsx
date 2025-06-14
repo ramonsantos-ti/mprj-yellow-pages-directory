@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { mockProfiles } from '../data/mockData';
 import { Profile } from '../types';
@@ -104,14 +103,19 @@ const Admin: React.FC = () => {
       return updatedProfiles;
     });
     
+    // Get current user info for audit log
+    const currentUser = JSON.parse(localStorage.getItem('mprj_user') || '{}');
+    const currentUserProfile = profiles.find(p => p.userId === currentUser.id || p.matricula === currentUser.matricula);
+    
     addAuditLog(
       'Perfil editado',
-      'Admin',
+      currentUser.name || 'Usuário',
       `Perfil ${profile?.name} foi editado pelo administrador`,
       'Perfil',
       profileId,
       JSON.stringify(previousData),
-      JSON.stringify(newData)
+      JSON.stringify(newData),
+      currentUser.matricula || currentUserProfile?.matricula
     );
   };
 
@@ -134,14 +138,19 @@ const Admin: React.FC = () => {
       return updatedProfiles;
     });
     
+    // Get current user info for audit log
+    const currentUser = JSON.parse(localStorage.getItem('mprj_user') || '{}');
+    const currentUserProfile = profiles.find(p => p.userId === currentUser.id || p.matricula === currentUser.matricula);
+    
     addAuditLog(
       newStatus === 'Ativo' ? 'Perfil ativado' : 'Perfil desativado',
-      'Admin',
+      currentUser.name || 'Usuário',
       `Status do perfil ${profile?.name} alterado`,
       'Perfil',
       profileId,
       previousStatus,
-      newStatus
+      newStatus,
+      currentUser.matricula || currentUserProfile?.matricula
     );
   };
 
@@ -185,14 +194,19 @@ const Admin: React.FC = () => {
       return updatedProfiles;
     });
     
+    // Get current user info for audit log
+    const currentUser = JSON.parse(localStorage.getItem('mprj_user') || '{}');
+    const currentUserProfile = profiles.find(p => p.userId === currentUser.id || p.matricula === currentUser.matricula);
+    
     addAuditLog(
       newRole === 'Administrador' ? 'Usuário promovido a admin' : 'Admin rebaixado a usuário',
-      'Admin',
+      currentUser.name || 'Usuário',
       `Papel do usuário ${profile?.name} alterado`,
       'Perfil',
       profileId,
       previousRole,
-      newRole
+      newRole,
+      currentUser.matricula || currentUserProfile?.matricula
     );
   };
 
@@ -202,14 +216,19 @@ const Admin: React.FC = () => {
     
     setProfiles(prev => prev.filter(profile => profile.id !== profileId));
     
+    // Get current user info for audit log
+    const currentUser = JSON.parse(localStorage.getItem('mprj_user') || '{}');
+    const currentUserProfile = profiles.find(p => p.userId === currentUser.id || p.matricula === currentUser.matricula);
+    
     addAuditLog(
       'Perfil excluído',
-      'Admin',
+      currentUser.name || 'Usuário',
       `Perfil ${profile?.name} foi excluído permanentemente`,
       'Perfil',
       profileId,
       profileData,
-      'Excluído'
+      'Excluído',
+      currentUser.matricula || currentUserProfile?.matricula
     );
   };
 
@@ -236,15 +255,20 @@ const Admin: React.FC = () => {
       recipients = selectedRecipients;
     }
     
+    // Get current user info for audit log
+    const currentUser = JSON.parse(localStorage.getItem('mprj_user') || '{}');
+    const currentUserProfile = profiles.find(p => p.userId === currentUser.id || p.matricula === currentUser.matricula);
+    
     // Register in audit log
     addAuditLog(
       'Notificação enviada',
-      'Admin',
+      currentUser.name || 'Usuário',
       `Notificação "${messageSubject}" enviada`,
       'Notificação',
       undefined,
       `${recipients.length} destinatários`,
-      `Assunto: ${messageSubject}`
+      `Assunto: ${messageSubject}`,
+      currentUser.matricula || currentUserProfile?.matricula
     );
     
     // Clear form
@@ -258,14 +282,19 @@ const Admin: React.FC = () => {
   const generateReport = (reportType: string) => {
     generateProfileReport(profiles, reportType);
     
+    // Get current user info for audit log
+    const currentUser = JSON.parse(localStorage.getItem('mprj_user') || '{}');
+    const currentUserProfile = profiles.find(p => p.userId === currentUser.id || p.matricula === currentUser.matricula);
+    
     addAuditLog(
       'Relatório gerado',
-      'Admin',
+      currentUser.name || 'Usuário',
       `Relatório de tipo "${reportType}" foi gerado`,
       'Relatório',
       undefined,
       undefined,
-      `Tipo: ${reportType}, ${profiles.length} perfis incluídos`
+      `Tipo: ${reportType}, ${profiles.length} perfis incluídos`,
+      currentUser.matricula || currentUserProfile?.matricula
     );
   };
 

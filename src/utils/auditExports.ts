@@ -1,4 +1,3 @@
-
 import { jsPDF } from 'jspdf';
 import * as XLSX from 'xlsx';
 import { format } from 'date-fns';
@@ -72,7 +71,8 @@ export const exportAuditLogsToPDF = (logs: AuditLog[], type: 'selecionados' | 't
     }
     
     // User and timestamp
-    doc.text(`Usuário: ${log.user}`, 25, currentY);
+    const userText = log.userMatricula ? `${log.user} (Mat: ${log.userMatricula})` : log.user;
+    doc.text(`Usuário: ${userText}`, 25, currentY);
     currentY += 4;
     doc.text(`Data/Hora: ${format(log.timestamp, "dd/MM/yyyy 'às' HH:mm:ss", { locale: ptBR })}`, 25, currentY);
     
@@ -102,6 +102,7 @@ export const exportAuditLogsToXLS = (logs: AuditLog[], type: 'selecionados' | 't
       'Valor Anterior': log.previousValue || '',
       'Valor Novo': log.newValue || '',
       'Usuário': log.user,
+      'Matrícula': log.userMatricula || '',
       'Data': format(log.timestamp, 'dd/MM/yyyy', { locale: ptBR }),
       'Hora': format(log.timestamp, 'HH:mm:ss', { locale: ptBR }),
       'Timestamp': log.timestamp.toISOString()
@@ -117,6 +118,7 @@ export const exportAuditLogsToXLS = (logs: AuditLog[], type: 'selecionados' | 't
     { wch: 30 }, // Valor Anterior
     { wch: 30 }, // Valor Novo
     { wch: 20 }, // Usuário
+    { wch: 12 }, // Matrícula
     { wch: 12 }, // Data
     { wch: 10 }, // Hora
     { wch: 20 }  // Timestamp

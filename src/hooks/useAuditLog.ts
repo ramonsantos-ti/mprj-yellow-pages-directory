@@ -27,12 +27,14 @@ export const useAuditLog = () => {
     entityType: string,
     entityId?: string,
     previousValue?: string,
-    newValue?: string
+    newValue?: string,
+    userMatricula?: string
   ) => {
     const newLog: AuditLog = {
       id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
       action,
       user,
+      userMatricula,
       details,
       previousValue,
       newValue,
