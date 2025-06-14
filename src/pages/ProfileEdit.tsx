@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -9,7 +8,11 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Textarea } from '../components/ui/textarea';
 import { Label } from '../components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import { Badge } from '../components/ui/badge';
+import { Checkbox } from '../components/ui/checkbox';
 import { useToast } from '../hooks/use-toast';
+import { Plus, X } from 'lucide-react';
 import { 
   CARGOS, 
   FUNCOES, 
@@ -395,6 +398,436 @@ const ProfileEdit: React.FC = () => {
                 onChange={(e) => setLinkCurriculo(e.target.value)}
                 placeholder="https://..."
               />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Cargo, Função e Unidade */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Cargo, Função e Lotação</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label>Cargos</Label>
+              <div className="space-y-2">
+                <Select onValueChange={(value) => {
+                  if (isValidSelectValue(value) && !cargo.includes(value)) {
+                    setCargo([...cargo, value]);
+                  }
+                }}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione um cargo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {safeCargos.map((cargoItem, index) => (
+                      <SelectItem key={`cargo-${index}-${cargoItem}`} value={cargoItem}>
+                        {cargoItem}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <div className="flex flex-wrap gap-2">
+                  {cargo.map((cargoItem, index) => (
+                    <Badge key={index} variant="secondary" className="flex items-center space-x-1">
+                      <span>{cargoItem}</span>
+                      <X 
+                        className="w-3 h-3 cursor-pointer" 
+                        onClick={() => setCargo(cargo.filter((_, i) => i !== index))}
+                      />
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <Label>Função</Label>
+              <div className="space-y-2">
+                <Select onValueChange={(value) => {
+                  if (isValidSelectValue(value) && !funcao.includes(value)) {
+                    setFuncao([...funcao, value]);
+                  }
+                }}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione uma função (opcional)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {safeFuncoes.map((funcaoItem, index) => (
+                      <SelectItem key={`funcao-${index}-${funcaoItem}`} value={funcaoItem}>
+                        {funcaoItem}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <div className="flex flex-wrap gap-2">
+                  {funcao.map((funcaoItem, index) => (
+                    <Badge key={index} variant="outline" className="flex items-center space-x-1">
+                      <span>{funcaoItem}</span>
+                      <X 
+                        className="w-3 h-3 cursor-pointer" 
+                        onClick={() => setFuncao(funcao.filter((_, i) => i !== index))}
+                      />
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <Label>Unidades</Label>
+              <div className="space-y-2">
+                <Select onValueChange={(value) => {
+                  if (isValidSelectValue(value) && !unidade.includes(value)) {
+                    setUnidade([...unidade, value]);
+                  }
+                }}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione uma unidade" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {safeUnidades.map((unidadeItem, index) => (
+                      <SelectItem key={`unidade-${index}-${unidadeItem}`} value={unidadeItem}>
+                        {unidadeItem}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <div className="flex flex-wrap gap-2">
+                  {unidade.map((unidadeItem, index) => (
+                    <Badge key={index} variant="secondary" className="flex items-center space-x-1">
+                      <span>{unidadeItem}</span>
+                      <X 
+                        className="w-3 h-3 cursor-pointer" 
+                        onClick={() => setUnidade(unidade.filter((_, i) => i !== index))}
+                      />
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Formação Acadêmica */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <span>Formação Acadêmica</span>
+              <Button type="button" onClick={() => {
+                setFormacoes([...formacoes, { nivel: '', instituicao: '', curso: '', ano: new Date().getFullYear() }]);
+              }} size="sm" variant="outline">
+                <Plus className="w-4 h-4 mr-2" />
+                Adicionar
+              </Button>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {formacoes.map((formacao, index) => (
+              <div key={index} className="border rounded-lg p-4 space-y-3">
+                <div className="flex justify-between items-start">
+                  <h4 className="font-medium">Formação {index + 1}</h4>
+                  <Button
+                    type="button"
+                    onClick={() => setFormacoes(formacoes.filter((_, i) => i !== index))}
+                    size="sm"
+                    variant="ghost"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                  <Select
+                    value={formacao.nivel}
+                    onValueChange={(value) => {
+                      if (isValidSelectValue(value)) {
+                        const novas = [...formacoes];
+                        novas[index].nivel = value;
+                        setFormacoes(novas);
+                      }
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Nível" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {safeNiveisFormacao.map((nivel, nivelIndex) => (
+                        <SelectItem key={`nivel-${nivelIndex}-${nivel}`} value={nivel}>
+                          {nivel}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Input
+                    placeholder="Instituição"
+                    value={formacao.instituicao}
+                    onChange={(e) => {
+                      const novas = [...formacoes];
+                      novas[index].instituicao = e.target.value;
+                      setFormacoes(novas);
+                    }}
+                  />
+                  <Input
+                    placeholder="Curso"
+                    value={formacao.curso}
+                    onChange={(e) => {
+                      const novas = [...formacoes];
+                      novas[index].curso = e.target.value;
+                      setFormacoes(novas);
+                    }}
+                  />
+                  <Input
+                    type="number"
+                    placeholder="Ano"
+                    value={formacao.ano}
+                    onChange={(e) => {
+                      const novas = [...formacoes];
+                      novas[index].ano = parseInt(e.target.value);
+                      setFormacoes(novas);
+                    }}
+                  />
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        {/* Projetos */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <span>Projetos</span>
+              <Button type="button" onClick={() => {
+                setProjetos([...projetos, { nome: '', dataInicio: '' }]);
+              }} size="sm" variant="outline">
+                <Plus className="w-4 h-4 mr-2" />
+                Adicionar
+              </Button>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {projetos.map((projeto, index) => (
+              <div key={index} className="border rounded-lg p-4 space-y-3">
+                <div className="flex justify-between items-start">
+                  <h4 className="font-medium">Projeto {index + 1}</h4>
+                  <Button
+                    type="button"
+                    onClick={() => setProjetos(projetos.filter((_, i) => i !== index))}
+                    size="sm"
+                    variant="ghost"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <Input
+                    placeholder="Nome do projeto"
+                    value={projeto.nome}
+                    onChange={(e) => {
+                      const novos = [...projetos];
+                      novos[index].nome = e.target.value;
+                      setProjetos(novos);
+                    }}
+                  />
+                  <Input
+                    type="date"
+                    placeholder="Data início"
+                    value={projeto.dataInicio}
+                    onChange={(e) => {
+                      const novos = [...projetos];
+                      novos[index].dataInicio = e.target.value;
+                      setProjetos(novos);
+                    }}
+                  />
+                  <Input
+                    type="date"
+                    placeholder="Data fim (opcional)"
+                    value={projeto.dataFim || ''}
+                    onChange={(e) => {
+                      const novos = [...projetos];
+                      novos[index].dataFim = e.target.value;
+                      setProjetos(novos);
+                    }}
+                  />
+                </div>
+                <Textarea
+                  placeholder="Observações sobre o projeto"
+                  value={projeto.observacoes || ''}
+                  onChange={(e) => {
+                    const novos = [...projetos];
+                    novos[index].observacoes = e.target.value;
+                    setProjetos(novos);
+                  }}
+                />
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        {/* Certificações */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Certificações Relevantes</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div>
+              <Label>Certificações (PMP, ITIL, ISO, etc.)</Label>
+              <div className="space-y-2">
+                <Select onValueChange={(value) => {
+                  if (isValidSelectValue(value) && !certificacoes.includes(value)) {
+                    setCertificacoes([...certificacoes, value]);
+                  }
+                }}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione uma certificação" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {safeCertificacoes.map((cert, index) => (
+                      <SelectItem key={`cert-${index}-${cert}`} value={cert}>
+                        {cert}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <div className="flex flex-wrap gap-2">
+                  {certificacoes.map((cert, index) => (
+                    <Badge key={index} variant="secondary" className="flex items-center space-x-1">
+                      <span>{cert}</span>
+                      <X 
+                        className="w-3 h-3 cursor-pointer" 
+                        onClick={() => setCertificacoes(certificacoes.filter((_, i) => i !== index))}
+                      />
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Publicações */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Publicações, Cursos Ministrados e Trabalhos de Destaque</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div>
+              <Label>Publicações e Trabalhos de Destaque</Label>
+              <Textarea 
+                value={publicacoes}
+                onChange={(e) => setPublicacoes(e.target.value)}
+                rows={5} 
+                placeholder="Liste suas publicações, cursos ministrados, trabalhos de destaque, etc..."
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Disponibilidade */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Disponibilidade para Colaboração</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label>Tipo de Colaboração</Label>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
+                {safeTiposColaboracao.map(tipo => (
+                  <div key={tipo} className="flex items-center space-x-2">
+                    <Checkbox
+                      checked={tipoColaboracao.includes(tipo)}
+                      onCheckedChange={() => {
+                        if (tipoColaboracao.includes(tipo)) {
+                          setTipoColaboracao(tipoColaboracao.filter(t => t !== tipo));
+                        } else {
+                          setTipoColaboracao([...tipoColaboracao, tipo]);
+                        }
+                      }}
+                    />
+                    <span className="text-sm">{tipo}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <Label>Disponibilidade Estimada</Label>
+              <Select value={disponibilidadeEstimada} onValueChange={(value) => {
+                if (isValidSelectValue(value)) {
+                  setDisponibilidadeEstimada(value);
+                }
+              }}>
+                <SelectTrigger className="mt-2">
+                  <SelectValue placeholder="Selecione sua disponibilidade" />
+                </SelectTrigger>
+                <SelectContent>
+                  {safeDisponibilidadeEstimada.map((disponibilidade, dispIndex) => (
+                    <SelectItem key={`disp-${dispIndex}-${disponibilidade}`} value={disponibilidade}>
+                      {disponibilidade}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Preferências de Contato */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Preferências de Contato</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label>Forma Preferencial de Contato</Label>
+              <Select value={formaContato} onValueChange={(value) => {
+                if (isValidSelectValue(value)) {
+                  setFormaContato(value);
+                }
+              }}>
+                <SelectTrigger className="mt-2">
+                  <SelectValue placeholder="Selecione a forma de contato" />
+                </SelectTrigger>
+                <SelectContent>
+                  {safeFormasContato.map((forma, formaIndex) => (
+                    <SelectItem key={`forma-${formaIndex}-${forma}`} value={forma}>
+                      {forma}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label>Horário Preferencial</Label>
+              <Input
+                className="mt-2"
+                placeholder="Ex: manhã, tarde, 14h às 16h"
+                value={horarioPreferencial}
+                onChange={(e) => setHorarioPreferencial(e.target.value)}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Aceite de Termos */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Informações Adicionais</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-start space-x-3">
+              <Checkbox
+                checked={aceiteTermos}
+                onCheckedChange={setAceiteTermos}
+              />
+              <div className="space-y-1 leading-none">
+                <Label>
+                  Declaro que as informações prestadas neste formulário são verdadeiras, 
+                  atualizadas e de minha responsabilidade. Comprometo-me a atualizá-las 
+                  sempre que houver mudanças relevantes. *
+                </Label>
+              </div>
             </div>
           </CardContent>
         </Card>
