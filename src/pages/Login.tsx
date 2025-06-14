@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -17,6 +16,9 @@ const Login: React.FC = () => {
   
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  // Check if user is admin (usuario01 or any user with admin role)
+  const isAdminLogin = username === 'usuario01';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,8 +102,9 @@ const Login: React.FC = () => {
 
               <Button
                 type="submit"
-                className="w-full bg-amber-900 hover:bg-amber-800"
+                className="w-full"
                 disabled={isLoading}
+                isAdmin={isAdminLogin}
               >
                 {isLoading ? 'Entrando...' : 'Entrar'}
               </Button>
