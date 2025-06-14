@@ -18,10 +18,14 @@ const Home: React.FC = () => {
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [exportCount, setExportCount] = useState<number | 'all'>('all');
 
-  // Ordenar perfis por data de atualização (mais recente primeiro)
-  const sortedProfiles = useMemo(() => {
-    return [...mockProfiles].sort((a, b) => new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime());
+  // Filtrar apenas perfis ativos e ordenar por data de atualização (mais recente primeiro)
+  const activeProfiles = useMemo(() => {
+    return mockProfiles.filter(profile => profile.isActive !== false);
   }, []);
+
+  const sortedProfiles = useMemo(() => {
+    return [...activeProfiles].sort((a, b) => new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime());
+  }, [activeProfiles]);
 
   // Filtrar perfis apenas por termo de busca
   const filteredProfiles = useMemo(() => {

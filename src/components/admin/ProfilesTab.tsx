@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Profile } from '../../types';
 import { Card, CardContent } from '../ui/card';
@@ -107,24 +108,49 @@ const ProfilesTab: React.FC<ProfilesTabProps> = ({
                 </div>
                 
                 <div className="flex items-center space-x-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => toggleProfileStatus(profile.id)}
-                    className="flex items-center space-x-1"
-                  >
-                    {profile.isActive !== false ? (
-                      <>
-                        <XCircle className="w-4 h-4" />
-                        <span>Desativar</span>
-                      </>
-                    ) : (
-                      <>
-                        <CheckCircle className="w-4 h-4" />
-                        <span>Ativar</span>
-                      </>
-                    )}
-                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex items-center space-x-1"
+                      >
+                        {profile.isActive !== false ? (
+                          <>
+                            <XCircle className="w-4 h-4" />
+                            <span>Desativar</span>
+                          </>
+                        ) : (
+                          <>
+                            <CheckCircle className="w-4 h-4" />
+                            <span>Ativar</span>
+                          </>
+                        )}
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>
+                          {profile.isActive !== false ? 'Desativar Perfil' : 'Ativar Perfil'}
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                          {profile.isActive !== false 
+                            ? `Tem certeza que deseja desativar o perfil de ${profile.name}? O perfil não aparecerá mais nas buscas públicas, mas continuará visível no painel de administração.`
+                            : `Tem certeza que deseja ativar o perfil de ${profile.name}? O perfil voltará a aparecer nas buscas públicas.`
+                          }
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => toggleProfileStatus(profile.id)}
+                          className={profile.isActive !== false ? "bg-red-600 hover:bg-red-700" : ""}
+                        >
+                          {profile.isActive !== false ? 'Desativar' : 'Ativar'}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                   
                   <Button
                     variant="outline"
