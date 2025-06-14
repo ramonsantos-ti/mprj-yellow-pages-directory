@@ -81,28 +81,10 @@ const ProfileEdit: React.FC = () => {
           const userProfile = parsedProfiles.find((p: Profile) => p.userId === user.id);
           setProfile(userProfile || null);
           
-          // Populate form with profile data
-          if (userProfile) {
-            setFotoPreview(userProfile.fotoUrl || '');
-            setName(userProfile.name || user.name);
-            setMatricula(userProfile.matricula || user.matricula);
-            setEmail(userProfile.email || user.username);
-            setTelefone(userProfile.telefone || '');
-            setBiografia(userProfile.biografia || '');
-            setCargo(Array.isArray(userProfile.cargo) ? userProfile.cargo : []);
-            setFuncao(Array.isArray(userProfile.funcao) ? userProfile.funcao : []);
-            setUnidade(Array.isArray(userProfile.unidade) ? userProfile.unidade : []);
-            setFormacoes(Array.isArray(userProfile.formacaoAcademica) ? userProfile.formacaoAcademica : []);
-            setLinkCurriculo(userProfile.linkCurriculo || '');
-            setAceiteTermos(userProfile.aceiteTermos || false);
-            setProjetos(Array.isArray(userProfile.projetos) ? userProfile.projetos : []);
-            setCertificacoes(Array.isArray(userProfile.certificacoes) ? userProfile.certificacoes : []);
-            setPublicacoes(userProfile.publicacoes || '');
-            setTipoColaboracao(Array.isArray(userProfile.disponibilidade?.tipoColaboracao) ? userProfile.disponibilidade.tipoColaboracao : []);
-            setDisponibilidadeEstimada(userProfile.disponibilidade?.disponibilidadeEstimada || '');
-            setFormaContato(userProfile.contato?.formaContato || '');
-            setHorarioPreferencial(userProfile.contato?.horarioPreferencial || '');
-          } else {
+          // Only populate form if it's the initial load (when form fields are empty)
+          if (userProfile && !name && !email) {
+            populateFormFromProfile(userProfile);
+          } else if (!userProfile && !name && !email) {
             // Set default values for new profile
             setName(user.name);
             setMatricula(user.matricula);
@@ -118,28 +100,9 @@ const ProfileEdit: React.FC = () => {
           const userProfile = mockProfiles.find(p => p.userId === user.id);
           setProfile(userProfile || null);
           
-          if (userProfile) {
-            // Populate form with mock profile data
-            setFotoPreview(userProfile.fotoUrl || '');
-            setName(userProfile.name || user.name);
-            setMatricula(userProfile.matricula || user.matricula);
-            setEmail(userProfile.email || user.username);
-            setTelefone(userProfile.telefone || '');
-            setBiografia(userProfile.biografia || '');
-            setCargo(Array.isArray(userProfile.cargo) ? userProfile.cargo : []);
-            setFuncao(Array.isArray(userProfile.funcao) ? userProfile.funcao : []);
-            setUnidade(Array.isArray(userProfile.unidade) ? userProfile.unidade : []);
-            setFormacoes(Array.isArray(userProfile.formacaoAcademica) ? userProfile.formacaoAcademica : []);
-            setLinkCurriculo(userProfile.linkCurriculo || '');
-            setAceiteTermos(userProfile.aceiteTermos || false);
-            setProjetos(Array.isArray(userProfile.projetos) ? userProfile.projetos : []);
-            setCertificacoes(Array.isArray(userProfile.certificacoes) ? userProfile.certificacoes : []);
-            setPublicacoes(userProfile.publicacoes || '');
-            setTipoColaboracao(Array.isArray(userProfile.disponibilidade?.tipoColaboracao) ? userProfile.disponibilidade.tipoColaboracao : []);
-            setDisponibilidadeEstimada(userProfile.disponibilidade?.disponibilidadeEstimada || '');
-            setFormaContato(userProfile.contato?.formaContato || '');
-            setHorarioPreferencial(userProfile.contato?.horarioPreferencial || '');
-          } else {
+          if (userProfile && !name && !email) {
+            populateFormFromProfile(userProfile);
+          } else if (!userProfile && !name && !email) {
             // Set default values for new profile
             setName(user.name);
             setMatricula(user.matricula);
@@ -150,22 +113,40 @@ const ProfileEdit: React.FC = () => {
       setIsLoading(false);
     };
 
+    const populateFormFromProfile = (userProfile: Profile) => {
+      setFotoPreview(userProfile.fotoUrl || '');
+      setName(userProfile.name || user?.name || '');
+      setMatricula(userProfile.matricula || user?.matricula || '');
+      setEmail(userProfile.email || user?.username || '');
+      setTelefone(userProfile.telefone || '');
+      setBiografia(userProfile.biografia || '');
+      setCargo(Array.isArray(userProfile.cargo) ? userProfile.cargo : []);
+      setFuncao(Array.isArray(userProfile.funcao) ? userProfile.funcao : []);
+      setUnidade(Array.isArray(userProfile.unidade) ? userProfile.unidade : []);
+      setFormacoes(Array.isArray(userProfile.formacaoAcademica) ? userProfile.formacaoAcademica : []);
+      setLinkCurriculo(userProfile.linkCurriculo || '');
+      setAceiteTermos(userProfile.aceiteTermos || false);
+      setProjetos(Array.isArray(userProfile.projetos) ? userProfile.projetos : []);
+      setCertificacoes(Array.isArray(userProfile.certificacoes) ? userProfile.certificacoes : []);
+      setPublicacoes(userProfile.publicacoes || '');
+      setTipoColaboracao(Array.isArray(userProfile.disponibilidade?.tipoColaboracao) ? userProfile.disponibilidade.tipoColaboracao : []);
+      setDisponibilidadeEstimada(userProfile.disponibilidade?.disponibilidadeEstimada || '');
+      setFormaContato(userProfile.contato?.formaContato || '');
+      setHorarioPreferencial(userProfile.contato?.horarioPreferencial || '');
+    };
+
     loadProfiles();
 
-    // Listen for localStorage changes (when admin makes changes)
+    // Listen for localStorage changes (when admin makes changes) - but don't poll continuously
     const handleStorageChange = () => {
       console.log('ProfileEdit: Storage changed, reloading profiles');
       loadProfiles();
     };
 
     window.addEventListener('storage', handleStorageChange);
-    
-    // Also check for changes periodically (for same-tab updates)
-    const interval = setInterval(loadProfiles, 1000);
 
     return () => {
       window.removeEventListener('storage', handleStorageChange);
-      clearInterval(interval);
     };
   }, [user]);
 
