@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { mockProfiles } from '../data/mockData';
 import { Profile } from '../types';
@@ -63,8 +62,8 @@ const Home: React.FC = () => {
       <div className="text-center space-y-4">
         <div className="flex justify-center mb-4">
           <img 
-            src="/lovable-uploads/ffe5cc24-92ae-420f-8300-9f560b00a352.png" 
-            alt="MPRJ Logo" 
+            src="/lovable-uploads/58d2655c-30b5-4f5f-9d74-c9e6c62b7b21.png" 
+            alt="Páginas Amarelas do MPRJ" 
             className="h-24 w-auto"
           />
         </div>
