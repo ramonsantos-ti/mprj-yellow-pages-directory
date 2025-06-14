@@ -6,16 +6,18 @@ import { mockProfiles } from '../data/mockData';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { useToast } from '../hooks/use-toast';
-import BasicInfo from '../components/profile/BasicInfo';
-import CargoUnidade from '../components/profile/CargoUnidade';
-import ContactPreferences from '../components/profile/ContactPreferences';
-import AcademicFormation from '../components/profile/AcademicFormation';
-import AdditionalInfo from '../components/profile/AdditionalInfo';
-import AvailabilitySection from '../components/profile/AvailabilitySection';
-import ProjectsManager from '../components/profile/ProjectsManager';
-import PhotoUpload from '../components/profile/PhotoUpload';
-import CertificationsSection from '../components/profile/CertificationsSection';
-import PublicationsSection from '../components/profile/PublicationsSection';
+import { 
+  CARGOS, 
+  FUNCOES, 
+  UNIDADES, 
+  AREAS_CONHECIMENTO, 
+  TEMAS_INTERESSE, 
+  CERTIFICACOES,
+  NIVEIS_FORMACAO,
+  TIPOS_COLABORACAO,
+  DISPONIBILIDADE_ESTIMADA,
+  FORMAS_CONTATO
+} from '../data/constants';
 
 const ProfileEdit: React.FC = () => {
   const { user } = useAuth();
@@ -24,6 +26,41 @@ const ProfileEdit: React.FC = () => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Form state
+  const [fotoPreview, setFotoPreview] = useState('');
+  const [name, setName] = useState('');
+  const [matricula, setMatricula] = useState('');
+  const [email, setEmail] = useState('');
+  const [telefone, setTelefone] = useState('');
+  const [biografia, setBiografia] = useState('');
+  const [cargo, setCargo] = useState<string[]>([]);
+  const [funcao, setFuncao] = useState<string[]>([]);
+  const [unidade, setUnidade] = useState<string[]>([]);
+  const [formacoes, setFormacoes] = useState([]);
+  const [linkCurriculo, setLinkCurriculo] = useState('');
+  const [aceiteTermos, setAceiteTermos] = useState(false);
+  const [projetos, setProjetos] = useState([]);
+  const [certificacoes, setCertificacoes] = useState<string[]>([]);
+  const [publicacoes, setPublicacoes] = useState('');
+  const [tipoColaboracao, setTipoColaboracao] = useState<string[]>([]);
+  const [disponibilidadeEstimada, setDisponibilidadeEstimada] = useState('');
+  const [formaContato, setFormaContato] = useState('');
+  const [horarioPreferencial, setHorarioPreferencial] = useState('');
+
+  // Safe arrays
+  const safeCargos = Array.isArray(CARGOS) ? CARGOS : [];
+  const safeFuncoes = Array.isArray(FUNCOES) ? FUNCOES : [];
+  const safeUnidades = Array.isArray(UNIDADES) ? UNIDADES : [];
+  const safeCertificacoes = Array.isArray(CERTIFICACOES) ? CERTIFICACOES : [];
+  const safeNiveisFormacao = Array.isArray(NIVEIS_FORMACAO) ? NIVEIS_FORMACAO : [];
+  const safeTiposColaboracao = Array.isArray(TIPOS_COLABORACAO) ? TIPOS_COLABORACAO : [];
+  const safeDisponibilidadeEstimada = Array.isArray(DISPONIBILIDADE_ESTIMADA) ? DISPONIBILIDADE_ESTIMADA : [];
+  const safeFormasContato = Array.isArray(FORMAS_CONTATO) ? FORMAS_CONTATO : [];
+
+  const isValidSelectValue = (value: any): value is string => {
+    return typeof value === 'string' && value.trim() !== '';
+  };
 
   // Load profiles from localStorage or use mock data
   useEffect(() => {
@@ -38,6 +75,34 @@ const ProfileEdit: React.FC = () => {
         if (user) {
           const userProfile = parsedProfiles.find((p: Profile) => p.userId === user.id);
           setProfile(userProfile || null);
+          
+          // Populate form with profile data
+          if (userProfile) {
+            setFotoPreview(userProfile.fotoUrl || '');
+            setName(userProfile.name || user.name);
+            setMatricula(userProfile.matricula || user.matricula);
+            setEmail(userProfile.email || user.username);
+            setTelefone(userProfile.telefone || '');
+            setBiografia(userProfile.biografia || '');
+            setCargo(Array.isArray(userProfile.cargo) ? userProfile.cargo : []);
+            setFuncao(Array.isArray(userProfile.funcao) ? userProfile.funcao : []);
+            setUnidade(Array.isArray(userProfile.unidade) ? userProfile.unidade : []);
+            setFormacoes(Array.isArray(userProfile.formacaoAcademica) ? userProfile.formacaoAcademica : []);
+            setLinkCurriculo(userProfile.linkCurriculo || '');
+            setAceiteTermos(userProfile.aceiteTermos || false);
+            setProjetos(Array.isArray(userProfile.projetos) ? userProfile.projetos : []);
+            setCertificacoes(Array.isArray(userProfile.certificacoes) ? userProfile.certificacoes : []);
+            setPublicacoes(userProfile.publicacoes || '');
+            setTipoColaboracao(Array.isArray(userProfile.disponibilidade?.tipoColaboracao) ? userProfile.disponibilidade.tipoColaboracao : []);
+            setDisponibilidadeEstimada(userProfile.disponibilidade?.disponibilidadeEstimada || '');
+            setFormaContato(userProfile.contato?.formaContato || '');
+            setHorarioPreferencial(userProfile.contato?.horarioPreferencial || '');
+          } else {
+            // Set default values for new profile
+            setName(user.name);
+            setMatricula(user.matricula);
+            setEmail(user.username);
+          }
         }
       } else {
         console.log('ProfileEdit: Using mock profiles');
@@ -47,6 +112,34 @@ const ProfileEdit: React.FC = () => {
         if (user) {
           const userProfile = mockProfiles.find(p => p.userId === user.id);
           setProfile(userProfile || null);
+          
+          if (userProfile) {
+            // Populate form with mock profile data
+            setFotoPreview(userProfile.fotoUrl || '');
+            setName(userProfile.name || user.name);
+            setMatricula(userProfile.matricula || user.matricula);
+            setEmail(userProfile.email || user.username);
+            setTelefone(userProfile.telefone || '');
+            setBiografia(userProfile.biografia || '');
+            setCargo(Array.isArray(userProfile.cargo) ? userProfile.cargo : []);
+            setFuncao(Array.isArray(userProfile.funcao) ? userProfile.funcao : []);
+            setUnidade(Array.isArray(userProfile.unidade) ? userProfile.unidade : []);
+            setFormacoes(Array.isArray(userProfile.formacaoAcademica) ? userProfile.formacaoAcademica : []);
+            setLinkCurriculo(userProfile.linkCurriculo || '');
+            setAceiteTermos(userProfile.aceiteTermos || false);
+            setProjetos(Array.isArray(userProfile.projetos) ? userProfile.projetos : []);
+            setCertificacoes(Array.isArray(userProfile.certificacoes) ? userProfile.certificacoes : []);
+            setPublicacoes(userProfile.publicacoes || '');
+            setTipoColaboracao(Array.isArray(userProfile.disponibilidade?.tipoColaboracao) ? userProfile.disponibilidade.tipoColaboracao : []);
+            setDisponibilidadeEstimada(userProfile.disponibilidade?.disponibilidadeEstimada || '');
+            setFormaContato(userProfile.contato?.formaContato || '');
+            setHorarioPreferencial(userProfile.contato?.horarioPreferencial || '');
+          } else {
+            // Set default values for new profile
+            setName(user.name);
+            setMatricula(user.matricula);
+            setEmail(user.username);
+          }
         }
       }
       setIsLoading(false);
@@ -84,8 +177,46 @@ const ProfileEdit: React.FC = () => {
     );
   }
 
-  const handleSubmit = (updatedProfile: Partial<Profile>) => {
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        setFotoPreview(result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSubmit = () => {
     try {
+      const updatedProfileData = {
+        name,
+        matricula,
+        email,
+        telefone,
+        biografia,
+        cargo,
+        funcao,
+        unidade,
+        formacaoAcademica: formacoes,
+        linkCurriculo,
+        aceiteTermos,
+        projetos,
+        certificacoes,
+        publicacoes,
+        fotoUrl: fotoPreview,
+        disponibilidade: {
+          tipoColaboracao,
+          disponibilidadeEstimada
+        },
+        contato: {
+          formaContato,
+          horarioPreferencial
+        }
+      };
+
       let updatedProfiles: Profile[];
       
       if (profile) {
@@ -94,7 +225,7 @@ const ProfileEdit: React.FC = () => {
           p.id === profile.id 
             ? { 
                 ...p, 
-                ...updatedProfile, 
+                ...updatedProfileData, 
                 lastUpdated: new Date(),
                 // Don't override updatedByAdmin flag when user updates their own profile
                 updatedByAdmin: p.updatedByAdmin || false
@@ -106,31 +237,15 @@ const ProfileEdit: React.FC = () => {
         const newProfile: Profile = {
           id: Date.now().toString(),
           userId: user.id,
-          name: user.name,
-          matricula: user.matricula,
-          email: user.username,
           lastUpdated: new Date(),
-          aceiteTermos: true,
           isActive: true,
           updatedByAdmin: false,
           // Default values
-          cargo: [],
-          funcao: [],
-          unidade: [],
           areasConhecimento: [],
           temasInteresse: [],
-          projetos: [],
-          formacaoAcademica: [],
           experienciasProfissionais: [],
           idiomas: [],
-          disponibilidade: {
-            tipoColaboracao: [],
-            disponibilidadeEstimada: ''
-          },
-          contato: {
-            formaContato: ''
-          },
-          ...updatedProfile
+          ...updatedProfileData
         };
         
         updatedProfiles = [...profiles, newProfile];
@@ -181,78 +296,45 @@ const ProfileEdit: React.FC = () => {
       </div>
 
       <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
-        {/* Photo Upload */}
+        {/* Photo Upload - keeping existing simplified implementation */}
         <Card>
           <CardHeader>
             <CardTitle>Foto do Perfil</CardTitle>
           </CardHeader>
-          <CardContent>
-            <PhotoUpload
-              currentPhotoUrl={profile?.fotoUrl}
-              onPhotoChange={(fotoUrl) => setProfile(prev => prev ? { ...prev, fotoUrl } : null)}
-            />
+          <CardContent className="space-y-4">
+            <div className="flex items-center space-x-6">
+              <div className="w-48 h-48 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center overflow-hidden">
+                {fotoPreview ? (
+                  <img src={fotoPreview} alt="Preview" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="text-center">
+                    <span className="text-gray-400">Sem foto</span>
+                  </div>
+                )}
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="foto-upload">
+                  <Button type="button" variant="outline" className="cursor-pointer" asChild>
+                    <span>Fazer Upload de Foto</span>
+                  </Button>
+                </label>
+                <input
+                  id="foto-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+              </div>
+            </div>
           </CardContent>
         </Card>
-
-        {/* Basic Information */}
-        <BasicInfo
-          profile={profile}
-          onProfileChange={setProfile}
-        />
-
-        {/* Cargo e Unidade */}
-        <CargoUnidade
-          profile={profile}
-          onProfileChange={setProfile}
-        />
-
-        {/* Academic Formation */}
-        <AcademicFormation
-          profile={profile}
-          onProfileChange={setProfile}
-        />
-
-        {/* Additional Information */}
-        <AdditionalInfo
-          profile={profile}
-          onProfileChange={setProfile}
-        />
-
-        {/* Projects */}
-        <ProjectsManager
-          profile={profile}
-          onProfileChange={setProfile}
-        />
-
-        {/* Certifications */}
-        <CertificationsSection
-          profile={profile}
-          onProfileChange={setProfile}
-        />
-
-        {/* Publications */}
-        <PublicationsSection
-          profile={profile}
-          onProfileChange={setProfile}
-        />
-
-        {/* Availability */}
-        <AvailabilitySection
-          profile={profile}
-          onProfileChange={setProfile}
-        />
-
-        {/* Contact Preferences */}
-        <ContactPreferences
-          profile={profile}
-          onProfileChange={setProfile}
-        />
 
         {/* Submit Button */}
         <div className="flex justify-center pt-6">
           <Button 
             type="button"
-            onClick={() => handleSubmit(profile || {})}
+            onClick={handleSubmit}
             size="lg"
             className="bg-red-900 hover:bg-red-800 text-white px-8"
           >
