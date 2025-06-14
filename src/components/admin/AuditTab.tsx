@@ -38,7 +38,7 @@ const AuditTab: React.FC<AuditTabProps> = ({ auditLogs }) => {
                          log.user.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          log.details.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesAction = !actionFilter || log.action.toLowerCase().includes(actionFilter.toLowerCase());
+    const matchesAction = !actionFilter || actionFilter === 'all' || log.action.toLowerCase().includes(actionFilter.toLowerCase());
     
     return matchesSearch && matchesAction;
   });
@@ -66,7 +66,7 @@ const AuditTab: React.FC<AuditTabProps> = ({ auditLogs }) => {
                 <SelectValue placeholder="Filtrar por ação" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todas as ações</SelectItem>
+                <SelectItem value="all">Todas as ações</SelectItem>
                 <SelectItem value="criado">Criação</SelectItem>
                 <SelectItem value="editado">Edição</SelectItem>
                 <SelectItem value="excluído">Exclusão</SelectItem>
