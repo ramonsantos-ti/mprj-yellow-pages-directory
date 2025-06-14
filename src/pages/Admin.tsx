@@ -123,15 +123,33 @@ const Admin: React.FC = () => {
   };
 
   const promoteToAdmin = (profileId: string) => {
-    setProfiles(prev => prev.map(profile => 
-      profile.id === profileId 
-        ? { 
-            ...profile, 
-            role: profile.role === 'admin' ? 'user' : 'admin',
-            lastUpdated: new Date()
-          } 
-        : profile
-    ));
+    setProfiles(prev => {
+      const updatedProfiles = prev.map(profile => 
+        profile.id === profileId 
+          ? { 
+              ...profile, 
+              role: profile.role === 'admin' ? 'user' : 'admin',
+              lastUpdated: new Date()
+            } 
+          : profile
+      );
+      
+      // Update the corresponding user in localStorage if this is the current user's profile
+      const updatedProfile = updatedProfiles.find(p => p.id === profileId);
+      if (updatedProfile) {
+        const currentUser = localStorage.getItem('mprj_user');
+        if (currentUser) {
+          const parsedUser = JSON.parse(currentUser);
+          if (parsedUser.id === updatedProfile.userId) {
+            const updatedUser = { ...parsedUser, role: updatedProfile.role };
+            localStorage.setItem('mprj_user', JSON.stringify(updatedUser));
+            console.log('Admin: Updated current user role in localStorage');
+          }
+        }
+      }
+      
+      return updatedProfiles;
+    });
     
     const profile = profiles.find(p => p.id === profileId);
     const action = profile?.role === 'admin' ? 'removido de administrador' : 'promovido a administrador';

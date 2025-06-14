@@ -37,6 +37,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(false);
   }, []);
 
+  // Listen for storage changes to sync user role updates across tabs
+  useEffect(() => {
+    const handleStorageChange = () => {
+      console.log('AuthContext: Storage event detected, checking for profile updates');
+      if (user) {
+        const profiles = localStorage.getItem('mprj_profiles');
+        if (profiles) {
+          const parsedProfiles = JSON.parse(profiles);
+          const userProfile = parsedProfiles.find((p: any) => p.userId === user.id);
+          
+          if (userProfile && userProfile.role !== user.role) {
+            console.log(`AuthContext: User role changed from ${user.role} to ${userProfile.role}`);
+            const updatedUser = { ...user, role: userProfile.role };
+            setUser(updatedUser);
+            localStorage.setItem('mprj_user', JSON.stringify(updatedUser));
+          }
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [user]);
+
   const login = (username: string, password: string): boolean => {
     const foundUser = mockUsers.find(u => u.username === username && u.password === password);
     if (foundUser) {
