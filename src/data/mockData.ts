@@ -1,4 +1,3 @@
-
 import { User, Profile } from '../types';
 
 // Mock users data
@@ -112,6 +111,46 @@ export const mockUsers: User[] = [
     role: 'user',
     isActive: true,
     lastLogin: new Date('2024-01-05T11:45:00')
+  },
+  {
+    id: '12',
+    username: 'usuario11',
+    password: 'usuario11',
+    name: 'Alexandre Pereira Santos',
+    matricula: 'MPRJ12355',
+    role: 'user',
+    isActive: true,
+    lastLogin: new Date('2024-01-04T13:20:00')
+  },
+  {
+    id: '13',
+    username: 'usuario12',
+    password: 'usuario12',
+    name: 'Camila Rodriguez Lima',
+    matricula: 'MPRJ12356',
+    role: 'user',
+    isActive: true,
+    lastLogin: new Date('2024-01-03T10:15:00')
+  },
+  {
+    id: '14',
+    username: 'usuario13',
+    password: 'usuario13',
+    name: 'Fernando Almeida Junior',
+    matricula: 'MPRJ12357',
+    role: 'user',
+    isActive: true,
+    lastLogin: new Date('2024-01-02T16:30:00')
+  },
+  {
+    id: '15',
+    username: 'usuario14',
+    password: 'usuario14',
+    name: 'Priscila Washington Silva',
+    matricula: 'MPRJ12358',
+    role: 'user',
+    isActive: true,
+    lastLogin: new Date('2024-01-01T14:45:00')
   }
 ];
 
@@ -702,6 +741,250 @@ export const mockProfiles: Profile[] = [
     },
     fotoUrl: '/lovable-uploads/f9d90feb-9994-4c95-a03e-ac72dc5c3985.png',
     lastUpdated: new Date('2024-01-06T13:20:00'),
+    aceiteTermos: true,
+    isActive: true,
+    role: 'user'
+  },
+  {
+    id: '11',
+    userId: '12',
+    name: 'Alexandre Pereira Santos',
+    matricula: 'MPRJ12355',
+    cargo: ['Promotor de Justiça'],
+    funcao: ['Coordenador'],
+    unidade: ['Coordenadoria de Segurança Pública e Investigação Penal'],
+    telefone: '(21) 99999-4578',
+    email: 'alexandre.santos@mprj.mp.br',
+    biografia: 'Promotor de Justiça especializado em investigação criminal e segurança pública. Coordenador de operações complexas envolvendo crimes organizados e corrupção.',
+    areasConhecimento: ['Direito Penal', 'Investigação Criminal', 'Segurança Pública', 'Combate ao Crime Organizado'],
+    especializacoes: 'Mestrado em Ciências Criminais pela PUCRS, Especialização em Investigação Criminal pela Academia Nacional de Polícia',
+    projetos: [
+      {
+        nome: 'Operação Transparência Total',
+        dataInicio: new Date('2023-04-15'),
+        observacoes: 'Investigação de esquema de corrupção em órgãos públicos estaduais'
+      },
+      {
+        nome: 'Protocolo de Investigação Digital',
+        dataInicio: new Date('2023-08-01'),
+        observacoes: 'Desenvolvimento de novos métodos de investigação em crimes cibernéticos'
+      }
+    ],
+    temasInteresse: ['Crimes Cibernéticos', 'Inteligência Criminal', 'Cooperação Policial', 'Justiça Criminal'],
+    formacaoAcademica: [
+      {
+        nivel: 'Mestrado',
+        instituicao: 'PUCRS',
+        curso: 'Ciências Criminais',
+        ano: 2011
+      },
+      {
+        nivel: 'Graduação',
+        instituicao: 'UERJ',
+        curso: 'Direito',
+        ano: 2008
+      }
+    ],
+    experienciasProfissionais: [
+      {
+        tempoMPRJ: '14 anos',
+        experienciaAnterior: 'Delegado de Polícia Civil por 2 anos'
+      }
+    ],
+    idiomas: ['Português', 'Inglês', 'Espanhol'],
+    disponibilidade: {
+      tipoColaboracao: ['Consultoria interna', 'Capacitações/tutoria', 'Formação de equipes'],
+      disponibilidadeEstimada: '5h a 7h/semana'
+    },
+    contato: {
+      formaContato: 'E-mail',
+      horarioPreferencial: 'Tarde (14h às 18h)'
+    },
+    fotoUrl: '/lovable-uploads/b1064d84-1199-4c7f-8a9d-79b5031fc937.png',
+    lastUpdated: new Date('2024-01-04T15:30:00'),
+    aceiteTermos: true,
+    isActive: true,
+    role: 'user'
+  },
+  {
+    id: '12',
+    userId: '13',
+    name: 'Camila Rodriguez Lima',
+    matricula: 'MPRJ12356',
+    cargo: ['Analista'],
+    funcao: ['Gerente'],
+    unidade: ['Gerência de Recursos Humanos e Desenvolvimento Organizacional'],
+    telefone: '(21) 99999-7845',
+    email: 'camila.lima@mprj.mp.br',
+    biografia: 'Gerente de RH com especialização em desenvolvimento organizacional e gestão de pessoas. Responsável por implementar políticas de desenvolvimento de carreira e bem-estar dos servidores.',
+    areasConhecimento: ['Recursos Humanos', 'Desenvolvimento Organizacional', 'Gestão de Pessoas', 'Psicologia Organizacional'],
+    especializacoes: 'MBA em Gestão de Pessoas pela FGV, Especialização em Psicologia Organizacional pela PUC-Rio',
+    projetos: [
+      {
+        nome: 'Programa Bem-Estar MPRJ',
+        dataInicio: new Date('2023-03-01'),
+        observacoes: 'Implementação de programa de qualidade de vida e saúde mental para servidores'
+      },
+      {
+        nome: 'Plano de Carreira Digital',
+        dataInicio: new Date('2023-07-01'),
+        observacoes: 'Modernização dos processos de desenvolvimento profissional'
+      }
+    ],
+    temasInteresse: ['Bem-estar no Trabalho', 'Liderança', 'Diversidade e Inclusão', 'Gestão de Talentos'],
+    formacaoAcademica: [
+      {
+        nivel: 'MBA',
+        instituicao: 'FGV',
+        curso: 'Gestão de Pessoas',
+        ano: 2019
+      },
+      {
+        nivel: 'Graduação',
+        instituicao: 'UFRJ',
+        curso: 'Psicologia',
+        ano: 2015
+      }
+    ],
+    experienciasProfissionais: [
+      {
+        tempoMPRJ: '7 anos',
+        experienciaAnterior: 'Consultora em RH por 3 anos, Psicóloga organizacional por 2 anos'
+      }
+    ],
+    idiomas: ['Português', 'Espanhol', 'Inglês', 'Francês'],
+    disponibilidade: {
+      tipoColaboracao: ['Consultoria interna', 'Mentoria', 'Capacitações/tutoria'],
+      disponibilidadeEstimada: '4h a 6h/semana'
+    },
+    contato: {
+      formaContato: 'Microsoft Teams',
+      horarioPreferencial: 'Manhã (9h às 13h)'
+    },
+    fotoUrl: '/lovable-uploads/f1d5d368-675e-4753-aae3-b5ef9394f482.png',
+    lastUpdated: new Date('2024-01-03T12:45:00'),
+    aceiteTermos: true,
+    isActive: true,
+    role: 'user'
+  },
+  {
+    id: '13',
+    userId: '14',
+    name: 'Fernando Almeida Junior',
+    matricula: 'MPRJ12357',
+    cargo: ['Procurador de Justiça'],
+    funcao: ['Procurador-Geral Adjunto'],
+    unidade: ['Procuradoria-Geral de Justiça Adjunta para Assuntos Administrativos'],
+    telefone: '(21) 99999-9632',
+    email: 'fernando.almeida@mprj.mp.br',
+    biografia: 'Procurador-Geral Adjunto com mais de 25 anos de experiência no Ministério Público. Especialista em gestão administrativa e modernização de processos institucionais.',
+    areasConhecimento: ['Direito Administrativo', 'Gestão Pública', 'Modernização Institucional', 'Liderança Estratégica'],
+    especializacoes: 'Doutorado em Direito Administrativo pela USP, MBA Executivo em Administração Pública pela FGV',
+    projetos: [
+      {
+        nome: 'Reforma Administrativa MPRJ 2024',
+        dataInicio: new Date('2023-01-01'),
+        observacoes: 'Reestruturação organizacional e otimização de processos administrativos'
+      },
+      {
+        nome: 'Sistema Integrado de Gestão',
+        dataInicio: new Date('2023-05-15'),
+        observacoes: 'Implementação de ERP para integração de todos os sistemas administrativos'
+      }
+    ],
+    temasInteresse: ['Eficiência Administrativa', 'Transformação Organizacional', 'Governança Pública', 'Sustentabilidade Institucional'],
+    formacaoAcademica: [
+      {
+        nivel: 'Doutorado',
+        instituicao: 'USP',
+        curso: 'Direito Administrativo',
+        ano: 2005
+      },
+      {
+        nivel: 'MBA Executivo',
+        instituicao: 'FGV',
+        curso: 'Administração Pública',
+        ano: 2012
+      }
+    ],
+    experienciasProfissionais: [
+      {
+        tempoMPRJ: '25 anos',
+        experienciaAnterior: 'Consultor em gestão pública por 3 anos'
+      }
+    ],
+    idiomas: ['Português', 'Inglês', 'Espanhol', 'Francês'],
+    disponibilidade: {
+      tipoColaboracao: ['Consultoria interna', 'Mentoria', 'Formação de equipes'],
+      disponibilidadeEstimada: 'Sob demanda (caso a caso)'
+    },
+    contato: {
+      formaContato: 'E-mail',
+      horarioPreferencial: 'Manhã (8h às 12h)'
+    },
+    fotoUrl: '/lovable-uploads/5edbd460-a227-4b80-968c-237a75d703f6.png',
+    lastUpdated: new Date('2024-01-02T10:20:00'),
+    aceiteTermos: true,
+    isActive: true,
+    role: 'user'
+  },
+  {
+    id: '14',
+    userId: '15',
+    name: 'Priscila Washington Silva',
+    matricula: 'MPRJ12358',
+    cargo: ['Promotor de Justiça'],
+    funcao: ['Coordenador'],
+    unidade: ['Coordenadoria de Inclusão e Mobilização Sociais'],
+    telefone: '(21) 99999-1593',
+    email: 'priscila.silva@mprj.mp.br',
+    biografia: 'Promotora de Justiça especializada em direitos sociais e inclusão. Coordenadora de programas de mobilização social e acesso à justiça para comunidades vulneráveis.',
+    areasConhecimento: ['Direitos Sociais', 'Inclusão Social', 'Mobilização Comunitária', 'Acesso à Justiça'],
+    especializacoes: 'Mestrado em Direitos Humanos pela PUC-Rio, Especialização em Políticas Públicas Sociais pela UERJ',
+    projetos: [
+      {
+        nome: 'MPRJ na Comunidade',
+        dataInicio: new Date('2023-02-01'),
+        observacoes: 'Programa de levar serviços do MP diretamente às comunidades carentes'
+      },
+      {
+        nome: 'Justiça Digital Inclusiva',
+        dataInicio: new Date('2023-09-01'),
+        observacoes: 'Democratização do acesso digital aos serviços de justiça'
+      }
+    ],
+    temasInteresse: ['Justiça Social', 'Direitos das Minorias', 'Políticas de Inclusão', 'Educação Popular'],
+    formacaoAcademica: [
+      {
+        nivel: 'Mestrado',
+        instituicao: 'PUC-Rio',
+        curso: 'Direitos Humanos',
+        ano: 2014
+      },
+      {
+        nivel: 'Graduação',
+        instituicao: 'UERJ',
+        curso: 'Direito',
+        ano: 2011
+      }
+    ],
+    experienciasProfissionais: [
+      {
+        tempoMPRJ: '11 anos',
+        experienciaAnterior: 'Advogada popular por 2 anos, Assistente social por 3 anos'
+      }
+    ],
+    idiomas: ['Português', 'Inglês', 'Espanhol'],
+    disponibilidade: {
+      tipoColaboracao: ['Grupos de trabalho', 'Capacitações/tutoria', 'Mentoria'],
+      disponibilidadeEstimada: '5h a 7h/semana'
+    },
+    contato: {
+      formaContato: 'E-mail',
+      horarioPreferencial: 'Tarde (13h às 17h)'
+    },
+    fotoUrl: '/lovable-uploads/2ab9f017-3f42-42f8-88ab-d8d97a349571.png',
+    lastUpdated: new Date('2024-01-01T16:15:00'),
     aceiteTermos: true,
     isActive: true,
     role: 'user'
