@@ -31,6 +31,7 @@ const ProfileEdit: React.FC = () => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [showAdminAlert, setShowAdminAlert] = useState(false);
 
   // Form state
   const [fotoPreview, setFotoPreview] = useState('');
@@ -81,6 +82,11 @@ const ProfileEdit: React.FC = () => {
           const userProfile = parsedProfiles.find((p: Profile) => p.userId === user.id);
           setProfile(userProfile || null);
           
+          // Show admin alert if profile was updated by admin
+          if (userProfile?.updatedByAdmin) {
+            setShowAdminAlert(true);
+          }
+          
           // Only populate form if it's the initial load (when form fields are empty)
           if (userProfile && !name && !email) {
             populateFormFromProfile(userProfile);
@@ -99,6 +105,11 @@ const ProfileEdit: React.FC = () => {
         if (user) {
           const userProfile = mockProfiles.find(p => p.userId === user.id);
           setProfile(userProfile || null);
+          
+          // Show admin alert if profile was updated by admin
+          if (userProfile?.updatedByAdmin) {
+            setShowAdminAlert(true);
+          }
           
           if (userProfile && !name && !email) {
             populateFormFromProfile(userProfile);
@@ -206,15 +217,14 @@ const ProfileEdit: React.FC = () => {
       let updatedProfiles: Profile[];
       
       if (profile) {
-        // Update existing profile
+        // Update existing profile and clear updatedByAdmin flag
         updatedProfiles = profiles.map(p => 
           p.id === profile.id 
             ? { 
                 ...p, 
                 ...updatedProfileData, 
                 lastUpdated: new Date(),
-                // Don't override updatedByAdmin flag when user updates their own profile
-                updatedByAdmin: p.updatedByAdmin || false
+                updatedByAdmin: false // Clear the admin flag when user updates
               } 
             : p
         );
@@ -244,6 +254,9 @@ const ProfileEdit: React.FC = () => {
       // Update local state
       setProfiles(updatedProfiles);
       
+      // Hide the admin alert after successful save
+      setShowAdminAlert(false);
+      
       // Manually trigger storage event for same-tab updates
       window.dispatchEvent(new Event('storage'));
       
@@ -272,7 +285,7 @@ const ProfileEdit: React.FC = () => {
         <p className="text-lg text-gray-600">
           {profile ? 'Atualize suas informações profissionais' : 'Complete seu perfil para aparecer nas buscas'}
         </p>
-        {profile?.updatedByAdmin && (
+        {showAdminAlert && (
           <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
             <p className="text-orange-800 text-sm font-medium">
               ⚠️ Este perfil foi alterado pelo administrador. Suas próximas alterações irão sobrescrever as modificações administrativas.
