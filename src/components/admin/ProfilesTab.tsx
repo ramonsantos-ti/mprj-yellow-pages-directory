@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Profile } from '../../types';
 import { Card, CardContent } from '../ui/card';
@@ -196,7 +197,7 @@ const ProfilesTab: React.FC<ProfilesTabProps> = ({
                     size="sm"
                     onClick={() => promoteToAdmin(profile.id)}
                     className="flex items-center space-x-1"
-                    showAdminStyle={true}
+                    showAdminStyle={profile.role === 'admin'}
                   >
                     <Shield className="w-4 h-4" />
                     <span>Admin</span>
