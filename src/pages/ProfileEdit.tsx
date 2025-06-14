@@ -736,11 +736,11 @@ const ProfileEdit: React.FC = () => {
                   <div key={tipo} className="flex items-center space-x-2">
                     <Checkbox
                       checked={tipoColaboracao.includes(tipo)}
-                      onCheckedChange={() => {
-                        if (tipoColaboracao.includes(tipo)) {
-                          setTipoColaboracao(tipoColaboracao.filter(t => t !== tipo));
-                        } else {
+                      onCheckedChange={(checked) => {
+                        if (checked === true) {
                           setTipoColaboracao([...tipoColaboracao, tipo]);
+                        } else {
+                          setTipoColaboracao(tipoColaboracao.filter(t => t !== tipo));
                         }
                       }}
                     />
@@ -819,7 +819,9 @@ const ProfileEdit: React.FC = () => {
             <div className="flex items-start space-x-3">
               <Checkbox
                 checked={aceiteTermos}
-                onCheckedChange={setAceiteTermos}
+                onCheckedChange={(checked) => {
+                  setAceiteTermos(checked === true);
+                }}
               />
               <div className="space-y-1 leading-none">
                 <Label>
