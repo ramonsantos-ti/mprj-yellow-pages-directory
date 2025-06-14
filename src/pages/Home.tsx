@@ -63,7 +63,7 @@ const Home: React.FC = () => {
       <div className="text-center space-y-4">
         <div className="flex justify-center mb-4">
           <img 
-            src="/lovable-uploads/9bdb3a99-0580-4f1a-90fd-bca0f42a713d.png" 
+            src="/lovable-uploads/ffe5cc24-92ae-420f-8300-9f560b00a352.png" 
             alt="MPRJ Logo" 
             className="h-24 w-auto"
           />
