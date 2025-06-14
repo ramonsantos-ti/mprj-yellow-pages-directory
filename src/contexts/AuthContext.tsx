@@ -27,7 +27,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const storedUser = localStorage.getItem('mprj_user');
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      const parsedUser = JSON.parse(storedUser);
+      // Ensure usuario01 is always admin
+      if (parsedUser.username === 'usuario01') {
+        parsedUser.role = 'admin';
+      }
+      setUser(parsedUser);
     }
     setIsLoading(false);
   }, []);
@@ -35,8 +40,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = (username: string, password: string): boolean => {
     const foundUser = mockUsers.find(u => u.username === username && u.password === password);
     if (foundUser) {
-      setUser(foundUser);
-      localStorage.setItem('mprj_user', JSON.stringify(foundUser));
+      // Ensure usuario01 is always admin
+      const userWithRole = { 
+        ...foundUser, 
+        role: username === 'usuario01' ? 'admin' as const : foundUser.role 
+      };
+      setUser(userWithRole);
+      localStorage.setItem('mprj_user', JSON.stringify(userWithRole));
       return true;
     }
     return false;
