@@ -1,4 +1,5 @@
-import React from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Profile } from '../types';
 import { mockProfiles } from '../data/mockData';
@@ -25,7 +26,49 @@ import { ptBR } from 'date-fns/locale';
 
 const ProfileDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const profile = mockProfiles.find(p => p.id === id);
+  const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [profile, setProfile] = useState<Profile | null>(null);
+
+  // Load profiles from localStorage or use mock data
+  useEffect(() => {
+    const loadProfiles = () => {
+      const savedProfiles = localStorage.getItem('mprj_profiles');
+      if (savedProfiles) {
+        const parsedProfiles = JSON.parse(savedProfiles);
+        console.log('ProfileDetail: Loaded profiles from localStorage:', parsedProfiles.length);
+        setProfiles(parsedProfiles);
+        
+        // Find the specific profile
+        const foundProfile = parsedProfiles.find((p: Profile) => p.id === id);
+        setProfile(foundProfile || null);
+      } else {
+        console.log('ProfileDetail: Using mock profiles');
+        setProfiles(mockProfiles);
+        
+        // Find the specific profile from mock data
+        const foundProfile = mockProfiles.find(p => p.id === id);
+        setProfile(foundProfile || null);
+      }
+    };
+
+    loadProfiles();
+
+    // Listen for localStorage changes (when admin makes changes)
+    const handleStorageChange = () => {
+      console.log('ProfileDetail: Storage changed, reloading profiles');
+      loadProfiles();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Also check for changes periodically (for same-tab updates)
+    const interval = setInterval(loadProfiles, 1000);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(interval);
+    };
+  }, [id]);
 
   if (!profile) {
     return (
@@ -97,6 +140,13 @@ const ProfileDetail: React.FC = () => {
                       {funcao}
                     </Badge>
                   ))}
+                </div>
+              )}
+              {profile.updatedByAdmin && (
+                <div className="mb-2">
+                  <Badge className="bg-orange-100 text-orange-800 text-xs">
+                    Alterado pelo Administrador
+                  </Badge>
                 </div>
               )}
               <div className="flex items-center space-x-4 text-sm text-gray-600">
