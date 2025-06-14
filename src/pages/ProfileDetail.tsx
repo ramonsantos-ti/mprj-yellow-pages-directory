@@ -1,114 +1,171 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 import { Profile } from '../types';
-import { mockProfiles } from '../data/mockData';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
 import { Button } from '../components/ui/button';
 import { Separator } from '../components/ui/separator';
 import { 
+  ArrowLeft, 
   Mail, 
   Phone, 
-  Calendar, 
   MapPin, 
-  User, 
-  BookOpen, 
-  Briefcase,
-  Globe,
-  Clock,
+  Briefcase, 
+  GraduationCap, 
+  Calendar,
   FileText,
-  ArrowLeft
+  Award,
+  Users,
+  Clock,
+  Loader2,
+  AlertCircle,
+  User
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 const ProfileDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [profiles, setProfiles] = useState<Profile[]>([]);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Load profiles from localStorage or use mock data
   useEffect(() => {
-    const loadProfiles = () => {
-      const savedProfiles = localStorage.getItem('mprj_profiles');
-      if (savedProfiles) {
-        const parsedProfiles = JSON.parse(savedProfiles);
-        console.log('ProfileDetail: Loaded profiles from localStorage:', parsedProfiles.length);
-        setProfiles(parsedProfiles);
-        
-        // Find the specific profile
-        const foundProfile = parsedProfiles.find((p: Profile) => p.id === id);
-        setProfile(foundProfile || null);
-      } else {
-        console.log('ProfileDetail: Using mock profiles');
-        setProfiles(mockProfiles);
-        
-        // Find the specific profile from mock data
-        const foundProfile = mockProfiles.find(p => p.id === id);
-        setProfile(foundProfile || null);
-      }
-    };
-
-    loadProfiles();
-
-    // Listen for localStorage changes (when admin makes changes)
-    const handleStorageChange = () => {
-      console.log('ProfileDetail: Storage changed, reloading profiles');
-      loadProfiles();
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    
-    // Also check for changes periodically (for same-tab updates)
-    const interval = setInterval(loadProfiles, 1000);
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      clearInterval(interval);
-    };
+    if (id) {
+      loadProfile();
+    }
   }, [id]);
 
-  if (!profile) {
+  const loadProfile = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('profiles')
+        .select(`
+          *,
+          projects(*),
+          academic_formations(*),
+          professional_experiences(*),
+          availability(*)
+        `)
+        .eq('id', id)
+        .eq('is_active', true)
+        .single();
+
+      if (error) throw error;
+
+      // Transform Supabase data to match our Profile type
+      const transformedProfile: Profile = {
+        id: data.id,
+        userId: data.user_id || '',
+        name: data.name,
+        matricula: data.matricula,
+        cargo: data.cargo || [],
+        funcao: data.funcao || [],
+        unidade: data.unidade || [],
+        telefone: data.telefone || '',
+        email: data.email,
+        biografia: data.biografia || '',
+        areasConhecimento: data.areas_conhecimento || [],
+        especializacoes: data.especializacoes || '',
+        temasInteresse: data.temas_interesse || [],
+        idiomas: data.idiomas || [],
+        linkCurriculo: data.link_curriculo || '',
+        fotoUrl: data.foto_url || '',
+        certificacoes: data.certificacoes || [],
+        publicacoes: data.publicacoes || '',
+        role: data.role as 'admin' | 'user',
+        isActive: data.is_active ?? true,
+        aceiteTermos: data.aceite_termos ?? false,
+        updatedByAdmin: data.updated_by_admin ?? false,
+        lastUpdated: new Date(data.updated_at || data.created_at || new Date()),
+        projetos: data.projects?.map((p: any) => ({
+          id: p.id,
+          nome: p.nome,
+          dataInicio: p.data_inicio,
+          dataFim: p.data_fim,
+          observacoes: p.observacoes || ''
+        })) || [],
+        formacaoAcademica: data.academic_formations?.map((f: any) => ({
+          id: f.id,
+          nivel: f.nivel,
+          instituicao: f.instituicao,
+          curso: f.curso,
+          ano: f.ano
+        })) || [],
+        disponibilidade: data.availability?.[0] ? {
+          tipoColaboracao: data.availability[0].tipo_colaboracao || [],
+          disponibilidadeEstimada: data.availability[0].disponibilidade_estimada || '',
+          formaContato: data.availability[0].forma_contato || 'email',
+          horarioPreferencial: data.availability[0].horario_preferencial || ''
+        } : undefined
+      };
+
+      setProfile(transformedProfile);
+    } catch (err: any) {
+      console.error('Error loading profile:', err);
+      setError('Perfil não encontrado ou não está ativo');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getInitials = (name: string) => {
+    return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+  };
+
+  if (loading) {
     return (
-      <div className="text-center py-12">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">Perfil não encontrado</h2>
-        <Link to="/" className="text-red-900 hover:text-red-800">
-          Voltar ao início
-        </Link>
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 mx-auto mb-4 animate-spin text-red-600" />
+          <p className="text-gray-600">Carregando perfil...</p>
+        </div>
       </div>
     );
   }
 
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(n => n[0])
-      .join('')
-      .substring(0, 2)
-      .toUpperCase();
-  };
+  if (error || !profile) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Card className="w-full max-w-md">
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <AlertCircle className="w-8 h-8 mx-auto mb-4 text-red-600" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Perfil não encontrado</h3>
+              <p className="text-gray-600 mb-4">{error}</p>
+              <Link to="/">
+                <Button variant="outline">
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Voltar à busca
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      {/* Header com botão voltar */}
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center justify-between">
         <Link to="/">
-          <Button variant="outline" size="sm" className="flex items-center space-x-2">
-            <ArrowLeft className="w-4 h-4" />
-            <span>Voltar</span>
+          <Button variant="outline">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Voltar à busca
           </Button>
         </Link>
-        <h1 className="text-2xl font-bold text-gray-900">Perfil Detalhado</h1>
       </div>
 
-      {/* Informações Básicas */}
+      {/* Header with photo and basic info */}
       <Card>
-        <CardHeader>
-          <div className="flex items-start space-x-6">
-            {/* Increased photo size from w-24 h-32 to w-36 h-48 (50% increase) */}
-            <div className="w-36 h-48 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border">
+        <CardContent className="pt-6">
+          <div className="flex flex-col md:flex-row items-start space-y-4 md:space-y-0 md:space-x-6">
+            {/* Photo */}
+            <div className="w-32 h-40 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border">
               {profile.fotoUrl ? (
                 <img 
                   src={profile.fotoUrl} 
@@ -117,92 +174,68 @@ const ProfileDetail: React.FC = () => {
                 />
               ) : (
                 <div className="w-full h-full bg-red-100 flex items-center justify-center">
-                  <span className="text-red-900 font-semibold text-2xl">
+                  <span className="text-red-900 font-semibold text-xl">
                     {getInitials(profile.name)}
                   </span>
                 </div>
               )}
             </div>
-            <div className="flex-1">
-              <h2 className="text-2xl font-bold text-gray-900">{profile.name}</h2>
-              <p className="text-lg text-gray-600 mb-2">Matrícula: {profile.matricula}</p>
-              <div className="flex flex-wrap gap-2 mb-2">
-                {profile.cargo.map((cargo, index) => (
-                  <Badge key={index} className="bg-red-900 text-white">
-                    {cargo}
-                  </Badge>
-                ))}
-              </div>
-              {profile.funcao && profile.funcao.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {profile.funcao.map((funcao, index) => (
-                    <Badge key={index} variant="outline" className="border-red-900 text-red-900">
-                      {funcao}
-                    </Badge>
-                  ))}
-                </div>
-              )}
-              {profile.updatedByAdmin && (
-                <div className="mb-2">
-                  <Badge className="bg-orange-100 text-orange-800 text-xs">
-                    Alterado pelo Administrador
-                  </Badge>
-                </div>
-              )}
-              <div className="flex items-center space-x-4 text-sm text-gray-600">
-                <div className="flex items-center space-x-1">
-                  <Calendar className="w-4 h-4" />
-                  <span>Atualizado em {format(profile.lastUpdated, "dd/MM/yyyy", { locale: ptBR })}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </CardHeader>
-      </Card>
 
-      {/* Contato e Localização */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Mail className="w-5 h-5" />
-            <span>Contato e Localização</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex items-center space-x-2">
-              <Mail className="w-4 h-4 text-gray-400" />
-              <span>{profile.email}</span>
-            </div>
-            {profile.telefone && (
-              <div className="flex items-center space-x-2">
-                <Phone className="w-4 h-4 text-gray-400" />
-                <span>{profile.telefone}</span>
+            {/* Basic Info */}
+            <div className="flex-1">
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">{profile.name}</h1>
+              <p className="text-lg text-gray-600 mb-4">Matrícula: {profile.matricula}</p>
+              
+              <div className="space-y-3">
+                <div className="flex items-center space-x-2 text-gray-600">
+                  <Mail className="w-4 h-4" />
+                  <span>{profile.email}</span>
+                </div>
+                
+                {profile.telefone && (
+                  <div className="flex items-center space-x-2 text-gray-600">
+                    <Phone className="w-4 h-4" />
+                    <span>{profile.telefone}</span>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-          <div>
-            <div className="flex items-start space-x-2">
-              <MapPin className="w-4 h-4 text-gray-400 mt-1" />
-              <div className="flex flex-wrap gap-1">
-                {profile.unidade.map((unidade, index) => (
-                  <Badge key={index} variant="outline">
-                    {unidade}
-                  </Badge>
-                ))}
+
+              {/* Cargo and Unidade */}
+              <div className="mt-4 space-y-2">
+                {profile.cargo.length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-900 mb-1">Cargo:</h3>
+                    <div className="flex flex-wrap gap-1">
+                      {profile.cargo.map((c, index) => (
+                        <Badge key={index} variant="outline">{c}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {profile.unidade.length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-900 mb-1">Unidade:</h3>
+                    <div className="flex flex-wrap gap-1">
+                      {profile.unidade.map((u, index) => (
+                        <Badge key={index} variant="outline">{u}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Biografia */}
+      {/* Biography */}
       {profile.biografia && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <User className="w-5 h-5" />
-              <span>Sobre</span>
+              <span>Biografia</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -211,123 +244,141 @@ const ProfileDetail: React.FC = () => {
         </Card>
       )}
 
-      {/* Áreas de Interesse */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <BookOpen className="w-5 h-5" />
-            <span>Áreas de Interesse</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-2">
-            {profile.areasConhecimento.map((area, index) => (
-              <Badge key={index} className="bg-amber-100 text-amber-900 hover:bg-amber-200">
-                {area}
-              </Badge>
-            ))}
-          </div>
-          {profile.especializacoes && (
-            <div className="mt-4">
-              <h4 className="text-sm font-medium text-gray-900 mb-2">Especializações</h4>
-              <p className="text-gray-700">{profile.especializacoes}</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Projetos */}
-      {profile.projetos.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Briefcase className="w-5 h-5" />
-              <span>Projetos</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {profile.projetos.map((projeto, index) => (
-              <div key={index} className="border-l-4 border-amber-200 pl-4">
-                <h4 className="font-medium text-gray-900">{projeto.nome}</h4>
-                <p className="text-sm text-gray-600">
-                  {format(projeto.dataInicio, "MMM/yyyy", { locale: ptBR })} - 
-                  {projeto.dataFim ? format(projeto.dataFim, "MMM/yyyy", { locale: ptBR }) : 'Atual'}
-                </p>
-                {projeto.observacoes && (
-                  <p className="text-sm text-gray-700 mt-1">{projeto.observacoes}</p>
-                )}
+      <div className="grid gap-6 md:grid-cols-2">
+        {/* Areas de Conhecimento */}
+        {profile.areasConhecimento.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Briefcase className="w-5 h-5" />
+                <span>Áreas de Conhecimento</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-2">
+                {profile.areasConhecimento.map((area, index) => (
+                  <Badge key={index} className="bg-red-100 text-red-800">
+                    {area}
+                  </Badge>
+                ))}
               </div>
-            ))}
-          </CardContent>
-        </Card>
-      )}
+            </CardContent>
+          </Card>
+        )}
 
-      {/* Formação e Experiência */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Temas de Interesse */}
+        {profile.temasInteresse.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Temas de Interesse</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-2">
+                {profile.temasInteresse.map((tema, index) => (
+                  <Badge key={index} variant="outline">{tema}</Badge>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+
+      {/* Academic Formation */}
+      {profile.formacaoAcademica.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <BookOpen className="w-5 h-5" />
+              <GraduationCap className="w-5 h-5" />
               <span>Formação Acadêmica</span>
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
-            {profile.formacaoAcademica.map((formacao, index) => (
-              <div key={index} className="border-b border-gray-100 pb-3 last:border-b-0">
-                <p className="font-medium text-gray-900">{formacao.nivel}</p>
-                <p className="text-gray-700">{formacao.curso}</p>
-                <p className="text-sm text-gray-600">{formacao.instituicao} - {formacao.ano}</p>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Briefcase className="w-5 h-5" />
-              <span>Experiência Profissional</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {profile.experienciasProfissionais.map((exp, index) => (
-              <div key={index} className="space-y-2">
-                <div>
-                  <p className="font-medium text-gray-900">Tempo no MPRJ</p>
-                  <p className="text-gray-700">{exp.tempoMPRJ}</p>
-                </div>
-                {exp.experienciaAnterior && (
-                  <div>
-                    <p className="font-medium text-gray-900">Experiência Anterior</p>
-                    <p className="text-gray-700">{exp.experienciaAnterior}</p>
-                  </div>
-                )}
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Idiomas e Disponibilidade */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Globe className="w-5 h-5" />
-              <span>Idiomas</span>
-            </CardTitle>
-          </CardHeader>
           <CardContent>
-            <div className="flex flex-wrap gap-2">
-              {profile.idiomas.map((idioma, index) => (
-                <Badge key={index} variant="outline">
-                  {idioma}
-                </Badge>
+            <div className="space-y-4">
+              {profile.formacaoAcademica.map((formacao, index) => (
+                <div key={formacao.id || index} className="border-l-4 border-red-200 pl-4">
+                  <h4 className="font-semibold text-gray-900">{formacao.nivel}</h4>
+                  <p className="text-gray-700">{formacao.curso}</p>
+                  <p className="text-sm text-gray-600">{formacao.instituicao} • {formacao.ano}</p>
+                </div>
               ))}
             </div>
           </CardContent>
         </Card>
+      )}
 
+      {/* Projects */}
+      {profile.projetos.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <FileText className="w-5 h-5" />
+              <span>Projetos</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {profile.projetos.map((projeto, index) => (
+                <div key={projeto.id || index} className="border-l-4 border-blue-200 pl-4">
+                  <h4 className="font-semibold text-gray-900">{projeto.nome}</h4>
+                  <p className="text-sm text-gray-600 mb-2">
+                    <Calendar className="w-4 h-4 inline mr-1" />
+                    {format(new Date(projeto.dataInicio), 'dd/MM/yyyy', { locale: ptBR })}
+                    {projeto.dataFim && (
+                      <> - {format(new Date(projeto.dataFim), 'dd/MM/yyyy', { locale: ptBR })}</>
+                    )}
+                  </p>
+                  {projeto.observacoes && (
+                    <p className="text-gray-700 text-sm">{projeto.observacoes}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Additional Info Grid */}
+      <div className="grid gap-6 md:grid-cols-2">
+        {/* Languages */}
+        {profile.idiomas.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Idiomas</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-2">
+                {profile.idiomas.map((idioma, index) => (
+                  <Badge key={index} variant="outline">{idioma}</Badge>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Certifications */}
+        {profile.certificacoes.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Award className="w-5 h-5" />
+                <span>Certificações</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {profile.certificacoes.map((cert, index) => (
+                  <div key={index} className="text-sm text-gray-700">
+                    • {cert}
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+
+      {/* Availability */}
+      {profile.disponibilidade && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
@@ -335,67 +386,82 @@ const ProfileDetail: React.FC = () => {
               <span>Disponibilidade</span>
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
-            <div>
-              <p className="font-medium text-gray-900 mb-2">Tipo de Colaboração</p>
-              <div className="flex flex-wrap gap-1">
-                {profile.disponibilidade.tipoColaboracao.map((tipo, index) => (
-                  <Badge key={index} variant="secondary" className="text-xs">
-                    {tipo}
-                  </Badge>
-                ))}
+          <CardContent>
+            <div className="grid gap-4 md:grid-cols-2">
+              {profile.disponibilidade.tipoColaboracao?.length > 0 && (
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-2">Tipos de Colaboração</h4>
+                  <div className="flex flex-wrap gap-1">
+                    {profile.disponibilidade.tipoColaboracao.map((tipo, index) => (
+                      <Badge key={index} variant="outline">{tipo}</Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {profile.disponibilidade.disponibilidadeEstimada && (
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-2">Disponibilidade Estimada</h4>
+                  <p className="text-gray-700">{profile.disponibilidade.disponibilidadeEstimada}</p>
+                </div>
+              )}
+              
+              <div>
+                <h4 className="font-medium text-gray-900 mb-2">Forma de Contato Preferencial</h4>
+                <Badge variant="outline">{profile.disponibilidade.formaContato}</Badge>
               </div>
-            </div>
-            <div>
-              <p className="font-medium text-gray-900">Disponibilidade Estimada</p>
-              <p className="text-gray-700">{profile.disponibilidade.disponibilidadeEstimada}</p>
+              
+              {profile.disponibilidade.horarioPreferencial && (
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-2">Horário Preferencial</h4>
+                  <p className="text-gray-700">{profile.disponibilidade.horarioPreferencial}</p>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {/* Publications and Curriculum */}
+      <div className="grid gap-6 md:grid-cols-2">
+        {profile.publicacoes && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Publicações</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-700 leading-relaxed">{profile.publicacoes}</p>
+            </CardContent>
+          </Card>
+        )}
+
+        {profile.linkCurriculo && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Currículo</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <a
+                href={profile.linkCurriculo}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-red-600 hover:text-red-700 underline"
+              >
+                Acessar Currículo Completo
+              </a>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
-      {/* Contato Preferencial */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Mail className="w-5 h-5" />
-            <span>Preferências de Contato</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <p className="font-medium text-gray-900">Forma Preferencial</p>
-              <p className="text-gray-700">{profile.contato.formaContato}</p>
-            </div>
-            {profile.contato.horarioPreferencial && (
-              <div>
-                <p className="font-medium text-gray-900">Horário Preferencial</p>
-                <p className="text-gray-700">{profile.contato.horarioPreferencial}</p>
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Link do Currículo */}
-      {profile.linkCurriculo && (
+      {/* Specializations */}
+      {profile.especializacoes && (
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <FileText className="w-5 h-5" />
-              <span>Currículo</span>
-            </CardTitle>
+            <CardTitle>Especializações</CardTitle>
           </CardHeader>
           <CardContent>
-            <a 
-              href={profile.linkCurriculo} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-amber-900 hover:text-amber-800 underline"
-            >
-              Acessar Currículo Completo
-            </a>
+            <p className="text-gray-700 leading-relaxed">{profile.especializacoes}</p>
           </CardContent>
         </Card>
       )}

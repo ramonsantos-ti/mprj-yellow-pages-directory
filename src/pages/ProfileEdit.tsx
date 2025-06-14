@@ -1,39 +1,29 @@
+
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { Profile } from '../types';
-import { mockProfiles } from '../data/mockData';
-import { useAuditLog } from '../hooks/useAuditLog';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Textarea } from '../components/ui/textarea';
-import { Label } from '../components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { Badge } from '../components/ui/badge';
-import { Checkbox } from '../components/ui/checkbox';
-import { useToast } from '../hooks/use-toast';
-import { Plus, X } from 'lucide-react';
-import { 
-  CARGOS, 
-  FUNCOES, 
-  UNIDADES, 
-  CERTIFICACOES,
-  NIVEIS_FORMACAO,
-  TIPOS_COLABORACAO,
-  DISPONIBILIDADE_ESTIMADA,
-  FORMAS_CONTATO
-} from '../data/constants';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
+import BasicInfo from '../components/profile/BasicInfo';
+import CargoUnidade from '../components/profile/CargoUnidade';
+import AdditionalInfo from '../components/profile/AdditionalInfo';
+import AcademicFormation from '../components/profile/AcademicFormation';
+import ProjectsManager from '../components/profile/ProjectsManager';
+import CertificationsSection from '../components/profile/CertificationsSection';
+import PublicationsSection from '../components/profile/PublicationsSection';
+import AvailabilitySection from '../components/profile/AvailabilitySection';
+import ContactPreferences from '../components/profile/ContactPreferences';
+import PhotoUpload from '../components/profile/PhotoUpload';
 
 const ProfileEdit: React.FC = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
-  const { toast } = useToast();
-  const { addAuditLog } = useAuditLog();
-  const [profiles, setProfiles] = useState<Profile[]>([]);
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [showAdminAlert, setShowAdminAlert] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [userProfile, setUserProfile] = useState<Profile | null>(null);
 
   // Form state
   const [fotoPreview, setFotoPreview] = useState('');
@@ -45,152 +35,103 @@ const ProfileEdit: React.FC = () => {
   const [cargo, setCargo] = useState<string[]>([]);
   const [funcao, setFuncao] = useState<string[]>([]);
   const [unidade, setUnidade] = useState<string[]>([]);
-  const [formacoes, setFormacoes] = useState([]);
+  const [areasConhecimento, setAreasConhecimento] = useState<string[]>([]);
+  const [especializacoes, setEspecializacoes] = useState('');
+  const [temasInteresse, setTemasInteresse] = useState<string[]>([]);
+  const [idiomas, setIdiomas] = useState<string[]>([]);
   const [linkCurriculo, setLinkCurriculo] = useState('');
-  const [aceiteTermos, setAceiteTermos] = useState(false);
-  const [projetos, setProjetos] = useState([]);
+  const [formacaoAcademica, setFormacaoAcademica] = useState<any[]>([]);
+  const [projetos, setProjetos] = useState<any[]>([]);
   const [certificacoes, setCertificacoes] = useState<string[]>([]);
   const [publicacoes, setPublicacoes] = useState('');
-  const [tipoColaboracao, setTipoColaboracao] = useState<string[]>([]);
-  const [disponibilidadeEstimada, setDisponibilidadeEstimada] = useState('');
-  const [formaContato, setFormaContato] = useState('');
-  const [horarioPreferencial, setHorarioPreferencial] = useState('');
+  const [disponibilidade, setDisponibilidade] = useState<any>({});
+  const [aceiteTermos, setAceiteTermos] = useState(false);
 
-  // Safe arrays
-  const safeCargos = Array.isArray(CARGOS) ? CARGOS : [];
-  const safeFuncoes = Array.isArray(FUNCOES) ? FUNCOES : [];
-  const safeUnidades = Array.isArray(UNIDADES) ? UNIDADES : [];
-  const safeCertificacoes = Array.isArray(CERTIFICACOES) ? CERTIFICACOES : [];
-  const safeNiveisFormacao = Array.isArray(NIVEIS_FORMACAO) ? NIVEIS_FORMACAO : [];
-  const safeTiposColaboracao = Array.isArray(TIPOS_COLABORACAO) ? TIPOS_COLABORACAO : [];
-  const safeDisponibilidadeEstimada = Array.isArray(DISPONIBILIDADE_ESTIMADA) ? DISPONIBILIDADE_ESTIMADA : [];
-  const safeFormasContato = Array.isArray(FORMAS_CONTATO) ? FORMAS_CONTATO : [];
-
-  const isValidSelectValue = (value: any): value is string => {
-    return typeof value === 'string' && value.trim() !== '';
-  };
-
-  // Load profiles from localStorage or use mock data
   useEffect(() => {
-    const loadProfiles = () => {
-      const savedProfiles = localStorage.getItem('mprj_profiles');
-      if (savedProfiles) {
-        const parsedProfiles = JSON.parse(savedProfiles);
-        console.log('ProfileEdit: Loaded profiles from localStorage:', parsedProfiles.length);
-        setProfiles(parsedProfiles);
-        
-        // Find the current user's profile
-        if (user) {
-          const userProfile = parsedProfiles.find((p: Profile) => p.userId === user.id);
-          setProfile(userProfile || null);
-          
-          // Show admin alert if profile was updated by admin
-          if (userProfile?.updatedByAdmin) {
-            setShowAdminAlert(true);
-          }
-          
-          // Only populate form if it's the initial load (when form fields are empty)
-          if (userProfile && !name && !email) {
-            populateFormFromProfile(userProfile);
-          } else if (!userProfile && !name && !email) {
-            // Set default values for new profile
-            setName(user.name);
-            setMatricula(user.matricula);
-            setEmail(user.email || '');
-          }
-        }
-      } else {
-        console.log('ProfileEdit: Using mock profiles');
-        setProfiles(mockProfiles);
-        
-        // Find the current user's profile from mock data
-        if (user) {
-          const userProfile = mockProfiles.find(p => p.userId === user.id);
-          setProfile(userProfile || null);
-          
-          // Show admin alert if profile was updated by admin
-          if (userProfile?.updatedByAdmin) {
-            setShowAdminAlert(true);
-          }
-          
-          if (userProfile && !name && !email) {
-            populateFormFromProfile(userProfile);
-          } else if (!userProfile && !name && !email) {
-            // Set default values for new profile
-            setName(user.name);
-            setMatricula(user.matricula);
-            setEmail(user.email || '');
-          }
-        }
-      }
-      setIsLoading(false);
-    };
-
-    const populateFormFromProfile = (userProfile: Profile) => {
-      setFotoPreview(userProfile.fotoUrl || '');
-      setName(userProfile.name || user?.name || '');
-      setMatricula(userProfile.matricula || user?.matricula || '');
-      setEmail(userProfile.email || user?.email || '');
-      setTelefone(userProfile.telefone || '');
-      setBiografia(userProfile.biografia || '');
-      setCargo(Array.isArray(userProfile.cargo) ? userProfile.cargo : []);
-      setFuncao(Array.isArray(userProfile.funcao) ? userProfile.funcao : []);
-      setUnidade(Array.isArray(userProfile.unidade) ? userProfile.unidade : []);
-      setFormacoes(Array.isArray(userProfile.formacaoAcademica) ? userProfile.formacaoAcademica : []);
-      setLinkCurriculo(userProfile.linkCurriculo || '');
-      setAceiteTermos(userProfile.aceiteTermos || false);
-      setProjetos(Array.isArray(userProfile.projetos) ? userProfile.projetos : []);
-      setCertificacoes(Array.isArray(userProfile.certificacoes) ? userProfile.certificacoes : []);
-      setPublicacoes(userProfile.publicacoes || '');
-      setTipoColaboracao(Array.isArray(userProfile.disponibilidade?.tipoColaboracao) ? userProfile.disponibilidade.tipoColaboracao : []);
-      setDisponibilidadeEstimada(userProfile.disponibilidade?.disponibilidadeEstimada || '');
-      setFormaContato(userProfile.contato?.formaContato || '');
-      setHorarioPreferencial(userProfile.contato?.horarioPreferencial || '');
-    };
-
-    loadProfiles();
-
-    // Listen for localStorage changes (when admin makes changes) - but don't poll continuously
-    const handleStorageChange = () => {
-      console.log('ProfileEdit: Storage changed, reloading profiles');
-      loadProfiles();
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
+    if (user) {
+      loadUserProfile();
+    }
   }, [user]);
 
-  if (!user) {
-    navigate('/login');
-    return null;
-  }
+  const loadUserProfile = async () => {
+    try {
+      setLoading(true);
+      
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select(`
+          *,
+          projects(*),
+          academic_formations(*),
+          professional_experiences(*),
+          availability(*)
+        `)
+        .eq('user_id', user?.id)
+        .single();
 
-  if (isLoading) {
-    return (
-      <div className="text-center py-12">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">Carregando perfil...</h2>
-      </div>
-    );
-  }
+      if (error && error.code !== 'PGRST116') {
+        throw error;
+      }
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        setFotoPreview(result);
-      };
-      reader.readAsDataURL(file);
+      if (profile) {
+        setUserProfile(profile);
+        populateFormWithProfile(profile);
+      } else {
+        // New profile - set defaults
+        setName(user?.user_metadata?.name || user?.email || '');
+        setEmail(user?.email || '');
+        setMatricula(user?.user_metadata?.matricula || '');
+      }
+    } catch (err: any) {
+      console.error('Error loading profile:', err);
+      setError('Erro ao carregar perfil: ' + err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleSubmit = () => {
+  const populateFormWithProfile = (profile: any) => {
+    setFotoPreview(profile.foto_url || '');
+    setName(profile.name || '');
+    setMatricula(profile.matricula || '');
+    setEmail(profile.email || '');
+    setTelefone(profile.telefone || '');
+    setBiografia(profile.biografia || '');
+    setCargo(profile.cargo || []);
+    setFuncao(profile.funcao || []);
+    setUnidade(profile.unidade || []);
+    setAreasConhecimento(profile.areas_conhecimento || []);
+    setEspecializacoes(profile.especializacoes || '');
+    setTemasInteresse(profile.temas_interesse || []);
+    setIdiomas(profile.idiomas || []);
+    setLinkCurriculo(profile.link_curriculo || '');
+    setCertificacoes(profile.certificacoes || []);
+    setPublicacoes(profile.publicacoes || '');
+    setAceiteTermos(profile.aceite_termos || false);
+
+    // Set related data
+    setFormacaoAcademica(profile.academic_formations || []);
+    setProjetos(profile.projects || []);
+    
+    if (profile.availability && profile.availability.length > 0) {
+      const avail = profile.availability[0];
+      setDisponibilidade({
+        tipoColaboracao: avail.tipo_colaboracao || [],
+        disponibilidadeEstimada: avail.disponibilidade_estimada || '',
+        formaContato: avail.forma_contato || 'email',
+        horarioPreferencial: avail.horario_preferencial || ''
+      });
+    }
+  };
+
+  const handleSave = async () => {
     try {
-      const updatedProfileData = {
+      setSaving(true);
+      setError(null);
+      setSuccessMessage(null);
+
+      const profileData = {
+        user_id: user?.id,
         name,
         matricula,
         email,
@@ -199,678 +140,336 @@ const ProfileEdit: React.FC = () => {
         cargo,
         funcao,
         unidade,
-        formacaoAcademica: formacoes,
-        linkCurriculo,
-        aceiteTermos,
-        projetos,
+        areas_conhecimento: areasConhecimento,
+        especializacoes,
+        temas_interesse: temasInteresse,
+        idiomas,
+        link_curriculo: linkCurriculo,
+        foto_url: fotoPreview,
         certificacoes,
         publicacoes,
-        fotoUrl: fotoPreview,
-        disponibilidade: {
-          tipoColaboracao,
-          disponibilidadeEstimada
-        },
-        contato: {
-          formaContato,
-          horarioPreferencial
-        }
+        aceite_termos: aceiteTermos,
+        updated_at: new Date().toISOString()
       };
 
-      let updatedProfiles: Profile[];
-      let isNewProfile = false;
-      
-      if (profile) {
-        // Update existing profile and clear updatedByAdmin flag
-        updatedProfiles = profiles.map(p => 
-          p.id === profile.id 
-            ? { 
-                ...p, 
-                ...updatedProfileData, 
-                lastUpdated: new Date(),
-                updatedByAdmin: false // Clear the admin flag when user updates
-              } 
-            : p
-        );
+      let profileId = userProfile?.id;
 
-        // Log the profile update
-        addAuditLog(
-          'Perfil atualizado pelo usuário',
-          user?.name || 'Usuário',
-          `${user?.name} atualizou seu próprio perfil`,
-          'Perfil',
-          profile.id,
-          `Perfil existente de ${profile.name}`,
-          'Perfil atualizado com novas informações'
-        );
+      if (userProfile) {
+        // Update existing profile
+        const { error } = await supabase
+          .from('profiles')
+          .update(profileData)
+          .eq('id', userProfile.id);
+
+        if (error) throw error;
       } else {
         // Create new profile
-        isNewProfile = true;
-        const newProfile: Profile = {
-          id: Date.now().toString(),
-          userId: user.id,
-          lastUpdated: new Date(),
-          isActive: true,
-          updatedByAdmin: false,
-          // Default values
-          areasConhecimento: [],
-          temasInteresse: [],
-          experienciasProfissionais: [],
-          idiomas: [],
-          ...updatedProfileData
-        };
-        
-        updatedProfiles = [...profiles, newProfile];
+        const { data, error } = await supabase
+          .from('profiles')
+          .insert(profileData)
+          .select()
+          .single();
 
-        // Log the profile creation
-        addAuditLog(
-          'Perfil criado',
-          user?.name || 'Usuário',
-          `${user?.name} criou um novo perfil no sistema`,
-          'Perfil',
-          newProfile.id,
-          'Nenhum perfil anterior',
-          `Novo perfil para ${name}`
-        );
+        if (error) throw error;
+        profileId = data.id;
+        setUserProfile(data);
       }
+
+      // Save academic formations
+      if (profileId) {
+        // Delete existing formations
+        await supabase
+          .from('academic_formations')
+          .delete()
+          .eq('profile_id', profileId);
+
+        // Insert new formations
+        if (formacaoAcademica.length > 0) {
+          const formations = formacaoAcademica.map(f => ({
+            profile_id: profileId,
+            nivel: f.nivel,
+            instituicao: f.instituicao,
+            curso: f.curso,
+            ano: f.ano
+          }));
+
+          await supabase
+            .from('academic_formations')
+            .insert(formations);
+        }
+
+        // Save projects
+        await supabase
+          .from('projects')
+          .delete()
+          .eq('profile_id', profileId);
+
+        if (projetos.length > 0) {
+          const projects = projetos.map(p => ({
+            profile_id: profileId,
+            nome: p.nome,
+            data_inicio: p.dataInicio,
+            data_fim: p.dataFim,
+            observacoes: p.observacoes
+          }));
+
+          await supabase
+            .from('projects')
+            .insert(projects);
+        }
+
+        // Save availability
+        await supabase
+          .from('availability')
+          .delete()
+          .eq('profile_id', profileId);
+
+        if (disponibilidade.tipoColaboracao?.length > 0) {
+          await supabase
+            .from('availability')
+            .insert({
+              profile_id: profileId,
+              tipo_colaboracao: disponibilidade.tipoColaboracao,
+              disponibilidade_estimada: disponibilidade.disponibilidadeEstimada,
+              forma_contato: disponibilidade.formaContato,
+              horario_preferencial: disponibilidade.horarioPreferencial
+            });
+        }
+      }
+
+      setSuccessMessage('Perfil salvo com sucesso!');
+      setTimeout(() => setSuccessMessage(null), 3000);
       
-      // Save to localStorage
-      localStorage.setItem('mprj_profiles', JSON.stringify(updatedProfiles));
-      console.log('ProfileEdit: Profile saved to localStorage');
+      // Reload profile data
+      await loadUserProfile();
       
-      // Update local state
-      setProfiles(updatedProfiles);
-      
-      // Hide the admin alert after successful save
-      setShowAdminAlert(false);
-      
-      // Manually trigger storage event for same-tab updates
-      window.dispatchEvent(new Event('storage'));
-      
-      toast({
-        title: isNewProfile ? "Perfil criado com sucesso!" : "Perfil salvo com sucesso!",
-        description: "Suas informações foram atualizadas.",
-      });
-      
-      navigate('/');
-    } catch (error) {
-      console.error('Error saving profile:', error);
-      toast({
-        title: "Erro ao salvar perfil",
-        description: "Tente novamente em alguns instantes.",
-        variant: "destructive",
-      });
+    } catch (err: any) {
+      console.error('Error saving profile:', err);
+      setError('Erro ao salvar perfil: ' + err.message);
+    } finally {
+      setSaving(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 mx-auto mb-4 animate-spin text-red-600" />
+          <p className="text-gray-600">Carregando perfil...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="text-center space-y-4">
         <h1 className="text-3xl font-bold text-gray-900">
-          {profile ? 'Editar Perfil' : 'Criar Perfil'}
+          {userProfile ? 'Editar Perfil' : 'Criar Perfil'}
         </h1>
         <p className="text-lg text-gray-600">
-          {profile ? 'Atualize suas informações profissionais' : 'Complete seu perfil para aparecer nas buscas'}
+          Complete suas informações para aparecer nas buscas públicas
         </p>
-        {showAdminAlert && (
-          <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-            <p className="text-orange-800 text-sm font-medium">
-              ⚠️ Este perfil foi alterado pelo administrador. Suas próximas alterações irão sobrescrever as modificações administrativas.
-            </p>
-          </div>
-        )}
       </div>
 
-      <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
-        {/* Photo Upload */}
+      {error && (
+        <Card className="border-red-200 bg-red-50">
+          <CardContent className="pt-6">
+            <div className="flex items-center space-x-2 text-red-800">
+              <AlertCircle className="w-5 h-5" />
+              <span>{error}</span>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {successMessage && (
+        <Card className="border-green-200 bg-green-50">
+          <CardContent className="pt-6">
+            <div className="flex items-center space-x-2 text-green-800">
+              <CheckCircle2 className="w-5 h-5" />
+              <span>{successMessage}</span>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      <div className="grid gap-6">
         <Card>
           <CardHeader>
             <CardTitle>Foto do Perfil</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center space-x-6">
-              <div className="w-48 h-48 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center overflow-hidden">
-                {fotoPreview ? (
-                  <img src={fotoPreview} alt="Preview" className="w-full h-full object-cover" />
-                ) : (
-                  <div className="text-center">
-                    <span className="text-gray-400">Sem foto</span>
-                  </div>
-                )}
-              </div>
-              <div className="space-y-2">
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={() => document.getElementById('foto-upload')?.click()}
-                >
-                  Fazer Upload de Foto
-                </Button>
-                <input
-                  id="foto-upload"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                />
-                <p className="text-sm text-gray-500">
-                  Formatos aceitos: JPG, PNG, GIF. Máximo 5MB.
-                </p>
-              </div>
-            </div>
+          <CardContent>
+            <PhotoUpload
+              currentPhotoUrl={fotoPreview}
+              onPhotoUrlChange={setFotoPreview}
+            />
           </CardContent>
         </Card>
 
-        {/* Basic Information */}
         <Card>
           <CardHeader>
             <CardTitle>Informações Básicas</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Nome Completo</Label>
-                <Input
-                  id="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Seu nome completo"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="matricula">Matrícula</Label>
-                <Input
-                  id="matricula"
-                  value={matricula}
-                  onChange={(e) => setMatricula(e.target.value)}
-                  placeholder="Sua matrícula"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="seu.email@mprj.mp.br"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="telefone">Telefone</Label>
-                <Input
-                  id="telefone"
-                  value={telefone}
-                  onChange={(e) => setTelefone(e.target.value)}
-                  placeholder="(21) 99999-9999"
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="biografia">Biografia</Label>
-              <Textarea
-                id="biografia"
-                value={biografia}
-                onChange={(e) => setBiografia(e.target.value)}
-                placeholder="Conte um pouco sobre você, sua experiência e áreas de interesse..."
-                rows={4}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="curriculo">Link do Currículo</Label>
-              <Input
-                id="curriculo"
-                value={linkCurriculo}
-                onChange={(e) => setLinkCurriculo(e.target.value)}
-                placeholder="https://..."
-              />
-            </div>
+          <CardContent>
+            <BasicInfo
+              name={name}
+              setName={setName}
+              matricula={matricula}
+              setMatricula={setMatricula}
+              email={email}
+              setEmail={setEmail}
+              telefone={telefone}
+              setTelefone={setTelefone}
+              biografia={biografia}
+              setBiografia={setBiografia}
+            />
           </CardContent>
         </Card>
 
-        {/* Cargo, Função e Unidade */}
         <Card>
           <CardHeader>
-            <CardTitle>Cargo, Função e Lotação</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label>Cargos</Label>
-              <div className="space-y-2">
-                <Select onValueChange={(value) => {
-                  if (isValidSelectValue(value) && !cargo.includes(value)) {
-                    setCargo([...cargo, value]);
-                  }
-                }}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione um cargo" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {safeCargos.map((cargoItem, index) => (
-                      <SelectItem key={`cargo-${index}-${cargoItem}`} value={cargoItem}>
-                        {cargoItem}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <div className="flex flex-wrap gap-2">
-                  {cargo.map((cargoItem, index) => (
-                    <Badge key={index} variant="secondary" className="flex items-center space-x-1">
-                      <span>{cargoItem}</span>
-                      <X 
-                        className="w-3 h-3 cursor-pointer" 
-                        onClick={() => setCargo(cargo.filter((_, i) => i !== index))}
-                      />
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <Label>Função</Label>
-              <div className="space-y-2">
-                <Select onValueChange={(value) => {
-                  if (isValidSelectValue(value) && !funcao.includes(value)) {
-                    setFuncao([...funcao, value]);
-                  }
-                }}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione uma função (opcional)" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {safeFuncoes.map((funcaoItem, index) => (
-                      <SelectItem key={`funcao-${index}-${funcaoItem}`} value={funcaoItem}>
-                        {funcaoItem}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <div className="flex flex-wrap gap-2">
-                  {funcao.map((funcaoItem, index) => (
-                    <Badge key={index} variant="outline" className="flex items-center space-x-1">
-                      <span>{funcaoItem}</span>
-                      <X 
-                        className="w-3 h-3 cursor-pointer" 
-                        onClick={() => setFuncao(funcao.filter((_, i) => i !== index))}
-                      />
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <Label>Unidades</Label>
-              <div className="space-y-2">
-                <Select onValueChange={(value) => {
-                  if (isValidSelectValue(value) && !unidade.includes(value)) {
-                    setUnidade([...unidade, value]);
-                  }
-                }}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione uma unidade" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {safeUnidades.map((unidadeItem, index) => (
-                      <SelectItem key={`unidade-${index}-${unidadeItem}`} value={unidadeItem}>
-                        {unidadeItem}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <div className="flex flex-wrap gap-2">
-                  {unidade.map((unidadeItem, index) => (
-                    <Badge key={index} variant="secondary" className="flex items-center space-x-1">
-                      <span>{unidadeItem}</span>
-                      <X 
-                        className="w-3 h-3 cursor-pointer" 
-                        onClick={() => setUnidade(unidade.filter((_, i) => i !== index))}
-                      />
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Formação Acadêmica */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <span>Formação Acadêmica</span>
-              <Button type="button" onClick={() => {
-                setFormacoes([...formacoes, { nivel: '', instituicao: '', curso: '', ano: new Date().getFullYear() }]);
-              }} size="sm" variant="outline">
-                <Plus className="w-4 h-4 mr-2" />
-                Adicionar
-              </Button>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {formacoes.map((formacao, index) => (
-              <div key={index} className="border rounded-lg p-4 space-y-3">
-                <div className="flex justify-between items-start">
-                  <h4 className="font-medium">Formação {index + 1}</h4>
-                  <Button
-                    type="button"
-                    onClick={() => setFormacoes(formacoes.filter((_, i) => i !== index))}
-                    size="sm"
-                    variant="ghost"
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-                  <Select
-                    value={formacao.nivel}
-                    onValueChange={(value) => {
-                      if (isValidSelectValue(value)) {
-                        const novas = [...formacoes];
-                        novas[index].nivel = value;
-                        setFormacoes(novas);
-                      }
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Nível" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {safeNiveisFormacao.map((nivel, nivelIndex) => (
-                        <SelectItem key={`nivel-${nivelIndex}-${nivel}`} value={nivel}>
-                          {nivel}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Input
-                    placeholder="Instituição"
-                    value={formacao.instituicao}
-                    onChange={(e) => {
-                      const novas = [...formacoes];
-                      novas[index].instituicao = e.target.value;
-                      setFormacoes(novas);
-                    }}
-                  />
-                  <Input
-                    placeholder="Curso"
-                    value={formacao.curso}
-                    onChange={(e) => {
-                      const novas = [...formacoes];
-                      novas[index].curso = e.target.value;
-                      setFormacoes(novas);
-                    }}
-                  />
-                  <Input
-                    type="number"
-                    placeholder="Ano"
-                    value={formacao.ano}
-                    onChange={(e) => {
-                      const novas = [...formacoes];
-                      novas[index].ano = parseInt(e.target.value);
-                      setFormacoes(novas);
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-
-        {/* Projetos */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <span>Projetos</span>
-              <Button type="button" onClick={() => {
-                setProjetos([...projetos, { nome: '', dataInicio: '' }]);
-              }} size="sm" variant="outline">
-                <Plus className="w-4 h-4 mr-2" />
-                Adicionar
-              </Button>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {projetos.map((projeto, index) => (
-              <div key={index} className="border rounded-lg p-4 space-y-3">
-                <div className="flex justify-between items-start">
-                  <h4 className="font-medium">Projeto {index + 1}</h4>
-                  <Button
-                    type="button"
-                    onClick={() => setProjetos(projetos.filter((_, i) => i !== index))}
-                    size="sm"
-                    variant="ghost"
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  <Input
-                    placeholder="Nome do projeto"
-                    value={projeto.nome}
-                    onChange={(e) => {
-                      const novos = [...projetos];
-                      novos[index].nome = e.target.value;
-                      setProjetos(novos);
-                    }}
-                  />
-                  <Input
-                    type="date"
-                    placeholder="Data início"
-                    value={projeto.dataInicio}
-                    onChange={(e) => {
-                      const novos = [...projetos];
-                      novos[index].dataInicio = e.target.value;
-                      setProjetos(novos);
-                    }}
-                  />
-                  <Input
-                    type="date"
-                    placeholder="Data fim (opcional)"
-                    value={projeto.dataFim || ''}
-                    onChange={(e) => {
-                      const novos = [...projetos];
-                      novos[index].dataFim = e.target.value;
-                      setProjetos(novos);
-                    }}
-                  />
-                </div>
-                <Textarea
-                  placeholder="Observações sobre o projeto"
-                  value={projeto.observacoes || ''}
-                  onChange={(e) => {
-                    const novos = [...projetos];
-                    novos[index].observacoes = e.target.value;
-                    setProjetos(novos);
-                  }}
-                />
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-
-        {/* Certificações */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Certificações Relevantes</CardTitle>
+            <CardTitle>Cargo e Unidade</CardTitle>
           </CardHeader>
           <CardContent>
-            <div>
-              <Label>Certificações (PMP, ITIL, ISO, etc.)</Label>
-              <div className="space-y-2">
-                <Select onValueChange={(value) => {
-                  if (isValidSelectValue(value) && !certificacoes.includes(value)) {
-                    setCertificacoes([...certificacoes, value]);
-                  }
-                }}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione uma certificação" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {safeCertificacoes.map((cert, index) => (
-                      <SelectItem key={`cert-${index}-${cert}`} value={cert}>
-                        {cert}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <div className="flex flex-wrap gap-2">
-                  {certificacoes.map((cert, index) => (
-                    <Badge key={index} variant="secondary" className="flex items-center space-x-1">
-                      <span>{cert}</span>
-                      <X 
-                        className="w-3 h-3 cursor-pointer" 
-                        onClick={() => setCertificacoes(certificacoes.filter((_, i) => i !== index))}
-                      />
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            </div>
+            <CargoUnidade
+              cargo={cargo}
+              setCargo={setCargo}
+              funcao={funcao}
+              setFuncao={setFuncao}
+              unidade={unidade}
+              setUnidade={setUnidade}
+            />
           </CardContent>
         </Card>
 
-        {/* Publicações */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Publicações, Cursos Ministrados e Trabalhos de Destaque</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div>
-              <Label>Publicações e Trabalhos de Destaque</Label>
-              <Textarea 
-                value={publicacoes}
-                onChange={(e) => setPublicacoes(e.target.value)}
-                rows={5} 
-                placeholder="Liste suas publicações, cursos ministrados, trabalhos de destaque, etc..."
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Disponibilidade */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Disponibilidade para Colaboração</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label>Tipo de Colaboração</Label>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
-                {safeTiposColaboracao.map(tipo => (
-                  <div key={tipo} className="flex items-center space-x-2">
-                    <Checkbox
-                      checked={tipoColaboracao.includes(tipo)}
-                      onCheckedChange={(checked) => {
-                        if (checked === true) {
-                          setTipoColaboracao([...tipoColaboracao, tipo]);
-                        } else {
-                          setTipoColaboracao(tipoColaboracao.filter(t => t !== tipo));
-                        }
-                      }}
-                    />
-                    <span className="text-sm">{tipo}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <Label>Disponibilidade Estimada</Label>
-              <Select value={disponibilidadeEstimada} onValueChange={(value) => {
-                if (isValidSelectValue(value)) {
-                  setDisponibilidadeEstimada(value);
-                }
-              }}>
-                <SelectTrigger className="mt-2">
-                  <SelectValue placeholder="Selecione sua disponibilidade" />
-                </SelectTrigger>
-                <SelectContent>
-                  {safeDisponibilidadeEstimada.map((disponibilidade, dispIndex) => (
-                    <SelectItem key={`disp-${dispIndex}-${disponibilidade}`} value={disponibilidade}>
-                      {disponibilidade}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Preferências de Contato */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Preferências de Contato</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label>Forma Preferencial de Contato</Label>
-              <Select value={formaContato} onValueChange={(value) => {
-                if (isValidSelectValue(value)) {
-                  setFormaContato(value);
-                }
-              }}>
-                <SelectTrigger className="mt-2">
-                  <SelectValue placeholder="Selecione a forma de contato" />
-                </SelectTrigger>
-                <SelectContent>
-                  {safeFormasContato.map((forma, formaIndex) => (
-                    <SelectItem key={`forma-${formaIndex}-${forma}`} value={forma}>
-                      {forma}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label>Horário Preferencial</Label>
-              <Input
-                className="mt-2"
-                placeholder="Ex: manhã, tarde, 14h às 16h"
-                value={horarioPreferencial}
-                onChange={(e) => setHorarioPreferencial(e.target.value)}
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Aceite de Termos */}
         <Card>
           <CardHeader>
             <CardTitle>Informações Adicionais</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-start space-x-3">
-              <Checkbox
-                checked={aceiteTermos}
-                onCheckedChange={(checked) => {
-                  setAceiteTermos(checked === true);
-                }}
-              />
-              <div className="space-y-1 leading-none">
-                <Label>
-                  Declaro que as informações prestadas neste formulário são verdadeiras, 
-                  atualizadas e de minha responsabilidade. Comprometo-me a atualizá-las 
-                  sempre que houver mudanças relevantes. *
-                </Label>
-              </div>
-            </div>
+          <CardContent>
+            <AdditionalInfo
+              areasConhecimento={areasConhecimento}
+              setAreasConhecimento={setAreasConhecimento}
+              especializacoes={especializacoes}
+              setEspecializacoes={setEspecializacoes}
+              temasInteresse={temasInteresse}
+              setTemasInteresse={setTemasInteresse}
+              idiomas={idiomas}
+              setIdiomas={setIdiomas}
+              linkCurriculo={linkCurriculo}
+              setLinkCurriculo={setLinkCurriculo}
+            />
           </CardContent>
         </Card>
 
-        {/* Submit Button */}
-        <div className="flex justify-center pt-6">
-          <Button 
-            type="button"
-            onClick={handleSubmit}
-            size="lg"
-            className="bg-red-900 hover:bg-red-800 text-white px-8"
-          >
-            {profile ? 'Atualizar Perfil' : 'Criar Perfil'}
-          </Button>
-        </div>
-      </form>
+        <Card>
+          <CardHeader>
+            <CardTitle>Formação Acadêmica</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <AcademicFormation
+              formacaoAcademica={formacaoAcademica}
+              setFormacaoAcademica={setFormacaoAcademica}
+            />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Projetos</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ProjectsManager
+              projetos={projetos}
+              setProjetos={setProjetos}
+            />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Certificações</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <CertificationsSection
+              certificacoes={certificacoes}
+              setCertificacoes={setCertificacoes}
+            />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Publicações</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <PublicationsSection
+              publicacoes={publicacoes}
+              setPublicacoes={setPublicacoes}
+            />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Disponibilidade</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <AvailabilitySection
+              disponibilidade={disponibilidade}
+              setDisponibilidade={setDisponibilidade}
+            />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Preferências de Contato</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ContactPreferences
+              disponibilidade={disponibilidade}
+              setDisponibilidade={setDisponibilidade}
+            />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center space-x-2 mb-4">
+              <input
+                type="checkbox"
+                id="aceite-termos"
+                checked={aceiteTermos}
+                onChange={(e) => setAceiteTermos(e.target.checked)}
+                className="rounded border-gray-300"
+              />
+              <label htmlFor="aceite-termos" className="text-sm text-gray-700">
+                Aceito que meu perfil seja exibido publicamente no sistema de busca
+              </label>
+            </div>
+            
+            <div className="flex space-x-4">
+              <Button
+                onClick={handleSave}
+                disabled={saving || !aceiteTermos}
+                className="flex-1"
+              >
+                {saving ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Salvando...
+                  </>
+                ) : (
+                  'Salvar Perfil'
+                )}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

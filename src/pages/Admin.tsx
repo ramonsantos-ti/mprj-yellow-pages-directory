@@ -1,10 +1,12 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { mockProfiles } from '../data/mockData';
-import { Profile } from '../types';
+
+import React, { useState, useMemo } from 'react';
+import { useAdminProfiles } from '../hooks/useAdminProfiles';
+import { useAuditLogs } from '../hooks/useAuditLogs';
 import { StandardMessage } from '../types/admin';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { Card, CardContent } from '../components/ui/card';
+import { Loader2, AlertCircle } from 'lucide-react';
 import { generateProfileReport } from '../utils/pdfReports';
-import { useAuditLog } from '../hooks/useAuditLog';
 import ProfilesTab from '../components/admin/ProfilesTab';
 import AuditTab from '../components/admin/AuditTab';
 import NotificationsTab from '../components/admin/NotificationsTab';
@@ -13,8 +15,18 @@ import AnalyticsTab from '../components/admin/AnalyticsTab';
 
 const Admin: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [profiles, setProfiles] = useState<Profile[]>([]);
-  const { auditLogs, addAuditLog } = useAuditLog();
+  const { 
+    profiles, 
+    loading: profilesLoading, 
+    error: profilesError,
+    updateProfile,
+    toggleProfileStatus,
+    promoteToAdmin,
+    deleteProfile 
+  } = useAdminProfiles();
+  
+  const { auditLogs, loading: auditLoading, addAuditLog } = useAuditLogs();
+  
   const [standardMessages, setStandardMessages] = useState<StandardMessage[]>([
     {
       id: '1',
@@ -32,27 +44,6 @@ const Admin: React.FC = () => {
   const [recipientType, setRecipientType] = useState('group');
   const [messageSubject, setMessageSubject] = useState('');
   const [messageContent, setMessageContent] = useState('');
-
-  // Load profiles from localStorage or use mock data
-  useEffect(() => {
-    const savedProfiles = localStorage.getItem('mprj_profiles');
-    if (savedProfiles) {
-      setProfiles(JSON.parse(savedProfiles));
-    } else {
-      setProfiles(mockProfiles);
-    }
-  }, []);
-
-  // Save profiles to localStorage whenever profiles change and trigger storage event
-  useEffect(() => {
-    if (profiles.length > 0) {
-      localStorage.setItem('mprj_profiles', JSON.stringify(profiles));
-      console.log('Admin: Saved profiles to localStorage, triggering storage event');
-      
-      // Manually trigger storage event for same-tab updates
-      window.dispatchEvent(new Event('storage'));
-    }
-  }, [profiles]);
 
   // Sort profiles to show recently updated first
   const sortedProfiles = useMemo(() => {
@@ -72,167 +63,7 @@ const Admin: React.FC = () => {
   const allUnidades = [...new Set(profiles.flatMap(p => p.unidade || []))];
   const allAreas = [...new Set(profiles.flatMap(p => p.areasConhecimento || []))];
 
-  const updateProfile = (profileId: string, updatedData: Partial<Profile>) => {
-    const profile = profiles.find(p => p.id === profileId);
-    const previousData = profile ? {
-      name: profile.name,
-      email: profile.email,
-      cargo: profile.cargo?.join(', '),
-      unidade: profile.unidade?.join(', ')
-    } : {};
-    
-    const newData = {
-      name: updatedData.name || profile?.name,
-      email: updatedData.email || profile?.email,
-      cargo: updatedData.cargo?.join(', '),
-      unidade: updatedData.unidade?.join(', ')
-    };
-
-    setProfiles(prev => {
-      const updatedProfiles = prev.map(profile => 
-        profile.id === profileId 
-          ? { 
-              ...profile, 
-              ...updatedData,
-              lastUpdated: new Date(),
-              updatedByAdmin: true
-            } 
-          : profile
-      );
-      console.log('Admin: Profile updated, new profiles state:', updatedProfiles.length);
-      return updatedProfiles;
-    });
-    
-    // Get current user info for audit log
-    const currentUser = JSON.parse(localStorage.getItem('mprj_user') || '{}');
-    const currentUserProfile = profiles.find(p => p.userId === currentUser.id || p.matricula === currentUser.matricula);
-    
-    addAuditLog(
-      'Perfil editado',
-      currentUser.name || 'Usuário',
-      `Perfil ${profile?.name} foi editado pelo administrador`,
-      'Perfil',
-      profileId,
-      JSON.stringify(previousData),
-      JSON.stringify(newData),
-      currentUser.matricula || currentUserProfile?.matricula
-    );
-  };
-
-  const toggleProfileStatus = (profileId: string) => {
-    const profile = profiles.find(p => p.id === profileId);
-    const previousStatus = profile?.isActive !== false ? 'Ativo' : 'Inativo';
-    const newStatus = profile?.isActive !== false ? 'Inativo' : 'Ativo';
-    
-    setProfiles(prev => {
-      const updatedProfiles = prev.map(profile => 
-        profile.id === profileId 
-          ? { 
-              ...profile, 
-              isActive: profile.isActive !== false ? false : true,
-              lastUpdated: new Date()
-            } 
-          : profile
-      );
-      console.log('Admin: Profile status toggled, new profiles state:', updatedProfiles.length);
-      return updatedProfiles;
-    });
-    
-    // Get current user info for audit log
-    const currentUser = JSON.parse(localStorage.getItem('mprj_user') || '{}');
-    const currentUserProfile = profiles.find(p => p.userId === currentUser.id || p.matricula === currentUser.matricula);
-    
-    addAuditLog(
-      newStatus === 'Ativo' ? 'Perfil ativado' : 'Perfil desativado',
-      currentUser.name || 'Usuário',
-      `Status do perfil ${profile?.name} alterado`,
-      'Perfil',
-      profileId,
-      previousStatus,
-      newStatus,
-      currentUser.matricula || currentUserProfile?.matricula
-    );
-  };
-
-  const promoteToAdmin = (profileId: string) => {
-    const profile = profiles.find(p => p.id === profileId);
-    const previousRole = profile?.role === 'admin' ? 'Administrador' : 'Usuário';
-    const newRole = profile?.role === 'admin' ? 'Usuário' : 'Administrador';
-    
-    setProfiles(prev => {
-      const updatedProfiles = prev.map(profile => 
-        profile.id === profileId 
-          ? { 
-              ...profile, 
-              role: (profile.role === 'admin' ? 'user' : 'admin') as 'admin' | 'user',
-              lastUpdated: new Date()
-            } 
-          : profile
-      );
-      
-      // Update the corresponding user in localStorage if this is the current user's profile
-      const updatedProfile = updatedProfiles.find(p => p.id === profileId);
-      if (updatedProfile) {
-        const currentUser = localStorage.getItem('mprj_user');
-        if (currentUser) {
-          const parsedUser = JSON.parse(currentUser);
-          
-          // Check if this profile belongs to the current user by multiple criteria
-          if (parsedUser.id === updatedProfile.userId || 
-              parsedUser.matricula === updatedProfile.matricula ||
-              parsedUser.name === updatedProfile.name) {
-            const updatedUser = { ...parsedUser, role: updatedProfile.role };
-            localStorage.setItem('mprj_user', JSON.stringify(updatedUser));
-            console.log('Admin: Updated current user role in localStorage to:', updatedProfile.role);
-            
-            // Force trigger storage event for immediate sync
-            window.dispatchEvent(new Event('storage'));
-          }
-        }
-      }
-      
-      return updatedProfiles;
-    });
-    
-    // Get current user info for audit log
-    const currentUser = JSON.parse(localStorage.getItem('mprj_user') || '{}');
-    const currentUserProfile = profiles.find(p => p.userId === currentUser.id || p.matricula === currentUser.matricula);
-    
-    addAuditLog(
-      newRole === 'Administrador' ? 'Usuário promovido a admin' : 'Admin rebaixado a usuário',
-      currentUser.name || 'Usuário',
-      `Papel do usuário ${profile?.name} alterado`,
-      'Perfil',
-      profileId,
-      previousRole,
-      newRole,
-      currentUser.matricula || currentUserProfile?.matricula
-    );
-  };
-
-  const deleteProfile = (profileId: string) => {
-    const profile = profiles.find(p => p.id === profileId);
-    const profileData = profile ? `${profile.name} (${profile.email})` : 'Perfil desconhecido';
-    
-    setProfiles(prev => prev.filter(profile => profile.id !== profileId));
-    
-    // Get current user info for audit log
-    const currentUser = JSON.parse(localStorage.getItem('mprj_user') || '{}');
-    const currentUserProfile = profiles.find(p => p.userId === currentUser.id || p.matricula === currentUser.matricula);
-    
-    addAuditLog(
-      'Perfil excluído',
-      currentUser.name || 'Usuário',
-      `Perfil ${profile?.name} foi excluído permanentemente`,
-      'Perfil',
-      profileId,
-      profileData,
-      'Excluído',
-      currentUser.matricula || currentUserProfile?.matricula
-    );
-  };
-
-  const sendNotification = () => {
+  const sendNotification = async () => {
     let recipients: string[] = [];
     
     if (recipientType === 'group') {
@@ -255,20 +86,15 @@ const Admin: React.FC = () => {
       recipients = selectedRecipients;
     }
     
-    // Get current user info for audit log
-    const currentUser = JSON.parse(localStorage.getItem('mprj_user') || '{}');
-    const currentUserProfile = profiles.find(p => p.userId === currentUser.id || p.matricula === currentUser.matricula);
-    
     // Register in audit log
-    addAuditLog(
+    await addAuditLog(
       'Notificação enviada',
-      currentUser.name || 'Usuário',
+      'Administrador',
       `Notificação "${messageSubject}" enviada`,
       'Notificação',
       undefined,
       `${recipients.length} destinatários`,
-      `Assunto: ${messageSubject}`,
-      currentUser.matricula || currentUserProfile?.matricula
+      `Assunto: ${messageSubject}`
     );
     
     // Clear form
@@ -279,24 +105,52 @@ const Admin: React.FC = () => {
     alert(`Notificação enviada para ${recipients.length} destinatários!`);
   };
 
-  const generateReport = (reportType: string) => {
+  const generateReport = async (reportType: string) => {
     generateProfileReport(profiles, reportType);
     
-    // Get current user info for audit log
-    const currentUser = JSON.parse(localStorage.getItem('mprj_user') || '{}');
-    const currentUserProfile = profiles.find(p => p.userId === currentUser.id || p.matricula === currentUser.matricula);
-    
-    addAuditLog(
+    await addAuditLog(
       'Relatório gerado',
-      currentUser.name || 'Usuário',
+      'Administrador',
       `Relatório de tipo "${reportType}" foi gerado`,
       'Relatório',
       undefined,
       undefined,
-      `Tipo: ${reportType}, ${profiles.length} perfis incluídos`,
-      currentUser.matricula || currentUserProfile?.matricula
+      `Tipo: ${reportType}, ${profiles.length} perfis incluídos`
     );
   };
+
+  if (profilesLoading || auditLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 mx-auto mb-4 animate-spin text-red-600" />
+          <p className="text-gray-600">Carregando dados administrativos...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (profilesError) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Card className="w-full max-w-md">
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <AlertCircle className="w-8 h-8 mx-auto mb-4 text-red-600" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Erro ao carregar dados</h3>
+              <p className="text-gray-600 mb-4">{profilesError}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              >
+                Tentar novamente
+              </button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
