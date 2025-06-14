@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo, useEffect } from 'react';
 import { mockProfiles } from '../data/mockData';
 import { Profile } from '../types';
@@ -74,6 +75,25 @@ const Admin: React.FC = () => {
       timestamp: new Date()
     };
     setAuditLogs(prev => [newLog, ...prev]);
+  };
+
+  const updateProfile = (profileId: string, updatedData: Partial<Profile>) => {
+    setProfiles(prev => {
+      const updatedProfiles = prev.map(profile => 
+        profile.id === profileId 
+          ? { 
+              ...profile, 
+              ...updatedData,
+              lastUpdated: new Date(),
+              updatedByAdmin: true
+            } 
+          : profile
+      );
+      return updatedProfiles;
+    });
+    
+    const profile = profiles.find(p => p.id === profileId);
+    addAuditLog('profile_edit', 'Admin', `Perfil ${profile?.name} editado pelo administrador`);
   };
 
   const toggleProfileStatus = (profileId: string) => {
@@ -176,6 +196,7 @@ const Admin: React.FC = () => {
             toggleProfileStatus={toggleProfileStatus}
             promoteToAdmin={promoteToAdmin}
             deleteProfile={deleteProfile}
+            updateProfile={updateProfile}
           />
         </TabsContent>
 

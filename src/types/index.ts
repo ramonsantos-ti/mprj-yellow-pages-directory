@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   username: string;
@@ -39,6 +38,7 @@ export interface Profile {
   certificacoes?: string[];
   publicacoes?: string;
   role?: 'admin' | 'user';
+  updatedByAdmin?: boolean; // New field to track admin modifications
 }
 
 export interface Project {

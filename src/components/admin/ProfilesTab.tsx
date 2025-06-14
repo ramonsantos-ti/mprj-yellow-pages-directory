@@ -1,14 +1,16 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Profile } from '../../types';
 import { Card, CardContent } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Input } from '../ui/input';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../ui/alert-dialog';
-import { Search, UserCheck, UserX, Shield, Trash2, CheckCircle, XCircle } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
+import { Search, UserCheck, UserX, Shield, Trash2, CheckCircle, XCircle, Edit } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import AdminProfileEditModal from './AdminProfileEditModal';
 
 interface ProfilesTabProps {
   searchTerm: string;
@@ -17,6 +19,7 @@ interface ProfilesTabProps {
   toggleProfileStatus: (profileId: string) => void;
   promoteToAdmin: (profileId: string) => void;
   deleteProfile: (profileId: string) => void;
+  updateProfile: (profileId: string, updatedData: Partial<Profile>) => void;
 }
 
 const ProfilesTab: React.FC<ProfilesTabProps> = ({
@@ -25,8 +28,11 @@ const ProfilesTab: React.FC<ProfilesTabProps> = ({
   filteredProfiles,
   toggleProfileStatus,
   promoteToAdmin,
-  deleteProfile
+  deleteProfile,
+  updateProfile
 }) => {
+  const [editingProfile, setEditingProfile] = useState<Profile | null>(null);
+
   const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   };
@@ -88,6 +94,11 @@ const ProfilesTab: React.FC<ProfilesTabProps> = ({
                           Atualizado recentemente
                         </Badge>
                       )}
+                      {profile.updatedByAdmin && (
+                        <Badge className="bg-orange-100 text-orange-800 text-xs">
+                          Alterado pelo Administrador
+                        </Badge>
+                      )}
                       <Badge variant={profile.isActive !== false ? "default" : "secondary"}>
                         {profile.isActive !== false ? "Ativo" : "Inativo"}
                       </Badge>
@@ -108,6 +119,35 @@ const ProfilesTab: React.FC<ProfilesTabProps> = ({
                 </div>
                 
                 <div className="flex items-center space-x-2">
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setEditingProfile(profile)}
+                        className="flex items-center space-x-1"
+                      >
+                        <Edit className="w-4 h-4" />
+                        <span>Editar</span>
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                      <DialogHeader>
+                        <DialogTitle>Editar Perfil - {profile.name}</DialogTitle>
+                      </DialogHeader>
+                      {editingProfile && (
+                        <AdminProfileEditModal
+                          profile={editingProfile}
+                          onSave={(updatedData) => {
+                            updateProfile(profile.id, updatedData);
+                            setEditingProfile(null);
+                          }}
+                          onCancel={() => setEditingProfile(null)}
+                        />
+                      )}
+                    </DialogContent>
+                  </Dialog>
+
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button
