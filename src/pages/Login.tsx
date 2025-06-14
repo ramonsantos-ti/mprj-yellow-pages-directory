@@ -104,7 +104,6 @@ const Login: React.FC = () => {
                 type="submit"
                 className="w-full"
                 disabled={isLoading}
-                isAdmin={isAdminLogin}
               >
                 {isLoading ? 'Entrando...' : 'Entrar'}
               </Button>

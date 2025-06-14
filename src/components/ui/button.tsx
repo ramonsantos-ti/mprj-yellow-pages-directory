@@ -40,13 +40,13 @@ export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean
-  isAdmin?: boolean
+  showAdminStyle?: boolean
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, isAdmin = false, children, ...props }, ref) => {
+  ({ className, variant, size, asChild = false, showAdminStyle = false, children, ...props }, ref) => {
     const Comp = asChild ? Slot : "button"
-    const finalVariant = isAdmin ? "admin" : variant
+    const finalVariant = showAdminStyle ? "admin" : variant
     
     return (
       <Comp
@@ -54,7 +54,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         {...props}
       >
-        {isAdmin && <Crown className="w-4 h-4" />}
+        {showAdminStyle && <Crown className="w-4 h-4" />}
         {children}
       </Comp>
     )

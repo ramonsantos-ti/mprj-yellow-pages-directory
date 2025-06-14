@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Profile } from '../../types';
 import { Card, CardContent } from '../ui/card';
@@ -126,7 +125,6 @@ const ProfilesTab: React.FC<ProfilesTabProps> = ({
                         size="sm"
                         onClick={() => setEditingProfile(profile)}
                         className="flex items-center space-x-1"
-                        isAdmin={profile.role === 'admin'}
                       >
                         <Edit className="w-4 h-4" />
                         <span>Editar</span>
@@ -155,7 +153,6 @@ const ProfilesTab: React.FC<ProfilesTabProps> = ({
                         variant="outline"
                         size="sm"
                         className="flex items-center space-x-1"
-                        isAdmin={profile.role === 'admin'}
                       >
                         {profile.isActive !== false ? (
                           <>
@@ -199,7 +196,7 @@ const ProfilesTab: React.FC<ProfilesTabProps> = ({
                     size="sm"
                     onClick={() => promoteToAdmin(profile.id)}
                     className="flex items-center space-x-1"
-                    isAdmin={profile.role === 'admin'}
+                    showAdminStyle={true}
                   >
                     <Shield className="w-4 h-4" />
                     <span>Admin</span>
@@ -211,7 +208,6 @@ const ProfilesTab: React.FC<ProfilesTabProps> = ({
                         variant="outline"
                         size="sm"
                         className="flex items-center space-x-1 text-red-600 hover:text-red-700"
-                        isAdmin={profile.role === 'admin'}
                       >
                         <Trash2 className="w-4 h-4" />
                         <span>Excluir</span>
