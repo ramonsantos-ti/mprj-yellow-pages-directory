@@ -140,10 +140,17 @@ const Admin: React.FC = () => {
         const currentUser = localStorage.getItem('mprj_user');
         if (currentUser) {
           const parsedUser = JSON.parse(currentUser);
-          if (parsedUser.id === updatedProfile.userId) {
+          
+          // Check if this profile belongs to the current user by multiple criteria
+          if (parsedUser.id === updatedProfile.userId || 
+              parsedUser.matricula === updatedProfile.matricula ||
+              parsedUser.name === updatedProfile.name) {
             const updatedUser = { ...parsedUser, role: updatedProfile.role };
             localStorage.setItem('mprj_user', JSON.stringify(updatedUser));
-            console.log('Admin: Updated current user role in localStorage');
+            console.log('Admin: Updated current user role in localStorage to:', updatedProfile.role);
+            
+            // Force trigger storage event for immediate sync
+            window.dispatchEvent(new Event('storage'));
           }
         }
       }

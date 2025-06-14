@@ -45,30 +45,73 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const profiles = localStorage.getItem('mprj_profiles');
         if (profiles) {
           const parsedProfiles = JSON.parse(profiles);
-          const userProfile = parsedProfiles.find((p: any) => p.userId === user.id);
           
-          if (userProfile && userProfile.role !== user.role) {
+          // Try to find the profile by multiple criteria to ensure we find the right one
+          const userProfile = parsedProfiles.find((p: any) => 
+            p.userId === user.id || 
+            p.matricula === user.matricula ||
+            p.email === user.name || // In case email is stored as name
+            p.name === user.name
+          );
+          
+          console.log('AuthContext: Current user:', user);
+          console.log('AuthContext: Found user profile:', userProfile);
+          
+          if (userProfile && userProfile.role && userProfile.role !== user.role) {
             console.log(`AuthContext: User role changed from ${user.role} to ${userProfile.role}`);
             const updatedUser = { ...user, role: userProfile.role };
             setUser(updatedUser);
             localStorage.setItem('mprj_user', JSON.stringify(updatedUser));
+            
+            // Force a page reload to ensure the protected route re-evaluates
+            if (userProfile.role === 'user' && window.location.pathname === '/admin') {
+              window.location.href = '/';
+            }
           }
         }
       }
     };
 
+    // Listen for both storage events and manual dispatch events
+    const handleManualStorageChange = () => handleStorageChange();
+    
     window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    window.addEventListener('storage', handleManualStorageChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('storage', handleManualStorageChange);
+    };
   }, [user]);
 
   const login = (username: string, password: string): boolean => {
     const foundUser = mockUsers.find(u => u.username === username && u.password === password);
     if (foundUser) {
+      // Check if there's an existing profile for this user that might have admin role
+      const profiles = localStorage.getItem('mprj_profiles');
+      let userRole = foundUser.role;
+      
+      if (profiles) {
+        const parsedProfiles = JSON.parse(profiles);
+        const userProfile = parsedProfiles.find((p: any) => 
+          p.userId === foundUser.id || 
+          p.matricula === foundUser.matricula ||
+          p.name === foundUser.name
+        );
+        
+        if (userProfile && userProfile.role) {
+          userRole = userProfile.role;
+        }
+      }
+      
       // Ensure usuario01 is always admin
+      const finalRole = username === 'usuario01' ? 'admin' as const : userRole;
+      
       const userWithRole = { 
         ...foundUser, 
-        role: username === 'usuario01' ? 'admin' as const : foundUser.role 
+        role: finalRole
       };
+      
       setUser(userWithRole);
       localStorage.setItem('mprj_user', JSON.stringify(userWithRole));
       return true;
