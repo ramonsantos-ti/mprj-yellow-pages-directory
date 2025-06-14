@@ -124,11 +124,18 @@ const Admin: React.FC = () => {
 
   const promoteToAdmin = (profileId: string) => {
     setProfiles(prev => prev.map(profile => 
-      profile.id === profileId ? { ...profile, role: 'admin' } : profile
+      profile.id === profileId 
+        ? { 
+            ...profile, 
+            role: profile.role === 'admin' ? 'user' : 'admin',
+            lastUpdated: new Date()
+          } 
+        : profile
     ));
     
     const profile = profiles.find(p => p.id === profileId);
-    addAuditLog('role_change', 'Admin', `Perfil ${profile?.name} promovido a administrador`);
+    const action = profile?.role === 'admin' ? 'removido de administrador' : 'promovido a administrador';
+    addAuditLog('role_change', 'Admin', `Perfil ${profile?.name} ${action}`);
   };
 
   const deleteProfile = (profileId: string) => {
