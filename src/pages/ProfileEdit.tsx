@@ -1,326 +1,265 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { Button } from '../components/ui/button';
-import { Form } from '../components/ui/form';
-import { Alert, AlertDescription } from '../components/ui/alert';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { FormField, FormItem, FormLabel, FormMessage } from '../components/ui/form';
-import { Checkbox } from '../components/ui/checkbox';
-import { 
-  CARGOS,
-  FUNCOES,
-  UNIDADES,
-  NIVEIS_FORMACAO,
-  TIPOS_COLABORACAO,
-  DISPONIBILIDADE_ESTIMADA,
-  FORMAS_CONTATO,
-  CERTIFICACOES,
-  IDIOMAS
-} from '../data/constants';
+import { useAuth } from '../contexts/AuthContext';
+import { Profile } from '../types';
 import { mockProfiles } from '../data/mockData';
-import { Save, AlertCircle } from 'lucide-react';
-import { toast } from 'sonner';
-import { validateEmail } from '../utils/pdfReports';
-import InterestAreaSelector from '../components/InterestAreaSelector';
-import PhotoUpload from '../components/profile/PhotoUpload';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { useToast } from '../hooks/use-toast';
 import BasicInfo from '../components/profile/BasicInfo';
 import CargoUnidade from '../components/profile/CargoUnidade';
-import ProjectsManager from '../components/profile/ProjectsManager';
-import AcademicFormation from '../components/profile/AcademicFormation';
-import AvailabilitySection from '../components/profile/AvailabilitySection';
 import ContactPreferences from '../components/profile/ContactPreferences';
+import AcademicFormation from '../components/profile/AcademicFormation';
+import AdditionalInfo from '../components/profile/AdditionalInfo';
+import AvailabilitySection from '../components/profile/AvailabilitySection';
+import ProjectsManager from '../components/profile/ProjectsManager';
+import PhotoUpload from '../components/profile/PhotoUpload';
 import CertificationsSection from '../components/profile/CertificationsSection';
 import PublicationsSection from '../components/profile/PublicationsSection';
-import AdditionalInfo from '../components/profile/AdditionalInfo';
-
-const profileSchema = z.object({
-  name: z.string().min(1, 'Nome é obrigatório'),
-  matricula: z.string().min(1, 'Matrícula é obrigatória'),
-  cargo: z.array(z.string()).min(1, 'Pelo menos um cargo é obrigatório'),
-  funcao: z.array(z.string()).optional().default([]),
-  unidade: z.array(z.string()).min(1, 'Pelo menos uma unidade é obrigatória'),
-  email: z.string().email('Email inválido').refine(validateEmail, 'Email deve ser do domínio @mprj.mp.br'),
-  telefone: z.string().optional(),
-  biografia: z.string().optional(),
-  areasInteresse: z.array(z.string()).min(1, 'Pelo menos uma área de interesse é obrigatória'),
-  especializacoes: z.string().optional(),
-  temasInteresse: z.array(z.string()).min(1, 'Pelo menos um tema de interesse é obrigatório'),
-  idiomas: z.array(z.string()),
-  linkCurriculo: z.string().optional(),
-  certificacoes: z.array(z.string()).optional(),
-  publicacoes: z.string().optional(),
-  aceiteTermos: z.boolean().refine(val => val === true, 'Deve aceitar os termos')
-});
-
-type ProfileFormData = z.infer<typeof profileSchema>;
-
-// Enhanced validation function for Select values
-const isValidSelectValue = (value: any): value is string => {
-  const isValid = typeof value === 'string' && 
-                 value.trim().length > 0 && 
-                 /\S/.test(value.trim());
-  if (!isValid) {
-    console.error('Invalid select value detected:', value, typeof value);
-  }
-  return isValid;
-};
-
-// Helper function to safely filter arrays for Select components
-const safeFilterForSelect = (array: string[], arrayName: string) => {
-  const filtered = array.filter(item => {
-    const valid = isValidSelectValue(item);
-    if (!valid) {
-      console.warn(`Filtering out invalid ${arrayName} item:`, item);
-    }
-    return valid;
-  });
-  
-  console.log(`Safe filter for ${arrayName}: ${array.length} -> ${filtered.length}`);
-  return filtered;
-};
 
 const ProfileEdit: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
-  const [projetos, setProjetos] = useState<Array<{nome: string, dataInicio: string, dataFim?: string, observacoes?: string}>>([]);
-  const [formacoes, setFormacoes] = useState<Array<{nivel: string, instituicao: string, curso: string, ano: number}>>([]);
-  const [tipoColaboracao, setTipoColaboracao] = useState<string[]>([]);
-  const [disponibilidadeEstimada, setDisponibilidadeEstimada] = useState('');
-  const [formaContato, setFormaContato] = useState('');
-  const [horarioPreferencial, setHorarioPreferencial] = useState('');
-  const [fotoFile, setFotoFile] = useState<File | null>(null);
-  const [fotoPreview, setFotoPreview] = useState<string>('');
+  const { toast } = useToast();
+  const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Buscar perfil existente do usuário
-  const userProfile = mockProfiles.find(p => p.userId === user?.id);
-
-  const form = useForm<ProfileFormData>({
-    resolver: zodResolver(profileSchema),
-    defaultValues: {
-      name: user?.name || '',
-      matricula: user?.matricula || '',
-      cargo: userProfile?.cargo || [],
-      funcao: userProfile?.funcao || [],
-      unidade: userProfile?.unidade || [],
-      email: userProfile?.email || '',
-      telefone: userProfile?.telefone || '',
-      biografia: userProfile?.biografia || '',
-      areasInteresse: userProfile?.areasConhecimento || [],
-      especializacoes: userProfile?.especializacoes || '',
-      temasInteresse: userProfile?.temasInteresse || [],
-      idiomas: userProfile?.idiomas || [],
-      linkCurriculo: userProfile?.linkCurriculo || '',
-      certificacoes: userProfile?.certificacoes || [],
-      publicacoes: userProfile?.publicacoes || '',
-      aceiteTermos: userProfile?.aceiteTermos || false
-    }
-  });
-
+  // Load profiles from localStorage or use mock data
   useEffect(() => {
-    if (userProfile) {
-      setProjetos(userProfile.projetos.map(p => ({
-        nome: p.nome,
-        dataInicio: p.dataInicio.toISOString().split('T')[0],
-        dataFim: p.dataFim?.toISOString().split('T')[0],
-        observacoes: p.observacoes
-      })));
-      setFormacoes(userProfile.formacaoAcademica);
-      setTipoColaboracao(userProfile.disponibilidade.tipoColaboracao);
-      setDisponibilidadeEstimada(userProfile.disponibilidade.disponibilidadeEstimada);
-      setFormaContato(userProfile.contato.formaContato);
-      setHorarioPreferencial(userProfile.contato.horarioPreferencial || '');
-      setFotoPreview(userProfile.fotoUrl || '');
-    }
-  }, [userProfile]);
-
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
-        toast.error('Arquivo muito grande. Máximo 5MB.');
-        return;
+    const loadProfiles = () => {
+      const savedProfiles = localStorage.getItem('mprj_profiles');
+      if (savedProfiles) {
+        const parsedProfiles = JSON.parse(savedProfiles);
+        console.log('ProfileEdit: Loaded profiles from localStorage:', parsedProfiles.length);
+        setProfiles(parsedProfiles);
+        
+        // Find the current user's profile
+        if (user) {
+          const userProfile = parsedProfiles.find((p: Profile) => p.userId === user.id);
+          setProfile(userProfile || null);
+        }
+      } else {
+        console.log('ProfileEdit: Using mock profiles');
+        setProfiles(mockProfiles);
+        
+        // Find the current user's profile from mock data
+        if (user) {
+          const userProfile = mockProfiles.find(p => p.userId === user.id);
+          setProfile(userProfile || null);
+        }
       }
-      
-      if (!file.type.startsWith('image/')) {
-        toast.error('Apenas imagens são permitidas.');
-        return;
-      }
-
-      setFotoFile(file);
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setFotoPreview(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const onSubmit = async (data: ProfileFormData) => {
-    setIsLoading(true);
-    try {
-      // Simular salvamento
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      toast.success('Perfil atualizado com sucesso!');
-      navigate('/');
-    } catch (error) {
-      toast.error('Erro ao salvar perfil');
-    } finally {
       setIsLoading(false);
-    }
-  };
+    };
+
+    loadProfiles();
+
+    // Listen for localStorage changes (when admin makes changes)
+    const handleStorageChange = () => {
+      console.log('ProfileEdit: Storage changed, reloading profiles');
+      loadProfiles();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Also check for changes periodically (for same-tab updates)
+    const interval = setInterval(loadProfiles, 1000);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(interval);
+    };
+  }, [user]);
 
   if (!user) {
+    navigate('/login');
+    return null;
+  }
+
+  if (isLoading) {
     return (
-      <Alert>
-        <AlertCircle className="h-4 w-4" />
-        <AlertDescription>
-          Você precisa estar logado para acessar esta página.
-        </AlertDescription>
-      </Alert>
+      <div className="text-center py-12">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">Carregando perfil...</h2>
+      </div>
     );
   }
 
-  // Safe filtered arrays for Select components
-  const safeCargos = safeFilterForSelect(CARGOS, 'CARGOS');
-  const safeFuncoes = safeFilterForSelect(FUNCOES, 'FUNCOES');
-  const safeUnidades = safeFilterForSelect(UNIDADES, 'UNIDADES');
-  const safeNiveisFormacao = safeFilterForSelect(NIVEIS_FORMACAO, 'NIVEIS_FORMACAO');
-  const safeTiposColaboracao = safeFilterForSelect(TIPOS_COLABORACAO, 'TIPOS_COLABORACAO');
-  const safeDisponibilidadeEstimada = safeFilterForSelect(DISPONIBILIDADE_ESTIMADA, 'DISPONIBILIDADE_ESTIMADA');
-  const safeFormasContato = safeFilterForSelect(FORMAS_CONTATO, 'FORMAS_CONTATO');
-  const safeCertificacoes = safeFilterForSelect(CERTIFICACOES, 'CERTIFICACOES');
+  const handleSubmit = (updatedProfile: Partial<Profile>) => {
+    try {
+      let updatedProfiles: Profile[];
+      
+      if (profile) {
+        // Update existing profile
+        updatedProfiles = profiles.map(p => 
+          p.id === profile.id 
+            ? { 
+                ...p, 
+                ...updatedProfile, 
+                lastUpdated: new Date(),
+                // Don't override updatedByAdmin flag when user updates their own profile
+                updatedByAdmin: p.updatedByAdmin || false
+              } 
+            : p
+        );
+      } else {
+        // Create new profile
+        const newProfile: Profile = {
+          id: Date.now().toString(),
+          userId: user.id,
+          name: user.name,
+          matricula: user.matricula,
+          email: user.username,
+          lastUpdated: new Date(),
+          aceiteTermos: true,
+          isActive: true,
+          updatedByAdmin: false,
+          // Default values
+          cargo: [],
+          funcao: [],
+          unidade: [],
+          areasConhecimento: [],
+          temasInteresse: [],
+          projetos: [],
+          formacaoAcademica: [],
+          experienciasProfissionais: [],
+          idiomas: [],
+          disponibilidade: {
+            tipoColaboracao: [],
+            disponibilidadeEstimada: ''
+          },
+          contato: {
+            formaContato: ''
+          },
+          ...updatedProfile
+        };
+        
+        updatedProfiles = [...profiles, newProfile];
+      }
+      
+      // Save to localStorage
+      localStorage.setItem('mprj_profiles', JSON.stringify(updatedProfiles));
+      console.log('ProfileEdit: Profile saved to localStorage');
+      
+      // Update local state
+      setProfiles(updatedProfiles);
+      
+      // Manually trigger storage event for same-tab updates
+      window.dispatchEvent(new Event('storage'));
+      
+      toast({
+        title: "Perfil salvo com sucesso!",
+        description: "Suas informações foram atualizadas.",
+      });
+      
+      navigate('/');
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      toast({
+        title: "Erro ao salvar perfil",
+        description: "Tente novamente em alguns instantes.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-red-900">
-          {userProfile ? 'Editar Perfil' : 'Completar Cadastro'}
+      <div className="text-center space-y-4">
+        <h1 className="text-3xl font-bold text-gray-900">
+          {profile ? 'Editar Perfil' : 'Criar Perfil'}
         </h1>
-        <Button onClick={() => navigate('/')} variant="outline">
-          Cancelar
-        </Button>
+        <p className="text-lg text-gray-600">
+          {profile ? 'Atualize suas informações profissionais' : 'Complete seu perfil para aparecer nas buscas'}
+        </p>
+        {profile?.updatedByAdmin && (
+          <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+            <p className="text-orange-800 text-sm font-medium">
+              ⚠️ Este perfil foi alterado pelo administrador. Suas próximas alterações irão sobrescrever as modificações administrativas.
+            </p>
+          </div>
+        )}
       </div>
 
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          
-          <PhotoUpload 
-            fotoPreview={fotoPreview}
-            onFileUpload={handleFileUpload}
-          />
+      <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
+        {/* Photo Upload */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Foto do Perfil</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <PhotoUpload
+              currentPhotoUrl={profile?.fotoUrl}
+              onPhotoChange={(fotoUrl) => setProfile(prev => prev ? { ...prev, fotoUrl } : null)}
+            />
+          </CardContent>
+        </Card>
 
-          <BasicInfo form={form} />
+        {/* Basic Information */}
+        <BasicInfo
+          profile={profile}
+          onProfileChange={setProfile}
+        />
 
-          <CargoUnidade 
-            form={form}
-            safeCargos={safeCargos}
-            safeFuncoes={safeFuncoes}
-            safeUnidades={safeUnidades}
-            isValidSelectValue={isValidSelectValue}
-          />
+        {/* Cargo e Unidade */}
+        <CargoUnidade
+          profile={profile}
+          onProfileChange={setProfile}
+        />
 
-          <InterestAreaSelector form={form} fieldName="areasInteresse" />
+        {/* Academic Formation */}
+        <AcademicFormation
+          profile={profile}
+          onProfileChange={setProfile}
+        />
 
-          <ProjectsManager 
-            projetos={projetos}
-            setProjetos={setProjetos}
-          />
+        {/* Additional Information */}
+        <AdditionalInfo
+          profile={profile}
+          onProfileChange={setProfile}
+        />
 
-          <AcademicFormation 
-            formacoes={formacoes}
-            setFormacoes={setFormacoes}
-            safeNiveisFormacao={safeNiveisFormacao}
-            isValidSelectValue={isValidSelectValue}
-          />
+        {/* Projects */}
+        <ProjectsManager
+          profile={profile}
+          onProfileChange={setProfile}
+        />
 
-          <CertificationsSection 
-            form={form}
-            safeCertificacoes={safeCertificacoes}
-            isValidSelectValue={isValidSelectValue}
-          />
+        {/* Certifications */}
+        <CertificationsSection
+          profile={profile}
+          onProfileChange={setProfile}
+        />
 
-          <PublicationsSection form={form} />
+        {/* Publications */}
+        <PublicationsSection
+          profile={profile}
+          onProfileChange={setProfile}
+        />
 
-          {/* Idiomas Section */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Idiomas</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <FormField
-                control={form.control}
-                name="idiomas"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Idiomas</FormLabel>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                      {IDIOMAS.map(idioma => (
-                        <div key={idioma} className="flex items-center space-x-2">
-                          <Checkbox
-                            checked={field.value.includes(idioma)}
-                            onCheckedChange={() => {
-                              if (field.value.includes(idioma)) {
-                                field.onChange(field.value.filter(i => i !== idioma));
-                              } else {
-                                field.onChange([...field.value, idioma]);
-                              }
-                            }}
-                          />
-                          <span className="text-sm">{idioma}</span>
-                        </div>
-                      ))}
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </CardContent>
-          </Card>
+        {/* Availability */}
+        <AvailabilitySection
+          profile={profile}
+          onProfileChange={setProfile}
+        />
 
-          <AvailabilitySection 
-            tipoColaboracao={tipoColaboracao}
-            setTipoColaboracao={setTipoColaboracao}
-            disponibilidadeEstimada={disponibilidadeEstimada}
-            setDisponibilidadeEstimada={setDisponibilidadeEstimada}
-            safeTiposColaboracao={safeTiposColaboracao}
-            safeDisponibilidadeEstimada={safeDisponibilidadeEstimada}
-            isValidSelectValue={isValidSelectValue}
-          />
+        {/* Contact Preferences */}
+        <ContactPreferences
+          profile={profile}
+          onProfileChange={setProfile}
+        />
 
-          <ContactPreferences 
-            formaContato={formaContato}
-            setFormaContato={setFormaContato}
-            horarioPreferencial={horarioPreferencial}
-            setHorarioPreferencial={setHorarioPreferencial}
-            safeFormasContato={safeFormasContato}
-            isValidSelectValue={isValidSelectValue}
-          />
-
-          <AdditionalInfo form={form} />
-
-          <div className="flex justify-end space-x-4">
-            <Button type="button" variant="outline" onClick={() => navigate('/')}>
-              Cancelar
-            </Button>
-            <Button type="submit" disabled={isLoading} className="bg-amber-900 hover:bg-amber-800">
-              {isLoading ? (
-                'Salvando...'
-              ) : (
-                <>
-                  <Save className="w-4 h-4 mr-2" />
-                  Salvar Perfil
-                </>
-              )}
-            </Button>
-          </div>
-        </form>
-      </Form>
+        {/* Submit Button */}
+        <div className="flex justify-center pt-6">
+          <Button 
+            type="button"
+            onClick={() => handleSubmit(profile || {})}
+            size="lg"
+            className="bg-red-900 hover:bg-red-800 text-white px-8"
+          >
+            {profile ? 'Atualizar Perfil' : 'Criar Perfil'}
+          </Button>
+        </div>
+      </form>
     </div>
   );
 };
