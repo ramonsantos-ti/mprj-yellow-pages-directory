@@ -22,17 +22,45 @@ const Home: React.FC = () => {
 
   // Load profiles from localStorage or use mock data
   useEffect(() => {
-    const savedProfiles = localStorage.getItem('mprj_profiles');
-    if (savedProfiles) {
-      setProfiles(JSON.parse(savedProfiles));
-    } else {
-      setProfiles(mockProfiles);
-    }
+    const loadProfiles = () => {
+      const savedProfiles = localStorage.getItem('mprj_profiles');
+      if (savedProfiles) {
+        const parsedProfiles = JSON.parse(savedProfiles);
+        console.log('Loaded profiles from localStorage:', parsedProfiles.length);
+        setProfiles(parsedProfiles);
+      } else {
+        console.log('Using mock profiles');
+        setProfiles(mockProfiles);
+      }
+    };
+
+    loadProfiles();
+
+    // Listen for localStorage changes (when admin makes changes)
+    const handleStorageChange = () => {
+      console.log('Storage changed, reloading profiles');
+      loadProfiles();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Also check for changes periodically (for same-tab updates)
+    const interval = setInterval(loadProfiles, 1000);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(interval);
+    };
   }, []);
 
   // Filtrar apenas perfis ativos e ordenar por data de atualização (mais recente primeiro)
   const activeProfiles = useMemo(() => {
-    return profiles.filter(profile => profile.isActive !== false);
+    const actives = profiles.filter(profile => {
+      console.log(`Profile ${profile.name}: isActive = ${profile.isActive}`);
+      return profile.isActive !== false;
+    });
+    console.log(`Active profiles: ${actives.length} out of ${profiles.length}`);
+    return actives;
   }, [profiles]);
 
   const sortedProfiles = useMemo(() => {

@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { mockProfiles } from '../data/mockData';
 import { Profile } from '../types';
@@ -43,9 +42,15 @@ const Admin: React.FC = () => {
     }
   }, []);
 
-  // Save profiles to localStorage whenever profiles change
+  // Save profiles to localStorage whenever profiles change and trigger storage event
   useEffect(() => {
-    localStorage.setItem('mprj_profiles', JSON.stringify(profiles));
+    if (profiles.length > 0) {
+      localStorage.setItem('mprj_profiles', JSON.stringify(profiles));
+      console.log('Admin: Saved profiles to localStorage, triggering storage event');
+      
+      // Manually trigger storage event for same-tab updates
+      window.dispatchEvent(new Event('storage'));
+    }
   }, [profiles]);
 
   // Sort profiles to show recently updated first
@@ -89,6 +94,7 @@ const Admin: React.FC = () => {
             } 
           : profile
       );
+      console.log('Admin: Profile updated, new profiles state:', updatedProfiles.length);
       return updatedProfiles;
     });
     
@@ -107,6 +113,7 @@ const Admin: React.FC = () => {
             } 
           : profile
       );
+      console.log('Admin: Profile status toggled, new profiles state:', updatedProfiles.length);
       return updatedProfiles;
     });
     
