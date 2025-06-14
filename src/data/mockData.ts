@@ -15,9 +15,9 @@ export const mockUsers: User[] = [
   },
   {
     id: '2',
-    username: 'joao.silva',
-    password: 'senha123',
-    name: 'João Silva Santos',
+    username: 'usuario01',
+    password: 'usuario01',
+    name: 'Mariana Santos Silva',
     matricula: 'MPRJ12345',
     role: 'user',
     isActive: true,
@@ -25,9 +25,9 @@ export const mockUsers: User[] = [
   },
   {
     id: '3',
-    username: 'maria.santos',
-    password: 'senha123',
-    name: 'Maria Santos Oliveira',
+    username: 'usuario02',
+    password: 'usuario02',
+    name: 'Roberto Carlos Mendes',
     matricula: 'MPRJ12346',
     role: 'user',
     isActive: true,
@@ -35,9 +35,9 @@ export const mockUsers: User[] = [
   },
   {
     id: '4',
-    username: 'pedro.oliveira',
-    password: 'senha123',
-    name: 'Pedro Oliveira Costa',
+    username: 'usuario03',
+    password: 'usuario03',
+    name: 'Ana Beatriz Oliveira',
     matricula: 'MPRJ12347',
     role: 'user',
     isActive: true,
@@ -45,9 +45,9 @@ export const mockUsers: User[] = [
   },
   {
     id: '5',
-    username: 'ana.costa',
-    password: 'senha123',
-    name: 'Ana Costa Ferreira',
+    username: 'usuario04',
+    password: 'usuario04',
+    name: 'Hiroshi Tanaka Yamamoto',
     matricula: 'MPRJ12348',
     role: 'user',
     isActive: true,
@@ -55,9 +55,9 @@ export const mockUsers: User[] = [
   },
   {
     id: '6',
-    username: 'carlos.lima',
-    password: 'senha123',
-    name: 'Carlos Lima Rodrigues',
+    username: 'usuario05',
+    password: 'usuario05',
+    name: 'Gabriel Rodrigues Costa',
     matricula: 'MPRJ12349',
     role: 'user',
     isActive: true,
@@ -65,9 +65,9 @@ export const mockUsers: User[] = [
   },
   {
     id: '7',
-    username: 'fernanda.souza',
-    password: 'senha123',
-    name: 'Fernanda Souza Martins',
+    username: 'usuario06',
+    password: 'usuario06',
+    name: 'Carolina Ferreira Alves',
     matricula: 'MPRJ12350',
     role: 'user',
     isActive: true,
@@ -75,9 +75,9 @@ export const mockUsers: User[] = [
   },
   {
     id: '8',
-    username: 'ricardo.alves',
-    password: 'senha123',
-    name: 'Ricardo Alves Pereira',
+    username: 'usuario07',
+    password: 'usuario07',
+    name: 'Marcus Thompson Johnson',
     matricula: 'MPRJ12351',
     role: 'user',
     isActive: true,
@@ -85,9 +85,9 @@ export const mockUsers: User[] = [
   },
   {
     id: '9',
-    username: 'patricia.rocha',
-    password: 'senha123',
-    name: 'Patrícia Rocha Silva',
+    username: 'usuario08',
+    password: 'usuario08',
+    name: 'Diego Martinez Fernandez',
     matricula: 'MPRJ12352',
     role: 'user',
     isActive: true,
@@ -95,64 +95,84 @@ export const mockUsers: User[] = [
   },
   {
     id: '10',
-    username: 'marcos.ferreira',
-    password: 'senha123',
-    name: 'Marcos Ferreira Santos',
+    username: 'usuario09',
+    password: 'usuario09',
+    name: 'Fatima Al-Zahra Hassan',
     matricula: 'MPRJ12353',
     role: 'user',
     isActive: true,
     lastLogin: new Date('2024-01-06T14:30:00')
+  },
+  {
+    id: '11',
+    username: 'usuario10',
+    password: 'usuario10',
+    name: 'Rajesh Kumar Patel',
+    matricula: 'MPRJ12354',
+    role: 'user',
+    isActive: true,
+    lastLogin: new Date('2024-01-05T11:45:00')
   }
 ];
 
-// Mock profiles data with correct cargo and funcao values
+// Mock profiles data with diverse backgrounds and roles
 export const mockProfiles: Profile[] = [
   {
     id: '1',
     userId: '2',
-    name: 'João Silva Santos',
+    name: 'Mariana Santos Silva',
     matricula: 'MPRJ12345',
-    cargo: ['Promotor de Justiça'],
-    funcao: ['Coordenador'],
-    unidade: ['Promotoria de Justiça Criminal'],
+    cargo: ['Procurador de Justiça'],
+    funcao: ['Procurador-Geral de Justiça'],
+    unidade: ['Procuradoria-Geral de Justiça'],
     telefone: '(21) 99999-1234',
-    email: 'joao.silva@mprj.mp.br',
-    biografia: 'Promotor de Justiça especializado em direito penal, com mais de 10 anos de experiência no Ministério Público do Estado do Rio de Janeiro.',
-    areasConhecimento: ['Direito Penal', 'Direito Processual Penal', 'Criminologia e Política Criminal'],
-    especializacoes: 'Especialização em Direito Penal Econômico pela UERJ',
+    email: 'mariana.santos@mprj.mp.br',
+    biografia: 'Procuradora-Geral de Justiça com mais de 20 anos de experiência no Ministério Público. Especialista em direito constitucional e gestão pública, com foco em modernização institucional e transparência.',
+    areasConhecimento: ['Direito Constitucional', 'Gestão Pública', 'Direito Administrativo', 'Liderança Organizacional'],
+    especializacoes: 'Doutorado em Direito Constitucional pela USP, MBA em Gestão Pública pela FGV',
     projetos: [
       {
-        nome: 'Operação Transparência',
-        dataInicio: new Date('2023-03-15'),
-        dataFim: new Date('2023-12-20'),
-        observacoes: 'Investigação de crimes contra a administração pública'
+        nome: 'Programa de Modernização do MPRJ',
+        dataInicio: new Date('2023-01-15'),
+        observacoes: 'Implementação de novas tecnologias e processos digitais'
+      },
+      {
+        nome: 'Plano Estratégico 2024-2027',
+        dataInicio: new Date('2023-06-01'),
+        observacoes: 'Desenvolvimento do novo planejamento estratégico institucional'
       }
     ],
-    temasInteresse: ['Combate à Corrupção', 'Inovação Tecnológica', 'Capacitação de Equipes'],
+    temasInteresse: ['Transformação Digital', 'Governança Corporativa', 'Inovação no Setor Público', 'Direitos Fundamentais'],
     formacaoAcademica: [
       {
-        nivel: 'Graduação',
-        instituicao: 'UERJ',
-        curso: 'Direito',
+        nivel: 'Doutorado',
+        instituicao: 'USP',
+        curso: 'Direito Constitucional',
         ano: 2010
+      },
+      {
+        nivel: 'MBA',
+        instituicao: 'FGV',
+        curso: 'Gestão Pública',
+        ano: 2015
       }
     ],
     experienciasProfissionais: [
       {
-        tempoMPRJ: '12 anos',
-        experienciaAnterior: 'Advogado criminalista por 3 anos'
+        tempoMPRJ: '20 anos',
+        experienciaAnterior: 'Advogada constitucionalista por 5 anos, Professora universitária por 8 anos'
       }
     ],
-    idiomas: ['Português', 'Inglês', 'Espanhol'],
+    idiomas: ['Português', 'Inglês', 'Francês', 'Espanhol'],
     disponibilidade: {
-      tipoColaboracao: ['Consultoria interna', 'Capacitações/tutoria'],
-      disponibilidadeEstimada: '2h a 4h/semana'
+      tipoColaboracao: ['Consultoria interna', 'Capacitações/tutoria', 'Mentoria'],
+      disponibilidadeEstimada: 'Sob demanda (caso a caso)'
     },
     contato: {
       formaContato: 'E-mail',
-      horarioPreferencial: 'Manhã (8h às 12h)'
+      horarioPreferencial: 'Manhã (9h às 12h)'
     },
-    fotoUrl: '/lovable-uploads/2aae1185-7d52-453a-942a-1ef1876196b1.jpg',
+    fotoUrl: '/lovable-uploads/252819a5-bbb7-47c1-9299-20befdcf4b35.png',
     lastUpdated: new Date('2024-01-15T10:30:00'),
     aceiteTermos: true,
     isActive: true,
@@ -161,49 +181,48 @@ export const mockProfiles: Profile[] = [
   {
     id: '2',
     userId: '3',
-    name: 'Maria Santos Oliveira',
+    name: 'Roberto Carlos Mendes',
     matricula: 'MPRJ12346',
-    cargo: ['Técnico'],
-    funcao: [],
-    unidade: ['Diretoria de Recursos Humanos'],
+    cargo: ['Procurador de Justiça'],
+    funcao: ['Corregedor-Geral'],
+    unidade: ['Corregedoria-Geral do Ministério Público'],
     telefone: '(21) 99999-5678',
-    email: 'maria.santos@mprj.mp.br',
-    biografia: 'Técnica em administração com vasta experiência em gestão de pessoas e processos administrativos.',
-    areasConhecimento: ['Gestão de Pessoas / Recursos Humanos', 'Administração Pública'],
-    especializacoes: 'MBA em Gestão Pública',
+    email: 'roberto.mendes@mprj.mp.br',
+    biografia: 'Procurador de Justiça com vasta experiência em corregedoria e controle interno. Especialista em ética no serviço público e compliance institucional.',
+    areasConhecimento: ['Direito Administrativo', 'Controle Interno', 'Ética Pública', 'Compliance'],
+    especializacoes: 'Mestrado em Direito Administrativo pela UERJ, Especialização em Compliance Público',
     projetos: [
       {
-        nome: 'Sistema de Avaliação de Desempenho',
-        dataInicio: new Date('2023-02-01'),
-        dataFim: new Date('2023-11-30'),
-        observacoes: 'Implementação do novo sistema de avaliação'
+        nome: 'Sistema de Integridade MPRJ',
+        dataInicio: new Date('2023-03-01'),
+        observacoes: 'Implementação de sistema de compliance e integridade'
       }
     ],
-    temasInteresse: ['Modernização Administrativa', 'Qualidade de Vida no Trabalho'],
+    temasInteresse: ['Integridade Pública', 'Sistemas de Controle', 'Auditoria Interna', 'Prevenção à Corrupção'],
     formacaoAcademica: [
       {
-        nivel: 'Graduação',
-        instituicao: 'UFRJ',
-        curso: 'Administração',
+        nivel: 'Mestrado',
+        instituicao: 'UERJ',
+        curso: 'Direito Administrativo',
         ano: 2008
       }
     ],
     experienciasProfissionais: [
       {
-        tempoMPRJ: '15 anos',
-        experienciaAnterior: 'Setor privado - RH por 5 anos'
+        tempoMPRJ: '18 anos',
+        experienciaAnterior: 'Auditor público por 7 anos'
       }
     ],
-    idiomas: ['Português', 'Inglês'],
+    idiomas: ['Português', 'Inglês', 'Italiano'],
     disponibilidade: {
-      tipoColaboracao: ['Grupos de trabalho', 'Mentoria'],
-      disponibilidadeEstimada: 'Até 2h/semana'
+      tipoColaboracao: ['Consultoria interna', 'Capacitações/tutoria'],
+      disponibilidadeEstimada: '2h a 4h/semana'
     },
     contato: {
       formaContato: 'Microsoft Teams',
-      horarioPreferencial: 'Tarde (14h às 18h)'
+      horarioPreferencial: 'Tarde (14h às 17h)'
     },
-    fotoUrl: '/lovable-uploads/c07ab9f3-3adc-43c4-83c8-dac05c9c9fc3.jpg',
+    fotoUrl: '/lovable-uploads/d697bc7f-813e-48f0-81e7-ed4035f7e7af.png',
     lastUpdated: new Date('2024-01-14T15:45:00'),
     aceiteTermos: true,
     isActive: true,
@@ -212,48 +231,59 @@ export const mockProfiles: Profile[] = [
   {
     id: '3',
     userId: '4',
-    name: 'Pedro Oliveira Costa',
+    name: 'Ana Beatriz Oliveira',
     matricula: 'MPRJ12347',
-    cargo: ['Analista'],
-    funcao: ['Supervisor'],
-    unidade: ['Diretoria de Tecnologia da Informação'],
+    cargo: ['Promotor de Justiça'],
+    funcao: ['Coordenador'],
+    unidade: ['Coordenadoria de Combate à Violência Doméstica'],
     telefone: '(21) 99999-9012',
-    email: 'pedro.oliveira@mprj.mp.br',
-    biografia: 'Analista de sistemas especializado em desenvolvimento de soluções tecnológicas para o Ministério Público.',
-    areasConhecimento: ['Tecnologia da Informação e Comunicação (TIC)', 'Ciência de Dados e Business Intelligence'],
-    especializacoes: 'Mestrado em Ciência da Computação',
+    email: 'ana.oliveira@mprj.mp.br',
+    biografia: 'Promotora de Justiça especializada em violência doméstica e direitos da mulher. Coordenadora de projetos sociais de prevenção e atendimento às vítimas.',
+    areasConhecimento: ['Direitos Humanos', 'Violência Doméstica', 'Direito Penal', 'Políticas Públicas'],
+    especializacoes: 'Especialização em Violência Doméstica e Familiar pela PUC-Rio',
     projetos: [
       {
-        nome: 'Portal do Cidadão',
-        dataInicio: new Date('2023-01-15'),
-        observacoes: 'Desenvolvimento de portal para atendimento ao cidadão'
+        nome: 'Rede de Proteção à Mulher',
+        dataInicio: new Date('2023-08-01'),
+        observacoes: 'Articulação da rede de atendimento às mulheres vítimas de violência'
+      },
+      {
+        nome: 'Projeto Maria da Penha nas Escolas',
+        dataInicio: new Date('2023-02-15'),
+        observacoes: 'Programa educativo sobre prevenção à violência doméstica'
       }
     ],
-    temasInteresse: ['Inteligência Artificial', 'Automação de Processos'],
+    temasInteresse: ['Direitos da Mulher', 'Prevenção à Violência', 'Educação em Direitos', 'Políticas de Gênero'],
     formacaoAcademica: [
       {
         nivel: 'Graduação',
         instituicao: 'PUC-Rio',
-        curso: 'Ciência da Computação',
+        curso: 'Direito',
         ano: 2012
+      },
+      {
+        nivel: 'Especialização',
+        instituicao: 'PUC-Rio',
+        curso: 'Violência Doméstica e Familiar',
+        ano: 2018
       }
     ],
     experienciasProfissionais: [
       {
-        tempoMPRJ: '8 anos',
-        experienciaAnterior: 'Desenvolvedor em startup de tecnologia por 4 anos'
+        tempoMPRJ: '10 anos',
+        experienciaAnterior: 'Defensora Pública por 3 anos'
       }
     ],
-    idiomas: ['Português', 'Inglês', 'Japonês'],
+    idiomas: ['Português', 'Inglês', 'Francês'],
     disponibilidade: {
-      tipoColaboracao: ['Consultoria interna', 'Formação de equipes'],
-      disponibilidadeEstimada: '2h a 4h/semana'
+      tipoColaboracao: ['Capacitações/tutoria', 'Grupos de trabalho', 'Mentoria'],
+      disponibilidadeEstimada: '4h a 6h/semana'
     },
     contato: {
       formaContato: 'E-mail',
-      horarioPreferencial: 'Flexível'
+      horarioPreferencial: 'Manhã (8h às 12h)'
     },
-    fotoUrl: '/lovable-uploads/2ee6157e-fd08-4e0b-9189-84fa52673c3b.jpg',
+    fotoUrl: '/lovable-uploads/03f381cf-1670-41a0-b08a-e5cd586b9318.png',
     lastUpdated: new Date('2024-01-13T09:20:00'),
     aceiteTermos: true,
     isActive: true,
@@ -262,48 +292,59 @@ export const mockProfiles: Profile[] = [
   {
     id: '4',
     userId: '5',
-    name: 'Ana Costa Ferreira',
+    name: 'Hiroshi Tanaka Yamamoto',
     matricula: 'MPRJ12348',
-    cargo: ['Procurador de Justiça'],
+    cargo: ['Analista'],
     funcao: ['Diretor'],
-    unidade: ['3ª Procuradoria de Justiça'],
+    unidade: ['Diretoria de Tecnologia da Informação'],
     telefone: '(21) 99999-3456',
-    email: 'ana.costa@mprj.mp.br',
-    biografia: 'Procuradora de Justiça com vasta experiência em direito constitucional e administrativo.',
-    areasConhecimento: ['Direito Constitucional', 'Direito Administrativo', 'Direitos Humanos'],
-    especializacoes: 'Doutorado em Direito Constitucional',
+    email: 'hiroshi.yamamoto@mprj.mp.br',
+    biografia: 'Diretor de TI com formação em Engenharia de Software e vasta experiência em transformação digital. Responsável pela modernização tecnológica do MPRJ.',
+    areasConhecimento: ['Tecnologia da Informação e Comunicação (TIC)', 'Inteligência Artificial', 'Ciência de Dados e Business Intelligence', 'Segurança da Informação'],
+    especializacoes: 'Mestrado em Engenharia de Software pela COPPE/UFRJ, Certificação em Cloud Computing',
     projetos: [
       {
-        nome: 'Projeto Cidadania Ativa',
-        dataInicio: new Date('2022-08-01'),
-        observacoes: 'Programa de educação em direitos fundamentais'
+        nome: 'MPRJ Digital 2024',
+        dataInicio: new Date('2023-01-01'),
+        observacoes: 'Projeto de digitalização completa dos processos do MPRJ'
+      },
+      {
+        nome: 'Sistema de IA para Análise Documental',
+        dataInicio: new Date('2023-09-01'),
+        observacoes: 'Implementação de IA para análise automatizada de documentos'
       }
     ],
-    temasInteresse: ['Proteção de Direitos Fundamentais', 'Educação Jurídica'],
+    temasInteresse: ['Inteligência Artificial', 'Machine Learning', 'Cloud Computing', 'DevOps', 'Cybersecurity'],
     formacaoAcademica: [
       {
-        nivel: 'Doutorado',
+        nivel: 'Mestrado',
+        instituicao: 'COPPE/UFRJ',
+        curso: 'Engenharia de Software',
+        ano: 2015
+      },
+      {
+        nivel: 'Graduação',
         instituicao: 'UFRJ',
-        curso: 'Direito Constitucional',
-        ano: 2012
+        curso: 'Ciência da Computação',
+        ano: 2010
       }
     ],
     experienciasProfissionais: [
       {
-        tempoMPRJ: '18 anos',
-        experienciaAnterior: 'Professora universitária por 5 anos'
+        tempoMPRJ: '8 anos',
+        experienciaAnterior: 'Arquiteto de Software em multinacional de tecnologia por 6 anos'
       }
     ],
-    idiomas: ['Português', 'Inglês', 'Francês', 'Italiano'],
+    idiomas: ['Português', 'Inglês', 'Japonês', 'Mandarim'],
     disponibilidade: {
-      tipoColaboracao: ['Capacitações/tutoria', 'Mentoria'],
-      disponibilidadeEstimada: 'Sob demanda (caso a caso)'
+      tipoColaboracao: ['Consultoria interna', 'Capacitações/tutoria', 'Formação de equipes'],
+      disponibilidadeEstimada: '6h a 8h/semana'
     },
     contato: {
-      formaContato: 'Telefone',
-      horarioPreferencial: 'Manhã (9h às 11h)'
+      formaContato: 'Microsoft Teams',
+      horarioPreferencial: 'Flexível'
     },
-    fotoUrl: '/lovable-uploads/0727d710-b656-4d7c-860a-26b792b10a84.png',
+    fotoUrl: '/lovable-uploads/0d8bd3ce-b725-4f1e-8378-bf3ecef1051e.png',
     lastUpdated: new Date('2024-01-12T11:10:00'),
     aceiteTermos: true,
     isActive: true,
@@ -312,48 +353,59 @@ export const mockProfiles: Profile[] = [
   {
     id: '5',
     userId: '6',
-    name: 'Carlos Lima Rodrigues',
+    name: 'Gabriel Rodrigues Costa',
     matricula: 'MPRJ12349',
-    cargo: ['Assessor'],
-    funcao: ['Chefe'],
-    unidade: ['Gabinete da Procuradoria-Geral'],
+    cargo: ['Promotor de Justiça'],
+    funcao: [],
+    unidade: ['Promotoria de Justiça de Defesa do Meio Ambiente'],
     telefone: '(21) 99999-7890',
-    email: 'carlos.lima@mprj.mp.br',
-    biografia: 'Assessor jurídico especializado em direito constitucional e administrativo.',
-    areasConhecimento: ['Direito Constitucional', 'Direito Administrativo'],
-    especializacoes: 'Especialização em Direito Público',
+    email: 'gabriel.costa@mprj.mp.br',
+    biografia: 'Promotor de Justiça especializado em direito ambiental e sustentabilidade. Atua na defesa do meio ambiente e recursos naturais do Estado do Rio de Janeiro.',
+    areasConhecimento: ['Direito Ambiental', 'Sustentabilidade', 'Recursos Hídricos', 'Mudanças Climáticas'],
+    especializacoes: 'Mestrado em Direito Ambiental pela UERJ, Especialização em Gestão Ambiental',
     projetos: [
       {
-        nome: 'Modernização Administrativa',
-        dataInicio: new Date('2023-06-01'),
-        observacoes: 'Projeto de otimização de processos administrativos'
+        nome: 'Proteção da Mata Atlântica Fluminense',
+        dataInicio: new Date('2023-04-01'),
+        observacoes: 'Combate ao desmatamento e proteção de áreas de preservação'
+      },
+      {
+        nome: 'Águas Limpas RJ',
+        dataInicio: new Date('2023-07-15'),
+        observacoes: 'Fiscalização da qualidade da água em rios e lagoas'
       }
     ],
-    temasInteresse: ['Gestão Pública', 'Modernização'],
+    temasInteresse: ['Conservação Ambiental', 'Energia Renovável', 'Gestão de Resíduos', 'Educação Ambiental'],
     formacaoAcademica: [
       {
-        nivel: 'Graduação',
+        nivel: 'Mestrado',
         instituicao: 'UERJ',
+        curso: 'Direito Ambiental',
+        ano: 2016
+      },
+      {
+        nivel: 'Graduação',
+        instituicao: 'UFRJ',
         curso: 'Direito',
-        ano: 2015
+        ano: 2013
       }
     ],
     experienciasProfissionais: [
       {
-        tempoMPRJ: '7 anos',
-        experienciaAnterior: 'Advogado por 2 anos'
+        tempoMPRJ: '9 anos',
+        experienciaAnterior: 'Consultor ambiental por 2 anos'
       }
     ],
-    idiomas: ['Português', 'Inglês'],
+    idiomas: ['Português', 'Inglês', 'Espanhol'],
     disponibilidade: {
-      tipoColaboracao: ['Consultoria interna'],
-      disponibilidadeEstimada: 'Até 2h/semana'
+      tipoColaboracao: ['Consultoria interna', 'Capacitações/tutoria'],
+      disponibilidadeEstimada: '3h a 5h/semana'
     },
     contato: {
       formaContato: 'E-mail',
-      horarioPreferencial: 'Tarde (14h às 17h)'
+      horarioPreferencial: 'Manhã (8h às 12h)'
     },
-    fotoUrl: '/lovable-uploads/5785e26a-35aa-4cb7-8756-8076d98ebaf2.png',
+    fotoUrl: '/lovable-uploads/43e938c7-f896-452b-a284-3c9df63f213f.png',
     lastUpdated: new Date('2024-01-11T16:20:00'),
     aceiteTermos: true,
     isActive: true,
@@ -362,47 +414,59 @@ export const mockProfiles: Profile[] = [
   {
     id: '6',
     userId: '7',
-    name: 'Fernanda Souza Martins',
+    name: 'Carolina Ferreira Alves',
     matricula: 'MPRJ12350',
-    cargo: ['Auxiliar'],
-    funcao: [],
-    unidade: ['Secretaria Geral'],
+    cargo: ['Técnico'],
+    funcao: ['Gerente'],
+    unidade: ['Gerência de Comunicação Social'],
     telefone: '(21) 99999-4567',
-    email: 'fernanda.souza@mprj.mp.br',
-    biografia: 'Auxiliar administrativa com experiência em atendimento ao público e gestão documental.',
-    areasConhecimento: ['Administração Pública', 'Atendimento ao Público'],
-    especializacoes: 'Curso Técnico em Administração',
+    email: 'carolina.alves@mprj.mp.br',
+    biografia: 'Gerente de Comunicação Social com formação em Jornalismo e especialização em comunicação pública. Responsável pela estratégia de comunicação institucional do MPRJ.',
+    areasConhecimento: ['Comunicação Social', 'Jornalismo', 'Marketing Digital', 'Relações Públicas'],
+    especializacoes: 'MBA em Comunicação Estratégica pela ESPM, Especialização em Marketing Digital',
     projetos: [
       {
-        nome: 'Digitalização de Documentos',
-        dataInicio: new Date('2023-09-01'),
-        observacoes: 'Projeto de modernização do arquivo'
+        nome: 'Nova Identidade Visual MPRJ',
+        dataInicio: new Date('2023-05-01'),
+        observacoes: 'Renovação da identidade visual e comunicação institucional'
+      },
+      {
+        nome: 'MPRJ nas Redes Sociais',
+        dataInicio: new Date('2023-03-15'),
+        observacoes: 'Estratégia de presença digital e engajamento'
       }
     ],
-    temasInteresse: ['Organização', 'Atendimento'],
+    temasInteresse: ['Comunicação Digital', 'Transparência Pública', 'Storytelling', 'Gestão de Crise'],
     formacaoAcademica: [
       {
-        nivel: 'Ensino Médio',
-        instituicao: 'Colégio Estadual',
-        curso: 'Ensino Médio',
-        ano: 2018
+        nivel: 'MBA',
+        instituicao: 'ESPM',
+        curso: 'Comunicação Estratégica',
+        ano: 2019
+      },
+      {
+        nivel: 'Graduação',
+        instituicao: 'PUC-Rio',
+        curso: 'Jornalismo',
+        ano: 2014
       }
     ],
     experienciasProfissionais: [
       {
-        tempoMPRJ: '4 anos'
+        tempoMPRJ: '6 anos',
+        experienciaAnterior: 'Jornalista em veículos de comunicação por 4 anos'
       }
     ],
-    idiomas: ['Português'],
+    idiomas: ['Português', 'Inglês', 'Francês'],
     disponibilidade: {
-      tipoColaboracao: ['Grupos de trabalho'],
-      disponibilidadeEstimada: 'Até 2h/semana'
+      tipoColaboracao: ['Consultoria interna', 'Capacitações/tutoria', 'Grupos de trabalho'],
+      disponibilidadeEstimada: '4h a 6h/semana'
     },
     contato: {
       formaContato: 'Microsoft Teams',
-      horarioPreferencial: 'Manhã (8h às 12h)'
+      horarioPreferencial: 'Tarde (13h às 17h)'
     },
-    fotoUrl: '/lovable-uploads/5c24956a-cc0f-460e-9fa1-1ffefd55e576.png',
+    fotoUrl: '/lovable-uploads/6af4f8d2-76c4-4873-9922-c0f6cfe3d6d6.png',
     lastUpdated: new Date('2024-01-10T10:30:00'),
     aceiteTermos: true,
     isActive: true,
@@ -411,47 +475,59 @@ export const mockProfiles: Profile[] = [
   {
     id: '7',
     userId: '8',
-    name: 'Ricardo Alves Pereira',
+    name: 'Marcus Thompson Johnson',
     matricula: 'MPRJ12351',
-    cargo: ['Estagiário'],
-    funcao: [],
-    unidade: ['Promotoria de Justiça Cível'],
+    cargo: ['Assessor'],
+    funcao: ['Chefe'],
+    unidade: ['Assessoria Internacional'],
     telefone: '(21) 99999-8901',
-    email: 'ricardo.alves@mprj.mp.br',
-    biografia: 'Estagiário de Direito cursando o 8º período na UFRJ.',
-    areasConhecimento: ['Direito Civil', 'Direito do Consumidor'],
-    especializacoes: 'Graduando em Direito',
+    email: 'marcus.johnson@mprj.mp.br',
+    biografia: 'Chefe da Assessoria Internacional com formação em Relações Internacionais. Especialista em cooperação jurídica internacional e acordos multilaterais.',
+    areasConhecimento: ['Relações Internacionais', 'Cooperação Jurídica Internacional', 'Direito Internacional', 'Diplomacia'],
+    especializacoes: 'Mestrado em Relações Internacionais pela UnB, LLM em Direito Internacional pela NYU',
     projetos: [
       {
-        nome: 'Projeto de Pesquisa - Direito do Consumidor',
-        dataInicio: new Date('2024-01-01'),
-        observacoes: 'Pesquisa sobre direitos do consumidor digital'
+        nome: 'Acordo de Cooperação com Mercosul',
+        dataInicio: new Date('2023-02-01'),
+        observacoes: 'Negociação de acordos de cooperação jurídica regional'
+      },
+      {
+        nome: 'Programa de Intercâmbio MP Brasil-Europa',
+        dataInicio: new Date('2023-06-01'),
+        observacoes: 'Intercâmbio de boas práticas com MPs europeus'
       }
     ],
-    temasInteresse: ['Direito Digital', 'Proteção do Consumidor'],
+    temasInteresse: ['Cooperação Internacional', 'Combate à Corrupção Transnacional', 'Direitos Humanos Globais'],
     formacaoAcademica: [
       {
-        nivel: 'Graduação',
-        instituicao: 'UFRJ',
-        curso: 'Direito',
-        ano: 2025
+        nivel: 'LLM',
+        instituicao: 'NYU - Estados Unidos',
+        curso: 'Direito Internacional',
+        ano: 2018
+      },
+      {
+        nivel: 'Mestrado',
+        instituicao: 'UnB',
+        curso: 'Relações Internacionais',
+        ano: 2015
       }
     ],
     experienciasProfissionais: [
       {
-        tempoMPRJ: '1 ano'
+        tempoMPRJ: '7 anos',
+        experienciaAnterior: 'Diplomata no Itamaraty por 5 anos'
       }
     ],
-    idiomas: ['Português', 'Inglês'],
+    idiomas: ['Português', 'Inglês', 'Espanhol', 'Francês', 'Alemão'],
     disponibilidade: {
-      tipoColaboracao: ['Grupos de trabalho', 'Pesquisa'],
-      disponibilidadeEstimada: 'Até 4h/semana'
+      tipoColaboracao: ['Consultoria interna', 'Capacitações/tutoria'],
+      disponibilidadeEstimada: '3h a 5h/semana'
     },
     contato: {
       formaContato: 'E-mail',
-      horarioPreferencial: 'Tarde (14h às 18h)'
+      horarioPreferencial: 'Manhã (9h às 12h)'
     },
-    fotoUrl: '/lovable-uploads/6e97a462-d2f9-47e7-a8bd-a0b982c06863.png',
+    fotoUrl: '/lovable-uploads/9d9e158c-6b10-4a90-9722-25ab82516e04.png',
     lastUpdated: new Date('2024-01-09T14:15:00'),
     aceiteTermos: true,
     isActive: true,
@@ -460,47 +536,54 @@ export const mockProfiles: Profile[] = [
   {
     id: '8',
     userId: '9',
-    name: 'Patrícia Rocha Silva',
+    name: 'Diego Martinez Fernandez',
     matricula: 'MPRJ12352',
-    cargo: ['Residente'],
-    funcao: [],
-    unidade: ['Centro de Estudos e Aperfeiçoamento'],
+    cargo: ['Auxiliar'],
+    funcao: ['Secretário'],
+    unidade: ['Secretaria de Planejamento Estratégico'],
     telefone: '(21) 99999-2345',
-    email: 'patricia.rocha@mprj.mp.br',
-    biografia: 'Médica residente especializando-se em medicina legal.',
-    areasConhecimento: ['Medicina Legal', 'Perícia Médica'],
-    especializacoes: 'Residência em Medicina Legal',
+    email: 'diego.martinez@mprj.mp.br',
+    biografia: 'Secretário de Planejamento Estratégico com formação em Administração Pública. Especialista em gestão de projetos e indicadores de performance.',
+    areasConhecimento: ['Administração Pública', 'Planejamento Estratégico', 'Gestão de Projetos', 'Indicadores de Performance'],
+    especializacoes: 'MBA em Gestão de Projetos pela FGV, Certificação PMP',
     projetos: [
       {
-        nome: 'Protocolo de Perícias Médicas',
-        dataInicio: new Date('2023-07-01'),
-        observacoes: 'Desenvolvimento de novos protocolos de perícia'
+        nome: 'Sistema de Monitoramento Estratégico',
+        dataInicio: new Date('2023-01-15'),
+        observacoes: 'Implementação de dashboard de indicadores estratégicos'
       }
     ],
-    temasInteresse: ['Perícia Médica', 'Medicina Forense'],
+    temasInteresse: ['Business Intelligence', 'Análise de Dados', 'Gestão por Resultados', 'Inovação Pública'],
     formacaoAcademica: [
       {
-        nivel: 'Graduação',
-        instituicao: 'UFRJ',
-        curso: 'Medicina',
+        nivel: 'MBA',
+        instituicao: 'FGV',
+        curso: 'Gestão de Projetos',
         ano: 2020
+      },
+      {
+        nivel: 'Graduação',
+        instituicao: 'UERJ',
+        curso: 'Administração Pública',
+        ano: 2017
       }
     ],
     experienciasProfissionais: [
       {
-        tempoMPRJ: '2 anos'
+        tempoMPRJ: '5 anos',
+        experienciaAnterior: 'Analista de projetos em consultoria por 3 anos'
       }
     ],
-    idiomas: ['Português', 'Inglês', 'Espanhol'],
+    idiomas: ['Português', 'Espanhol', 'Inglês'],
     disponibilidade: {
-      tipoColaboracao: ['Consultoria interna', 'Capacitações/tutoria'],
+      tipoColaboracao: ['Grupos de trabalho', 'Consultoria interna'],
       disponibilidadeEstimada: '2h a 4h/semana'
     },
     contato: {
-      formaContato: 'E-mail',
-      horarioPreferencial: 'Manhã (8h às 12h)'
+      formaContato: 'Microsoft Teams',
+      horarioPreferencial: 'Tarde (14h às 18h)'
     },
-    fotoUrl: '/lovable-uploads/747bac21-c83d-48b7-b3e1-f71b3635d495.png',
+    fotoUrl: '/lovable-uploads/82b4eaed-3b82-4477-9ce5-bf0e9ef57f64.png',
     lastUpdated: new Date('2024-01-08T09:45:00'),
     aceiteTermos: true,
     isActive: true,
@@ -509,54 +592,54 @@ export const mockProfiles: Profile[] = [
   {
     id: '9',
     userId: '10',
-    name: 'Marcos Ferreira Santos',
+    name: 'Fatima Al-Zahra Hassan',
     matricula: 'MPRJ12353',
-    cargo: ['Cedido (Superior)'],
-    funcao: ['Gerente'],
-    unidade: ['Diretoria de Planejamento'],
+    cargo: ['Residente'],
+    funcao: [],
+    unidade: ['Centro de Estudos e Aperfeiçoamento'],
     telefone: '(21) 99999-6789',
-    email: 'marcos.ferreira@mprj.mp.br',
-    biografia: 'Servidor cedido com formação superior em Economia, atuando na área de planejamento estratégico.',
-    areasConhecimento: ['Planejamento Estratégico', 'Economia', 'Gestão Pública'],
-    especializacoes: 'MBA em Gestão Estratégica',
+    email: 'fatima.hassan@mprj.mp.br',
+    biografia: 'Médica residente especializada em medicina legal e perícia médica. Contribui para a modernização dos procedimentos periciais do MPRJ.',
+    areasConhecimento: ['Medicina Legal', 'Perícia Médica', 'Toxicologia Forense', 'Antropologia Forense'],
+    especializacoes: 'Residência em Medicina Legal pela UFRJ, Especialização em Toxicologia Forense',
     projetos: [
       {
-        nome: 'Plano Estratégico 2024-2027',
-        dataInicio: new Date('2023-04-01'),
-        observacoes: 'Elaboração do novo plano estratégico institucional'
+        nome: 'Protocolos Digitais de Perícia',
+        dataInicio: new Date('2023-08-01'),
+        observacoes: 'Digitalização e padronização de laudos periciais'
       }
     ],
-    temasInteresse: ['Planejamento', 'Estratégia', 'Indicadores'],
+    temasInteresse: ['Medicina Forense Digital', 'Análise de DNA', 'Perícia Criminal', 'Inovação Médica'],
     formacaoAcademica: [
       {
-        nivel: 'Graduação',
-        instituicao: 'UERJ',
-        curso: 'Economia',
-        ano: 2010
+        nivel: 'Residência',
+        instituicao: 'UFRJ',
+        curso: 'Medicina Legal',
+        ano: 2024
       },
       {
-        nivel: 'MBA',
-        instituicao: 'FGV',
-        curso: 'Gestão Estratégica',
-        ano: 2015
+        nivel: 'Graduação',
+        instituicao: 'UFRJ',
+        curso: 'Medicina',
+        ano: 2021
       }
     ],
     experienciasProfissionais: [
       {
-        tempoMPRJ: '6 anos',
-        experienciaAnterior: 'Analista em empresa privada por 8 anos'
+        tempoMPRJ: '2 anos',
+        experienciaAnterior: 'Médica em hospital público por 1 ano'
       }
     ],
-    idiomas: ['Português', 'Inglês'],
+    idiomas: ['Português', 'Árabe', 'Inglês', 'Francês'],
     disponibilidade: {
-      tipoColaboracao: ['Consultoria interna', 'Formação de equipes'],
-      disponibilidadeEstimada: '2h a 4h/semana'
+      tipoColaboracao: ['Consultoria interna', 'Capacitações/tutoria'],
+      disponibilidadeEstimada: '3h a 5h/semana'
     },
     contato: {
-      formaContato: 'Microsoft Teams',
-      horarioPreferencial: 'Tarde (13h às 17h)'
+      formaContato: 'E-mail',
+      horarioPreferencial: 'Manhã (7h às 11h)'
     },
-    fotoUrl: '/lovable-uploads/8de4caf3-e91d-4851-8767-4a49511d5ca8.png',
+    fotoUrl: '/lovable-uploads/b8f7d9cb-14c5-47d8-8fda-7d9e25031d33.png',
     lastUpdated: new Date('2024-01-07T11:30:00'),
     aceiteTermos: true,
     isActive: true,
@@ -565,48 +648,59 @@ export const mockProfiles: Profile[] = [
   {
     id: '10',
     userId: '11',
-    name: 'Luciana Medeiros Costa',
+    name: 'Rajesh Kumar Patel',
     matricula: 'MPRJ12354',
-    cargo: ['Cedido (Médio)'],
-    funcao: ['Secretário'],
-    unidade: ['Secretaria de Comunicação'],
+    cargo: ['Cedido (Superior)'],
+    funcao: ['Supervisor'],
+    unidade: ['Supervisão de Análise Econômica'],
     telefone: '(21) 99999-1357',
-    email: 'luciana.medeiros@mprj.mp.br',
-    biografia: 'Servidora cedida com ensino médio completo, atuando na área de comunicação institucional.',
-    areasConhecimento: ['Comunicação Social', 'Relações Públicas'],
-    especializacoes: 'Curso de Comunicação Institucional',
+    email: 'rajesh.patel@mprj.mp.br',
+    biografia: 'Economista cedido ao MPRJ, especialista em análise econômica de crimes financeiros e lavagem de dinheiro. Supervisor da equipe de análise econômica.',
+    areasConhecimento: ['Economia', 'Análise Financeira', 'Crimes Econômicos', 'Lavagem de Dinheiro'],
+    especializacoes: 'Doutorado em Economia pela LSE (Reino Unido), CFA (Chartered Financial Analyst)',
     projetos: [
       {
-        nome: 'Campanha de Transparência',
-        dataInicio: new Date('2023-10-01'),
-        observacoes: 'Desenvolvimento de material de comunicação para transparência'
+        nome: 'Sistema de Detecção de Lavagem de Dinheiro',
+        dataInicio: new Date('2023-03-01'),
+        observacoes: 'Desenvolvimento de algoritmos para detecção de operações suspeitas'
+      },
+      {
+        nome: 'Análise Econômica de Grandes Operações',
+        dataInicio: new Date('2023-01-01'),
+        observacoes: 'Análise econômica de grandes esquemas criminosos'
       }
     ],
-    temasInteresse: ['Comunicação', 'Transparência', 'Redes Sociais'],
+    temasInteresse: ['FinTech', 'Blockchain', 'Criptomoedas', 'Compliance Financeiro', 'Big Data'],
     formacaoAcademica: [
       {
-        nivel: 'Ensino Médio',
-        instituicao: 'Colégio Pedro II',
-        curso: 'Ensino Médio',
-        ano: 2015
+        nivel: 'Doutorado',
+        instituicao: 'LSE - Reino Unido',
+        curso: 'Economia',
+        ano: 2016
+      },
+      {
+        nivel: 'Mestrado',
+        instituicao: 'Mumbai University - Índia',
+        curso: 'Economia Aplicada',
+        ano: 2012
       }
     ],
     experienciasProfissionais: [
       {
-        tempoMPRJ: '5 anos',
-        experienciaAnterior: 'Assistente administrativo por 3 anos'
+        tempoMPRJ: '4 anos',
+        experienciaAnterior: 'Analista sênior em banco de investimento por 8 anos, Professor universitário por 3 anos'
       }
     ],
-    idiomas: ['Português', 'Inglês'],
+    idiomas: ['Português', 'Hindi', 'Inglês', 'Gujarati', 'Espanhol'],
     disponibilidade: {
-      tipoColaboracao: ['Grupos de trabalho', 'Comunicação'],
-      disponibilidadeEstimada: 'Até 2h/semana'
+      tipoColaboracao: ['Consultoria interna', 'Capacitações/tutoria', 'Formação de equipes'],
+      disponibilidadeEstimada: '6h a 8h/semana'
     },
     contato: {
-      formaContato: 'E-mail',
-      horarioPreferencial: 'Manhã (9h às 12h)'
+      formaContato: 'Microsoft Teams',
+      horarioPreferencial: 'Manhã (8h às 12h)'
     },
-    fotoUrl: '/lovable-uploads/9bdb3a99-0580-4f1a-90fd-bca0f42a713d.png',
+    fotoUrl: '/lovable-uploads/f9d90feb-9994-4c95-a03e-ac72dc5c3985.png',
     lastUpdated: new Date('2024-01-06T13:20:00'),
     aceiteTermos: true,
     isActive: true,
