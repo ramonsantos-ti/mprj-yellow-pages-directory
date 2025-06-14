@@ -64,7 +64,7 @@ const Home: React.FC = () => {
           <img 
             src="/lovable-uploads/58d2655c-30b5-4f5f-9d74-c9e6c62b7b21.png" 
             alt="Páginas Amarelas do MPRJ" 
-            className="h-24 w-auto"
+            className="h-36 w-auto"
           />
         </div>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
