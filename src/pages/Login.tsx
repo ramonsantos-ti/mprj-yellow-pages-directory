@@ -135,9 +135,9 @@ const Login: React.FC = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="text-xs text-amber-800 space-y-1">
-            <p><strong>Administrador:</strong> usuário0002 / usu@rio0002</p>
-            <p><strong>Usuário comum:</strong> usuário0001 / usu@rio0001</p>
-            <p><em>Outros usuários: usuário0003 a usuário0010 com senhas correspondentes</em></p>
+            <p><strong>Administrador:</strong> admin / admin123</p>
+            <p><strong>Usuário comum:</strong> usuario01 / usuario01</p>
+            <p><em>Outros usuários: usuario02 a usuario14 com senhas correspondentes</em></p>
           </CardContent>
         </Card>
       </div>
