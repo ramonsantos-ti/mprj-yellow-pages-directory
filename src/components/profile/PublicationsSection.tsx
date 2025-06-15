@@ -21,10 +21,11 @@ const PublicationsSection: React.FC<PublicationsSectionProps> = ({ form }) => {
           name="publicacoes"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Publicações e Trabalhos de Destaque</FormLabel>
+              <FormLabel htmlFor="publicacoes">Publicações e Trabalhos de Destaque</FormLabel>
               <FormControl>
                 <Textarea 
                   {...field} 
+                  id="publicacoes"
                   rows={5} 
                   placeholder="Liste suas publicações, cursos ministrados, trabalhos de destaque, etc..."
                 />

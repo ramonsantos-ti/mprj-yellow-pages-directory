@@ -23,9 +23,9 @@ const BasicInfo: React.FC<BasicInfoProps> = ({ form }) => {
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Nome Completo *</FormLabel>
+                <FormLabel htmlFor="name">Nome Completo *</FormLabel>
                 <FormControl>
-                  <Input {...field} disabled />
+                  <Input {...field} id="name" disabled />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -37,10 +37,11 @@ const BasicInfo: React.FC<BasicInfoProps> = ({ form }) => {
             name="matricula"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Matrícula *</FormLabel>
+                <FormLabel htmlFor="matricula">Matrícula *</FormLabel>
                 <FormControl>
                   <Input 
                     {...field} 
+                    id="matricula"
                     disabled 
                     placeholder="Matrícula como informada no cadastro"
                   />
@@ -57,9 +58,9 @@ const BasicInfo: React.FC<BasicInfoProps> = ({ form }) => {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email Institucional * (@mprj.mp.br)</FormLabel>
+                <FormLabel htmlFor="email">Email Institucional * (@mprj.mp.br)</FormLabel>
                 <FormControl>
-                  <Input {...field} type="email" placeholder="nome@mprj.mp.br" />
+                  <Input {...field} id="email" type="email" placeholder="nome@mprj.mp.br" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -71,9 +72,9 @@ const BasicInfo: React.FC<BasicInfoProps> = ({ form }) => {
             name="telefone"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Telefone Institucional</FormLabel>
+                <FormLabel htmlFor="telefone">Telefone Institucional</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="(21) 9999-9999" />
+                  <Input {...field} id="telefone" placeholder="(21) 9999-9999" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -86,9 +87,9 @@ const BasicInfo: React.FC<BasicInfoProps> = ({ form }) => {
           name="biografia"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Biografia/Apresentação</FormLabel>
+              <FormLabel htmlFor="biografia">Biografia/Apresentação</FormLabel>
               <FormControl>
-                <Textarea {...field} rows={4} placeholder="Fale um pouco sobre você..." />
+                <Textarea {...field} id="biografia" rows={4} placeholder="Fale um pouco sobre você..." />
               </FormControl>
               <FormMessage />
             </FormItem>

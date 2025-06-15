@@ -60,56 +60,71 @@ const AcademicFormation: React.FC<AcademicFormationProps> = ({
               </Button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-              <Select
-                value={formacao.nivel}
-                onValueChange={(value) => {
-                  console.log('Formacao nivel selected:', value, 'Type:', typeof value);
-                  if (isValidSelectValue(value)) {
+              <div>
+                <label htmlFor={`nivel-${index}`} className="sr-only">Nível</label>
+                <Select
+                  value={formacao.nivel}
+                  onValueChange={(value) => {
+                    console.log('Formacao nivel selected:', value, 'Type:', typeof value);
+                    if (isValidSelectValue(value)) {
+                      const novas = [...formacoes];
+                      novas[index].nivel = value;
+                      setFormacoes(novas);
+                    }
+                  }}
+                >
+                  <SelectTrigger id={`nivel-${index}`}>
+                    <SelectValue placeholder="Nível" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {safeNiveisFormacao.map((nivel, nivelIndex) => (
+                      <SelectItem key={`nivel-${nivelIndex}-${nivel}`} value={nivel}>
+                        {nivel}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label htmlFor={`instituicao-${index}`} className="sr-only">Instituição</label>
+                <Input
+                  id={`instituicao-${index}`}
+                  placeholder="Instituição"
+                  value={formacao.instituicao}
+                  onChange={(e) => {
                     const novas = [...formacoes];
-                    novas[index].nivel = value;
+                    novas[index].instituicao = e.target.value;
                     setFormacoes(novas);
-                  }
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Nível" />
-                </SelectTrigger>
-                <SelectContent>
-                  {safeNiveisFormacao.map((nivel, nivelIndex) => (
-                    <SelectItem key={`nivel-${nivelIndex}-${nivel}`} value={nivel}>
-                      {nivel}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Input
-                placeholder="Instituição"
-                value={formacao.instituicao}
-                onChange={(e) => {
-                  const novas = [...formacoes];
-                  novas[index].instituicao = e.target.value;
-                  setFormacoes(novas);
-                }}
-              />
-              <Input
-                placeholder="Curso"
-                value={formacao.curso}
-                onChange={(e) => {
-                  const novas = [...formacoes];
-                  novas[index].curso = e.target.value;
-                  setFormacoes(novas);
-                }}
-              />
-              <Input
-                type="number"
-                placeholder="Ano"
-                value={formacao.ano}
-                onChange={(e) => {
-                  const novas = [...formacoes];
-                  novas[index].ano = parseInt(e.target.value);
-                  setFormacoes(novas);
-                }}
-              />
+                  }}
+                />
+              </div>
+              <div>
+                <label htmlFor={`curso-${index}`} className="sr-only">Curso</label>
+                <Input
+                  id={`curso-${index}`}
+                  placeholder="Curso"
+                  value={formacao.curso}
+                  onChange={(e) => {
+                    const novas = [...formacoes];
+                    novas[index].curso = e.target.value;
+                    setFormacoes(novas);
+                  }}
+                />
+              </div>
+              <div>
+                <label htmlFor={`ano-${index}`} className="sr-only">Ano</label>
+                <Input
+                  id={`ano-${index}`}
+                  type="number"
+                  placeholder="Ano"
+                  value={formacao.ano}
+                  onChange={(e) => {
+                    const novas = [...formacoes];
+                    novas[index].ano = parseInt(e.target.value);
+                    setFormacoes(novas);
+                  }}
+                />
+              </div>
             </div>
           </div>
         ))}

@@ -22,9 +22,9 @@ const AdditionalInfo: React.FC<AdditionalInfoProps> = ({ form }) => {
           name="linkCurriculo"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Link do Currículo (Lattes/LinkedIn)</FormLabel>
+              <FormLabel htmlFor="linkCurriculo">Link do Currículo (Lattes/LinkedIn)</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="https://..." />
+                <Input {...field} id="linkCurriculo" placeholder="https://..." />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -38,12 +38,13 @@ const AdditionalInfo: React.FC<AdditionalInfoProps> = ({ form }) => {
             <FormItem className="flex flex-row items-start space-x-3 space-y-0">
               <FormControl>
                 <Checkbox
+                  id="aceiteTermos"
                   checked={field.value}
                   onCheckedChange={field.onChange}
                 />
               </FormControl>
               <div className="space-y-1 leading-none">
-                <FormLabel>
+                <FormLabel htmlFor="aceiteTermos">
                   Declaro que as informações prestadas neste formulário são verdadeiras, 
                   atualizadas e de minha responsabilidade. Comprometo-me a atualizá-las 
                   sempre que houver mudanças relevantes. *
