@@ -1,4 +1,3 @@
-
 // Helper function to filter and validate arrays
 const filterAndValidate = (array: string[], arrayName: string) => {
   console.log(`Processing ${arrayName}:`, array);
@@ -327,9 +326,10 @@ const rawTiposColaboracao = [
 ];
 
 const rawDisponibilidadeEstimada = [
+  'Até 1h/semana',
   'Até 2h/semana',
-  '2h a 4h/semana',
-  'Sob demanda (caso a caso)'
+  'Até 3h/semana',
+  'Até 4h/semana'
 ];
 
 const rawFormasContato = [
