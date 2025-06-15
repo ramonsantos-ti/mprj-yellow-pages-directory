@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '../components/ui/button';
@@ -46,7 +45,6 @@ const ProfileEdit: React.FC = () => {
 
   // Additional state for complex data structures
   const [fotoPreview, setFotoPreview] = useState('');
-  const [formacaoAcademica, setFormacaoAcademica] = useState<any[]>([]);
   const [projetos, setProjetos] = useState<any[]>([]);
   const [disponibilidade, setDisponibilidade] = useState<any>({});
 
@@ -60,8 +58,8 @@ const ProfileEdit: React.FC = () => {
     profile: userProfile,
     fotoPreview,
     setFotoPreview,
-    formacaoAcademica,
-    setFormacaoAcademica,
+    formacaoAcademica: [],
+    setFormacaoAcademica: () => {}, // Not needed anymore since form handles it directly
     projetos,
     setProjetos,
     disponibilidade,
@@ -80,6 +78,12 @@ const ProfileEdit: React.FC = () => {
   }, [userProfile, user]);
 
   const handleSave = async (data: any) => {
+    console.log('Form data being saved:', data);
+    console.log('Formação Acadêmica from form:', data.formacaoAcademica);
+    
+    // Get formação acadêmica directly from form data
+    const formacaoAcademica = data.formacaoAcademica || [];
+    
     await saveProfile(data, fotoPreview, formacaoAcademica, projetos, disponibilidade);
   };
 

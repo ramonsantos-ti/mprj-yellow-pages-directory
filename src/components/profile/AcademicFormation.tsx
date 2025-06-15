@@ -13,7 +13,7 @@ interface AcademicFormationProps {
 }
 
 const AcademicFormation: React.FC<AcademicFormationProps> = ({ form }) => {
-  const { register, control, formState: { errors } } = form;
+  const { control, watch, setValue } = form;
   
   const { fields, append, remove } = useFieldArray({
     control,
@@ -28,6 +28,8 @@ const AcademicFormation: React.FC<AcademicFormationProps> = ({ form }) => {
       ano: new Date().getFullYear()
     });
   };
+
+  const watchedFields = watch('formacaoAcademica');
 
   return (
     <Card>
@@ -71,11 +73,10 @@ const AcademicFormation: React.FC<AcademicFormationProps> = ({ form }) => {
                 <div className="grid gap-4 md:grid-cols-2">
                   <div>
                     <Label htmlFor={`formacaoAcademica.${index}.nivel`}>Nível</Label>
-                    <Select onValueChange={(value) => {
-                      register(`formacaoAcademica.${index}.nivel`).onChange({
-                        target: { value, name: `formacaoAcademica.${index}.nivel` }
-                      });
-                    }}>
+                    <Select 
+                      value={watchedFields?.[index]?.nivel || ''} 
+                      onValueChange={(value) => setValue(`formacaoAcademica.${index}.nivel`, value)}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Selecione o nível" />
                       </SelectTrigger>
@@ -95,7 +96,8 @@ const AcademicFormation: React.FC<AcademicFormationProps> = ({ form }) => {
                     <Label htmlFor={`formacaoAcademica.${index}.ano`}>Ano de Conclusão</Label>
                     <Input
                       type="number"
-                      {...register(`formacaoAcademica.${index}.ano`, { valueAsNumber: true })}
+                      value={watchedFields?.[index]?.ano || ''}
+                      onChange={(e) => setValue(`formacaoAcademica.${index}.ano`, parseInt(e.target.value) || '')}
                       placeholder="Ano"
                     />
                   </div>
@@ -103,7 +105,8 @@ const AcademicFormation: React.FC<AcademicFormationProps> = ({ form }) => {
                   <div>
                     <Label htmlFor={`formacaoAcademica.${index}.instituicao`}>Instituição</Label>
                     <Input
-                      {...register(`formacaoAcademica.${index}.instituicao`)}
+                      value={watchedFields?.[index]?.instituicao || ''}
+                      onChange={(e) => setValue(`formacaoAcademica.${index}.instituicao`, e.target.value)}
                       placeholder="Nome da instituição"
                     />
                   </div>
@@ -111,7 +114,8 @@ const AcademicFormation: React.FC<AcademicFormationProps> = ({ form }) => {
                   <div>
                     <Label htmlFor={`formacaoAcademica.${index}.curso`}>Curso</Label>
                     <Input
-                      {...register(`formacaoAcademica.${index}.curso`)}
+                      value={watchedFields?.[index]?.curso || ''}
+                      onChange={(e) => setValue(`formacaoAcademica.${index}.curso`, e.target.value)}
                       placeholder="Nome do curso"
                     />
                   </div>

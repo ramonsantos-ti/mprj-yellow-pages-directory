@@ -49,9 +49,11 @@ export const useProfileFormHandler = ({
     form.setValue('certificacoes', profile.certificacoes || []);
     form.setValue('publicacoes', profile.publicacoes || '');
     form.setValue('aceiteTermos', profile.aceiteTermos || false);
+    
+    // Set formação acadêmica directly in the form
+    form.setValue('formacaoAcademica', profile.formacaoAcademica || []);
 
     // Set related data
-    setFormacaoAcademica(profile.formacaoAcademica || []);
     setProjetos(profile.projetos || []);
     
     if (profile.disponibilidade && profile.contato) {

@@ -1,6 +1,13 @@
 
 import * as z from 'zod';
 
+const formacaoAcademicaSchema = z.object({
+  nivel: z.string().min(1, 'Nível é obrigatório'),
+  instituicao: z.string().min(1, 'Instituição é obrigatória'),
+  curso: z.string().min(1, 'Curso é obrigatório'),
+  ano: z.number().min(1900, 'Ano deve ser válido').max(new Date().getFullYear() + 10, 'Ano não pode ser muito futuro')
+});
+
 export const profileSchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório'),
   matricula: z.string().min(1, 'Matrícula é obrigatória'),
@@ -17,7 +24,8 @@ export const profileSchema = z.object({
   linkCurriculo: z.string().optional(),
   certificacoes: z.array(z.string()),
   publicacoes: z.string().optional(),
-  aceiteTermos: z.boolean().refine(val => val === true, 'Você deve aceitar os termos')
+  aceiteTermos: z.boolean().refine(val => val === true, 'Você deve aceitar os termos'),
+  formacaoAcademica: z.array(formacaoAcademicaSchema).optional()
 });
 
 export const defaultFormValues = {
@@ -36,5 +44,6 @@ export const defaultFormValues = {
   linkCurriculo: '',
   certificacoes: [],
   publicacoes: '',
-  aceiteTermos: false
+  aceiteTermos: false,
+  formacaoAcademica: []
 };
