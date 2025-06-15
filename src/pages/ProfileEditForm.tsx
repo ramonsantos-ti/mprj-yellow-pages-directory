@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+
+import React from 'react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { Loader2 } from 'lucide-react';
@@ -17,13 +17,8 @@ import CurriculumSection from '../components/profile/CurriculumSection';
 import StatusMessages from '../components/profile/StatusMessages';
 import InterestAreaSelector from '../components/InterestAreaSelector';
 import LanguagesSection from '../components/profile/LanguagesSection';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { Form } from '../components/ui/form';
-import { useProfileEdit } from '../hooks/useProfileEdit';
-import { useProfileFormHandler } from '../components/profile/ProfileFormHandler';
-import { profileSchema, defaultFormValues } from '../components/profile/ProfileFormSchema';
-import {
+import { 
   safeCargos,
   safeFuncoes,
   safeUnidades,
@@ -32,96 +27,26 @@ import {
   safeFormasContato,
   isValidSelectValue
 } from '../components/profile/ProfileFormConstants';
+import { useProfileEditFormController } from '../hooks/useProfileEditFormController';
 
-// Página de formulário separada, para torná-lo mais limpo/reutilizável.
+// Componente apenas para renderizar o formulário, lógica ficou separada
 const ProfileEditForm: React.FC = () => {
-  const { user } = useAuth();
   const {
+    userProfile,
     loading,
     saving,
     error,
     successMessage,
-    userProfile,
-    saveProfile
-  } = useProfileEdit();
-
-  const [fotoPreview, setFotoPreview] = useState('');
-  const [projetos, setProjetos] = useState<any[]>([]);
-  const [disponibilidade, setDisponibilidade] = useState<any>({});
-
-  // Criar o form SÓ com os valores default. Preenchimento será feito depois, se necessário.
-  const form = useForm({
-    resolver: zodResolver(profileSchema),
-    defaultValues: defaultFormValues
-  });
-
-  const { populateFormWithProfile, handleFileUpload } = useProfileFormHandler({
     form,
-    profile: userProfile,
+    handleSave,
     fotoPreview,
     setFotoPreview,
-    formacaoAcademica: [],
-    setFormacaoAcademica: () => {},
+    handleFileUpload,
     projetos,
     setProjetos,
     disponibilidade,
     setDisponibilidade
-  });
-
-  // Controle para rodar populateFormWithProfile só quando for realmente necessário
-  const hasLoadedProfileRef = React.useRef(false);
-
-  React.useEffect(() => {
-    // LOG extra para depuração
-    console.log("[DEBUG] userProfile carregado do banco:", userProfile);
-    if (userProfile && !hasLoadedProfileRef.current) {
-      populateFormWithProfile(userProfile);
-      hasLoadedProfileRef.current = true;
-      // LOG extra para depuração
-      console.log("[DEBUG] populateFormWithProfile executado");
-    } else if (user && !userProfile && !hasLoadedProfileRef.current) {
-      form.setValue('name', user?.email || '');
-      form.setValue('email', user?.email || '');
-      form.setValue('matricula', '');
-      hasLoadedProfileRef.current = true;
-      console.log("[DEBUG] Form setado para dados mínimos");
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userProfile, user]);
-
-  // Se o userProfile mudar após o primeiro carregamento (ex: editar/salvar e carregar o novo), resetar controle
-  React.useEffect(() => {
-    hasLoadedProfileRef.current = false;
-  }, [userProfile?.id]);
-
-  // Verificar se o form está de fato preenchido corretamente após o populate (ajuda a depurar)
-  useEffect(() => {
-    if (userProfile) {
-      // Aguarda um "tick" do React para garantir update
-      setTimeout(() => {
-        console.log("[DEBUG] Campos do formulário preenchidos após populate:", form.getValues());
-      }, 100);
-    }
-  }, [userProfile, form]);
-
-  // Log os erros atuais do formulário toda vez que o form for atualizado.
-  useEffect(() => {
-    // Mostra no console todos os erros do formulário
-    // Útil para entender validação que bloqueia submit.
-    if (Object.keys(form.formState.errors).length > 0) {
-      console.log("[DEBUG] Erros no formulário:", form.formState.errors);
-    }
-  }, [form.formState.errors]);
-
-  const handleSave = async (data: any) => {
-    // Log especial para análise de campos do formulário
-    console.log('[DEBUG][FORM BEFORE SUBMIT]:', {
-      biografia: data.biografia,
-      publicacoes: data.publicacoes
-    });
-    const formacaoAcademica = data.formacaoAcademica || [];
-    await saveProfile(data, fotoPreview, formacaoAcademica, projetos, disponibilidade);
-  };
+  } = useProfileEditFormController();
 
   function renderFormErrors() {
     const errors = form.formState.errors;
@@ -131,7 +56,6 @@ const ProfileEditForm: React.FC = () => {
         <strong>Corrija os campos obrigatórios:</strong>
         <ul className="list-disc ml-5 mt-1">
           {Object.entries(errors).map(([field, err]: any) => {
-            // Exiba erro especial para formação acadêmica com orientação clara
             if (field === "formacaoAcademica" && err?.message) {
               return (
                 <li key={field}>
@@ -142,7 +66,6 @@ const ProfileEditForm: React.FC = () => {
                 </li>
               );
             }
-            // Demais campos: exiba mensagem padrão
             return (
               <li key={field}>
                 {err?.message || field + " inválido"}
@@ -233,7 +156,6 @@ const ProfileEditForm: React.FC = () => {
 
           <AdditionalInfo form={form} />
 
-          {/* EXIBE ERROS DE VALIDAÇÃO */}
           {renderFormErrors()}
 
           <Card>
@@ -264,3 +186,4 @@ const ProfileEditForm: React.FC = () => {
 };
 
 export default ProfileEditForm;
+
