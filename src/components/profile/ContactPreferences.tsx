@@ -3,6 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Input } from '../ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { formaContatoMap } from './ProfileFormConstants';
 
 interface ContactPreferencesProps {
   formaContato: string;
@@ -40,7 +41,7 @@ const ContactPreferences: React.FC<ContactPreferencesProps> = ({
             </SelectTrigger>
             <SelectContent>
               {safeFormasContato.map((forma, formaIndex) => (
-                <SelectItem key={`forma-${formaIndex}-${forma}`} value={forma.toLowerCase()}>
+                <SelectItem key={`forma-${formaIndex}-${forma}`} value={forma}>
                   {forma}
                 </SelectItem>
               ))}

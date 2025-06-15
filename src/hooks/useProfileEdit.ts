@@ -1,8 +1,13 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Profile } from '../types';
+import { 
+  tipoColaboracaoMap, 
+  tipoColaboracaoReverseMap, 
+  formaContatoMap, 
+  formaContatoReverseMap 
+} from '../components/profile/ProfileFormConstants';
 
 export const useProfileEdit = () => {
   const { user } = useAuth();
@@ -79,17 +84,19 @@ export const useProfileEdit = () => {
             publicacoes: e.publicacoes || ''
           })) || [],
           disponibilidade: profile.availability?.[0] ? {
-            tipoColaboracao: profile.availability[0].tipo_colaboracao || [],
+            tipoColaboracao: (profile.availability[0].tipo_colaboracao || []).map((tipo: string) => 
+              tipoColaboracaoReverseMap[tipo] || tipo
+            ),
             disponibilidadeEstimada: profile.availability[0].disponibilidade_estimada || ''
           } : {
             tipoColaboracao: [],
             disponibilidadeEstimada: ''
           },
           contato: profile.availability?.[0] ? {
-            formaContato: profile.availability[0].forma_contato || 'email',
+            formaContato: formaContatoReverseMap[profile.availability[0].forma_contato] || profile.availability[0].forma_contato || 'E-mail',
             horarioPreferencial: profile.availability[0].horario_preferencial || ''
           } : {
-            formaContato: 'email',
+            formaContato: 'E-mail',
             horarioPreferencial: ''
           }
         };
@@ -213,28 +220,17 @@ export const useProfileEdit = () => {
           }
         }
 
-        // Availability - corrigindo a estrutura dos dados
+        // Availability - usando os mappings corretos
         await supabase.from('availability').delete().eq('profile_id', profileId);
         if (disponibilidade && (disponibilidade.tipoColaboracao?.length > 0 || disponibilidade.disponibilidadeEstimada || disponibilidade.formaContato)) {
           console.log('Saving availability data:', disponibilidade);
           
-          // Mapear os valores para o formato correto do banco
-          const tipoColaboracaoMapped = disponibilidade.tipoColaboracao?.map((tipo: string) => {
-            switch (tipo) {
-              case 'Consultoria interna': return 'consultoria_interna';
-              case 'Formação de equipes': return 'formacao_equipes';
-              case 'Capacitações/tutoria': return 'capacitacoes_tutoria';
-              case 'Grupos de trabalho': return 'grupos_trabalho';
-              case 'Mentoria': return 'mentoria';
-              case 'Coaching': return 'coaching';
-              case 'Grupo de trabalho': return 'grupo_trabalho';
-              case 'Grupo de atuação': return 'grupo_atuacao';
-              default: return tipo.toLowerCase().replace(/\s+/g, '_');
-            }
-          }) || [];
+          // Mapear os valores usando as constantes
+          const tipoColaboracaoMapped = disponibilidade.tipoColaboracao?.map((tipo: string) => 
+            tipoColaboracaoMap[tipo] || tipo.toLowerCase().replace(/\s+/g, '_')
+          ) || [];
 
-          const formaContatoMapped = disponibilidade.formaContato ? 
-            disponibilidade.formaContato.toLowerCase().replace(/\s+/g, '_').replace(/-/g, '_') : 'email';
+          const formaContatoMapped = formaContatoMap[disponibilidade.formaContato] || 'email';
 
           const availabilityData = {
             profile_id: profileId,
