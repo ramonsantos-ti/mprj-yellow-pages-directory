@@ -79,6 +79,15 @@ const Home: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="text-center space-y-4">
+        {/* Logo Secundária */}
+        <div className="flex justify-center mb-6">
+          <img 
+            src="/lovable-uploads/2aae1185-7d52-453a-942a-1ef1876196b1.jpg" 
+            alt="MPRJ Logo Secundária" 
+            className="h-20 w-auto"
+          />
+        </div>
+        
         <h1 className="text-4xl font-bold text-gray-900">
           Sistema de Especialistas
         </h1>
