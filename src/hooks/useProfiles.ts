@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Profile } from '../types';
@@ -24,12 +23,8 @@ export const useProfiles = () => {
 
       if (error) throw error;
 
-      console.log('Dados dos perfis carregados do banco:', data);
-
       // Transform Supabase data to match our Profile type
       const transformedProfiles: Profile[] = data.map(profile => {
-        console.log(`Perfil ${profile.name} - foto_url: ${profile.foto_url}`);
-        
         return {
           id: profile.id,
           userId: profile.user_id || '',
