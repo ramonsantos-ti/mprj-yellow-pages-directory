@@ -69,19 +69,19 @@ export const tipoColaboracaoReverseMap: { [key: string]: string } = {
   'grupo_atuacao': 'Grupo de atuação'
 };
 
-export const formaContatoMap: { [key: string]: string } = {
+// Mapeamento que garante compatibilidade com os enums do banco de dados
+export const formaContatoMap: { [key: string]: 'email' | 'telefone' | 'teams' | 'presencial' } = {
   'E-mail': 'email',
   'Telefone': 'telefone',
-  'Microsoft Teams': 'microsoft_teams',
-  'WhatsApp': 'whatsapp',
+  'Microsoft Teams': 'teams',
+  'WhatsApp': 'telefone', // WhatsApp mapeia para telefone no banco
   'Presencial': 'presencial'
 };
 
 export const formaContatoReverseMap: { [key: string]: string } = {
   'email': 'E-mail',
   'telefone': 'Telefone',
-  'microsoft_teams': 'Microsoft Teams',
-  'whatsapp': 'WhatsApp',
+  'teams': 'Microsoft Teams',
   'presencial': 'Presencial'
 };
 

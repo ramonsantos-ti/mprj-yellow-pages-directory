@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -220,23 +221,24 @@ export const useProfileEdit = () => {
           }
         }
 
-        // Availability - usando os mappings corretos
+        // Availability - garantindo tipos corretos para o banco de dados
         await supabase.from('availability').delete().eq('profile_id', profileId);
         if (disponibilidade && (disponibilidade.tipoColaboracao?.length > 0 || disponibilidade.disponibilidadeEstimada || disponibilidade.formaContato)) {
           console.log('Saving availability data:', disponibilidade);
           
-          // Mapear os valores usando as constantes
+          // Mapear os valores usando as constantes com tipos corretos
           const tipoColaboracaoMapped = disponibilidade.tipoColaboracao?.map((tipo: string) => 
             tipoColaboracaoMap[tipo] || tipo.toLowerCase().replace(/\s+/g, '_')
           ) || [];
 
+          // Garantir que o valor sempre seja um dos enum válidos
           const formaContatoMapped = formaContatoMap[disponibilidade.formaContato] || 'email';
 
           const availabilityData = {
             profile_id: profileId,
             tipo_colaboracao: tipoColaboracaoMapped,
             disponibilidade_estimada: disponibilidade.disponibilidadeEstimada || null,
-            forma_contato: formaContatoMapped,
+            forma_contato: formaContatoMapped as 'email' | 'telefone' | 'teams' | 'presencial',
             horario_preferencial: disponibilidade.horarioPreferencial || null
           };
 
