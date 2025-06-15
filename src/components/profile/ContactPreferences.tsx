@@ -28,14 +28,14 @@ const ContactPreferences: React.FC<ContactPreferencesProps> = ({
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
-          <label htmlFor="formaContato" className="text-sm font-medium text-gray-900">Forma Preferencial de Contato</label>
+          <label className="text-sm font-medium text-gray-900">Forma Preferencial de Contato</label>
           <Select value={formaContato} onValueChange={(value) => {
             console.log('Forma contato selected:', value, 'Type:', typeof value);
             if (isValidSelectValue(value)) {
               setFormaContato(value);
             }
           }}>
-            <SelectTrigger id="formaContato" className="mt-2">
+            <SelectTrigger className="mt-2">
               <SelectValue placeholder="Selecione a forma de contato" />
             </SelectTrigger>
             <SelectContent>
@@ -49,9 +49,8 @@ const ContactPreferences: React.FC<ContactPreferencesProps> = ({
         </div>
 
         <div>
-          <label htmlFor="horarioPreferencial" className="text-sm font-medium text-gray-900">Horário Preferencial</label>
+          <label className="text-sm font-medium text-gray-900">Horário Preferencial</label>
           <Input
-            id="horarioPreferencial"
             className="mt-2"
             placeholder="Ex: manhã, tarde, 14h às 16h"
             value={horarioPreferencial}

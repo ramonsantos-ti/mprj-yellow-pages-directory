@@ -1,232 +1,345 @@
-
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
+import React from 'react';
+import { useParams, Link } from 'react-router-dom';
 import { Profile } from '../types';
-import ProfileHeader from '../components/profile-detail/ProfileHeader';
-import ProfileBiography from '../components/profile-detail/ProfileBiography';
-import KnowledgeAreas from '../components/profile-detail/KnowledgeAreas';
-import AcademicFormationCard from '../components/profile-detail/AcademicFormationCard';
-import ProfessionalExperienceCard from '../components/profile-detail/ProfessionalExperienceCard';
-import ProjectsCard from '../components/profile-detail/ProjectsCard';
-import LanguagesAndCertifications from '../components/profile-detail/LanguagesAndCertifications';
-import AvailabilityCard from '../components/profile-detail/AvailabilityCard';
-import PublicationsAndCurriculum from '../components/profile-detail/PublicationsAndCurriculum';
-import LoadingState from '../components/profile-detail/LoadingState';
-import ErrorState from '../components/profile-detail/ErrorState';
+import { mockProfiles } from '../data/mockData';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Badge } from '../components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
+import { Button } from '../components/ui/button';
+import { Separator } from '../components/ui/separator';
+import { 
+  Mail, 
+  Phone, 
+  Calendar, 
+  MapPin, 
+  User, 
+  BookOpen, 
+  Briefcase,
+  Globe,
+  Clock,
+  FileText,
+  ArrowLeft
+} from 'lucide-react';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 const ProfileDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const profile = mockProfiles.find(p => p.id === id);
 
-  useEffect(() => {
-    if (id) {
-      loadProfile();
-    }
-  }, [id]);
-
-  const loadProfile = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      console.log('🔍 Carregando perfil com ID:', id);
-      
-      // Buscar dados básicos do perfil primeiro
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', id)
-        .single();
-
-      if (profileError) {
-        console.error('❌ Erro ao buscar perfil:', profileError);
-        setError('Perfil não encontrado');
-        return;
-      }
-
-      if (!profileData) {
-        console.log('❌ Nenhum perfil encontrado');
-        setError('Perfil não encontrado');
-        return;
-      }
-
-      console.log('✅ Dados básicos do perfil encontrados:', profileData);
-
-      // Buscar projetos relacionados
-      const { data: projectsData, error: projectsError } = await supabase
-        .from('projects')
-        .select('*')
-        .eq('profile_id', id);
-
-      console.log('📊 Projetos encontrados:', projectsData?.length || 0, projectsData);
-
-      // Buscar formações acadêmicas
-      const { data: formationsData, error: formationsError } = await supabase
-        .from('academic_formations')
-        .select('*')
-        .eq('profile_id', id);
-
-      console.log('🎓 Formações encontradas:', formationsData?.length || 0, formationsData);
-
-      // Buscar experiências profissionais
-      const { data: experiencesData, error: experiencesError } = await supabase
-        .from('professional_experiences')
-        .select('*')
-        .eq('profile_id', id);
-
-      console.log('💼 Experiências encontradas:', experiencesData?.length || 0, experiencesData);
-
-      // Buscar disponibilidade
-      const { data: availabilityData, error: availabilityError } = await supabase
-        .from('availability')
-        .select('*')
-        .eq('profile_id', id);
-
-      console.log('📅 Disponibilidade encontrada:', availabilityData?.length || 0, availabilityData);
-
-      // Transformar dados para o formato esperado
-      const transformedProfile: Profile = {
-        id: profileData.id,
-        userId: profileData.user_id || '',
-        name: profileData.name || 'Nome não informado',
-        matricula: profileData.matricula || 'Matrícula não informada',
-        cargo: Array.isArray(profileData.cargo) ? profileData.cargo : [],
-        funcao: Array.isArray(profileData.funcao) ? profileData.funcao : [],
-        unidade: Array.isArray(profileData.unidade) ? profileData.unidade : [],
-        telefone: profileData.telefone || '',
-        email: profileData.email || '',
-        biografia: profileData.biografia || '',
-        areasConhecimento: Array.isArray(profileData.areas_conhecimento) ? profileData.areas_conhecimento : [],
-        especializacoes: profileData.especializacoes || '',
-        temasInteresse: Array.isArray(profileData.temas_interesse) ? profileData.temas_interesse : [],
-        idiomas: Array.isArray(profileData.idiomas) ? profileData.idiomas : [],
-        linkCurriculo: profileData.link_curriculo || '',
-        fotoUrl: profileData.foto_url || '',
-        certificacoes: Array.isArray(profileData.certificacoes) ? profileData.certificacoes : [],
-        publicacoes: profileData.publicacoes || '',
-        role: (profileData.role as 'admin' | 'user') || 'user',
-        isActive: profileData.is_active ?? true,
-        aceiteTermos: profileData.aceite_termos ?? false,
-        updatedByAdmin: profileData.updated_by_admin ?? false,
-        lastUpdated: new Date(profileData.updated_at || profileData.created_at || new Date()),
-        projetos: projectsData?.map((p: any) => ({
-          id: p.id,
-          nome: p.nome,
-          dataInicio: new Date(p.data_inicio),
-          dataFim: p.data_fim ? new Date(p.data_fim) : undefined,
-          observacoes: p.observacoes || ''
-        })) || [],
-        formacaoAcademica: formationsData?.map((f: any) => ({
-          id: f.id,
-          nivel: f.nivel,
-          instituicao: f.instituicao,
-          curso: f.curso,
-          ano: f.ano
-        })) || [],
-        experienciasProfissionais: experiencesData?.map((e: any) => ({
-          tempoMPRJ: e.tempo_mprj || '',
-          experienciaAnterior: e.experiencia_anterior || '',
-          projetosInternos: e.projetos_internos || '',
-          publicacoes: e.publicacoes || ''
-        })) || [],
-        disponibilidade: availabilityData?.[0] ? {
-          tipoColaboracao: Array.isArray(availabilityData[0].tipo_colaboracao) ? availabilityData[0].tipo_colaboracao : [],
-          disponibilidadeEstimada: availabilityData[0].disponibilidade_estimada || ''
-        } : {
-          tipoColaboracao: [],
-          disponibilidadeEstimada: ''
-        },
-        contato: availabilityData?.[0] ? {
-          formaContato: availabilityData[0].forma_contato || 'email',
-          horarioPreferencial: availabilityData[0].horario_preferencial || ''
-        } : {
-          formaContato: 'email',
-          horarioPreferencial: ''
-        }
-      };
-
-      console.log('🔄 Perfil transformado final:', transformedProfile);
-      console.log('📊 Resumo dos dados:');
-      console.log('- Nome:', transformedProfile.name);
-      console.log('- Email:', transformedProfile.email);
-      console.log('- Cargo:', transformedProfile.cargo);
-      console.log('- Telefone:', transformedProfile.telefone || 'Não informado');
-      console.log('- Biografia:', transformedProfile.biografia || 'Não informado');
-      console.log('- Áreas:', transformedProfile.areasConhecimento?.length || 0);
-      console.log('- Temas:', transformedProfile.temasInteresse?.length || 0);
-      console.log('- Formações:', transformedProfile.formacaoAcademica?.length || 0);
-      console.log('- Idiomas:', transformedProfile.idiomas?.length || 0);
-      console.log('- Certificações:', transformedProfile.certificacoes?.length || 0);
-      
-      setProfile(transformedProfile);
-    } catch (err: any) {
-      console.error('❌ Erro geral ao carregar perfil:', err);
-      setError('Erro ao carregar perfil: ' + err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  if (!profile) {
+    return (
+      <div className="text-center py-12">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">Perfil não encontrado</h2>
+        <Link to="/" className="text-red-900 hover:text-red-800">
+          Voltar ao início
+        </Link>
+      </div>
+    );
+  }
 
   const getInitials = (name: string) => {
-    return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .substring(0, 2)
+      .toUpperCase();
   };
 
-  console.log('🎨 Renderizando ProfileDetail - loading:', loading, 'error:', error, 'profile existe:', !!profile);
-
-  if (loading) {
-    console.log('⏳ Renderizando LoadingState');
-    return <LoadingState />;
-  }
-
-  if (error || !profile) {
-    console.log('❌ Renderizando ErrorState com erro:', error);
-    return <ErrorState error={error || 'Erro desconhecido'} />;
-  }
-
-  console.log('✅ Renderizando perfil completo para:', profile.name);
-
   return (
-    <div className="max-w-4xl mx-auto space-y-6 p-4">
-      <ProfileHeader profile={profile} getInitials={getInitials} />
-      
+    <div className="max-w-4xl mx-auto space-y-6">
+      {/* Header com botão voltar */}
+      <div className="flex items-center space-x-4">
+        <Link to="/">
+          <Button variant="outline" size="sm" className="flex items-center space-x-2">
+            <ArrowLeft className="w-4 h-4" />
+            <span>Voltar</span>
+          </Button>
+        </Link>
+        <h1 className="text-2xl font-bold text-gray-900">Perfil Detalhado</h1>
+      </div>
+
+      {/* Informações Básicas */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-start space-x-6">
+            {/* Increased photo size from w-24 h-32 to w-36 h-48 (50% increase) */}
+            <div className="w-36 h-48 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border">
+              {profile.fotoUrl ? (
+                <img 
+                  src={profile.fotoUrl} 
+                  alt={profile.name} 
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-red-100 flex items-center justify-center">
+                  <span className="text-red-900 font-semibold text-2xl">
+                    {getInitials(profile.name)}
+                  </span>
+                </div>
+              )}
+            </div>
+            <div className="flex-1">
+              <h2 className="text-2xl font-bold text-gray-900">{profile.name}</h2>
+              <p className="text-lg text-gray-600 mb-2">Matrícula: {profile.matricula}</p>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {profile.cargo.map((cargo, index) => (
+                  <Badge key={index} className="bg-red-900 text-white">
+                    {cargo}
+                  </Badge>
+                ))}
+              </div>
+              <div className="flex items-center space-x-4 text-sm text-gray-600">
+                <div className="flex items-center space-x-1">
+                  <Calendar className="w-4 h-4" />
+                  <span>Atualizado em {format(profile.lastUpdated, "dd/MM/yyyy", { locale: ptBR })}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </CardHeader>
+      </Card>
+
+      {/* Contato e Localização */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Mail className="w-5 h-5" />
+            <span>Contato e Localização</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center space-x-2">
+              <Mail className="w-4 h-4 text-gray-400" />
+              <span>{profile.email}</span>
+            </div>
+            {profile.telefone && (
+              <div className="flex items-center space-x-2">
+                <Phone className="w-4 h-4 text-gray-400" />
+                <span>{profile.telefone}</span>
+              </div>
+            )}
+          </div>
+          <div>
+            <div className="flex items-start space-x-2">
+              <MapPin className="w-4 h-4 text-gray-400 mt-1" />
+              <div className="flex flex-wrap gap-1">
+                {profile.unidade.map((unidade, index) => (
+                  <Badge key={index} variant="outline">
+                    {unidade}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Biografia */}
-      <ProfileBiography biografia={profile.biografia} />
-      
-      {/* Áreas de Conhecimento e Temas de Interesse */}
-      <KnowledgeAreas 
-        areasConhecimento={profile.areasConhecimento} 
-        temasInteresse={profile.temasInteresse} 
-      />
-      
-      {/* Formação Acadêmica */}
-      <AcademicFormationCard formacaoAcademica={profile.formacaoAcademica} />
-      
-      {/* Experiência Profissional */}
-      <ProfessionalExperienceCard experienciasProfissionais={profile.experienciasProfissionais} />
-      
+      {profile.biografia && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <User className="w-5 h-5" />
+              <span>Sobre</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-700 leading-relaxed">{profile.biografia}</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Áreas de Interesse */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <BookOpen className="w-5 h-5" />
+            <span>Áreas de Interesse</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-2">
+            {profile.areasConhecimento.map((area, index) => (
+              <Badge key={index} className="bg-amber-100 text-amber-900 hover:bg-amber-200">
+                {area}
+              </Badge>
+            ))}
+          </div>
+          {profile.especializacoes && (
+            <div className="mt-4">
+              <h4 className="text-sm font-medium text-gray-900 mb-2">Especializações</h4>
+              <p className="text-gray-700">{profile.especializacoes}</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Projetos */}
-      <ProjectsCard projetos={profile.projetos} />
-      
-      {/* Idiomas e Certificações */}
-      <LanguagesAndCertifications 
-        idiomas={profile.idiomas} 
-        certificacoes={profile.certificacoes} 
-      />
-      
-      {/* Disponibilidade */}
-      <AvailabilityCard 
-        disponibilidade={profile.disponibilidade} 
-        contato={profile.contato} 
-      />
-      
-      {/* Publicações e Currículo */}
-      <PublicationsAndCurriculum 
-        publicacoes={profile.publicacoes}
-        linkCurriculo={profile.linkCurriculo}
-        especializacoes={profile.especializacoes}
-      />
+      {profile.projetos.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Briefcase className="w-5 h-5" />
+              <span>Projetos</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {profile.projetos.map((projeto, index) => (
+              <div key={index} className="border-l-4 border-amber-200 pl-4">
+                <h4 className="font-medium text-gray-900">{projeto.nome}</h4>
+                <p className="text-sm text-gray-600">
+                  {format(projeto.dataInicio, "MMM/yyyy", { locale: ptBR })} - 
+                  {projeto.dataFim ? format(projeto.dataFim, "MMM/yyyy", { locale: ptBR }) : 'Atual'}
+                </p>
+                {projeto.observacoes && (
+                  <p className="text-sm text-gray-700 mt-1">{projeto.observacoes}</p>
+                )}
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Formação e Experiência */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <BookOpen className="w-5 h-5" />
+              <span>Formação Acadêmica</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {profile.formacaoAcademica.map((formacao, index) => (
+              <div key={index} className="border-b border-gray-100 pb-3 last:border-b-0">
+                <p className="font-medium text-gray-900">{formacao.nivel}</p>
+                <p className="text-gray-700">{formacao.curso}</p>
+                <p className="text-sm text-gray-600">{formacao.instituicao} - {formacao.ano}</p>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Briefcase className="w-5 h-5" />
+              <span>Experiência Profissional</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {profile.experienciasProfissionais.map((exp, index) => (
+              <div key={index} className="space-y-2">
+                <div>
+                  <p className="font-medium text-gray-900">Tempo no MPRJ</p>
+                  <p className="text-gray-700">{exp.tempoMPRJ}</p>
+                </div>
+                {exp.experienciaAnterior && (
+                  <div>
+                    <p className="font-medium text-gray-900">Experiência Anterior</p>
+                    <p className="text-gray-700">{exp.experienciaAnterior}</p>
+                  </div>
+                )}
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Idiomas e Disponibilidade */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Globe className="w-5 h-5" />
+              <span>Idiomas</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-2">
+              {profile.idiomas.map((idioma, index) => (
+                <Badge key={index} variant="outline">
+                  {idioma}
+                </Badge>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Clock className="w-5 h-5" />
+              <span>Disponibilidade</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div>
+              <p className="font-medium text-gray-900 mb-2">Tipo de Colaboração</p>
+              <div className="flex flex-wrap gap-1">
+                {profile.disponibilidade.tipoColaboracao.map((tipo, index) => (
+                  <Badge key={index} variant="secondary" className="text-xs">
+                    {tipo}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="font-medium text-gray-900">Disponibilidade Estimada</p>
+              <p className="text-gray-700">{profile.disponibilidade.disponibilidadeEstimada}</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Contato Preferencial */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Mail className="w-5 h-5" />
+            <span>Preferências de Contato</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <p className="font-medium text-gray-900">Forma Preferencial</p>
+              <p className="text-gray-700">{profile.contato.formaContato}</p>
+            </div>
+            {profile.contato.horarioPreferencial && (
+              <div>
+                <p className="font-medium text-gray-900">Horário Preferencial</p>
+                <p className="text-gray-700">{profile.contato.horarioPreferencial}</p>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Link do Currículo */}
+      {profile.linkCurriculo && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <FileText className="w-5 h-5" />
+              <span>Currículo</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <a 
+              href={profile.linkCurriculo} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-amber-900 hover:text-amber-800 underline"
+            >
+              Acessar Currículo Completo
+            </a>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };

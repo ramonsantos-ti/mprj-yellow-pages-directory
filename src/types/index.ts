@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   username: string;
@@ -17,7 +16,6 @@ export interface Profile {
   name: string;
   matricula: string;
   cargo: string[];
-  funcao?: string[]; // New optional field for functions
   unidade: string[];
   telefone?: string;
   email: string;
@@ -39,11 +37,9 @@ export interface Profile {
   certificacoes?: string[];
   publicacoes?: string;
   role?: 'admin' | 'user';
-  updatedByAdmin?: boolean; // New field to track admin modifications
 }
 
 export interface Project {
-  id?: string;
   nome: string;
   dataInicio: Date;
   dataFim?: Date;
@@ -51,7 +47,6 @@ export interface Project {
 }
 
 export interface FormacaoAcademica {
-  id?: string;
   nivel: string;
   instituicao: string;
   curso: string;
@@ -77,7 +72,6 @@ export interface ContatoPreferencia {
 
 export interface SearchFilters {
   cargo?: string;
-  funcao?: string; // New filter for functions
   unidade?: string;
   areaConhecimento?: string;
   habilidadeTecnica?: string;

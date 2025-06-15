@@ -32,10 +32,9 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
         <div>
           <label className="text-sm font-medium text-gray-900">Tipo de Colaboração</label>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
-            {safeTiposColaboracao.map((tipo, index) => (
+            {safeTiposColaboracao.map(tipo => (
               <div key={tipo} className="flex items-center space-x-2">
                 <Checkbox
-                  id={`tipo-${index}`}
                   checked={tipoColaboracao.includes(tipo)}
                   onCheckedChange={() => {
                     if (tipoColaboracao.includes(tipo)) {
@@ -45,21 +44,21 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
                     }
                   }}
                 />
-                <label htmlFor={`tipo-${index}`} className="text-sm">{tipo}</label>
+                <span className="text-sm">{tipo}</span>
               </div>
             ))}
           </div>
         </div>
 
         <div>
-          <label htmlFor="disponibilidadeEstimada" className="text-sm font-medium text-gray-900">Disponibilidade Estimada</label>
+          <label className="text-sm font-medium text-gray-900">Disponibilidade Estimada</label>
           <Select value={disponibilidadeEstimada} onValueChange={(value) => {
             console.log('Disponibilidade selected:', value, 'Type:', typeof value);
             if (isValidSelectValue(value)) {
               setDisponibilidadeEstimada(value);
             }
           }}>
-            <SelectTrigger id="disponibilidadeEstimada" className="mt-2">
+            <SelectTrigger className="mt-2">
               <SelectValue placeholder="Selecione sua disponibilidade" />
             </SelectTrigger>
             <SelectContent>

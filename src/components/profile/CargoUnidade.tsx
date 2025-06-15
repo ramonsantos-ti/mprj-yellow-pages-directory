@@ -10,7 +10,6 @@ import { X } from 'lucide-react';
 interface CargoUnidadeProps {
   form: UseFormReturn<any>;
   safeCargos: string[];
-  safeFuncoes: string[];
   safeUnidades: string[];
   isValidSelectValue: (value: any) => boolean;
 }
@@ -18,14 +17,13 @@ interface CargoUnidadeProps {
 const CargoUnidade: React.FC<CargoUnidadeProps> = ({ 
   form, 
   safeCargos, 
-  safeFuncoes,
   safeUnidades, 
   isValidSelectValue 
 }) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Cargo, Função e Lotação</CardTitle>
+        <CardTitle>Cargo e Lotação</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <FormField
@@ -56,47 +54,6 @@ const CargoUnidade: React.FC<CargoUnidadeProps> = ({
                   {field.value.map((cargo, index) => (
                     <Badge key={index} variant="secondary" className="flex items-center space-x-1">
                       <span>{cargo}</span>
-                      <X 
-                        className="w-3 h-3 cursor-pointer" 
-                        onClick={() => field.onChange(field.value.filter((_, i) => i !== index))}
-                      />
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="funcao"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Função</FormLabel>
-              <div className="space-y-2">
-                <Select onValueChange={(value) => {
-                  console.log('Funcao selected:', value, 'Type:', typeof value);
-                  if (isValidSelectValue(value) && !field.value.includes(value)) {
-                    field.onChange([...field.value, value]);
-                  }
-                }}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione uma função (opcional)" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {safeFuncoes.map((funcao, index) => (
-                      <SelectItem key={`funcao-${index}-${funcao}`} value={funcao}>
-                        {funcao}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <div className="flex flex-wrap gap-2">
-                  {field.value.map((funcao, index) => (
-                    <Badge key={index} variant="outline" className="flex items-center space-x-1">
-                      <span>{funcao}</span>
                       <X 
                         className="w-3 h-3 cursor-pointer" 
                         onClick={() => field.onChange(field.value.filter((_, i) => i !== index))}

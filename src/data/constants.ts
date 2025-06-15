@@ -233,34 +233,30 @@ const rawIdiomas = [
   'Vietnamita'
 ];
 
-// Updated cargo list as requested
 const rawCargos = [
-  'Procurador de Justiça',
-  'Promotor de Justiça',
-  'Técnico',
-  'Analista',
-  'Assessor',
-  'Auxiliar',
-  'Estagiário',
-  'Residente',
-  'Cedido (Médio)',
-  'Cedido (Superior)',
-  'Cedido (Fundamental)'
-];
-
-// New functions list as requested
-const rawFuncoes = [
   'Procurador-Geral de Justiça',
   'Subprocurador-Geral de Justiça',
-  'Corregedor-Geral',
-  'Subcorregedor-Geral',
-  'Conselheiro',
+  'Procurador de Justiça',
+  'Promotor de Justiça',
+  'Promotor de Justiça Substituto',
+  'Servidor Efetivo - Nível Superior',
+  'Servidor Efetivo - Nível Médio',
+  'Servidor Comissionado - CJ-1',
+  'Servidor Comissionado - CJ-2',
+  'Servidor Comissionado - CJ-3',
+  'Servidor Comissionado - CJ-4',
+  'Servidor Comissionado - CJ-5',
+  'Assessor Especial',
+  'Chefe de Gabinete',
+  'Secretário Geral',
   'Diretor',
-  'Gerente',
-  'Chefe',
-  'Secretário',
   'Coordenador',
-  'Supervisor'
+  'Gerente',
+  'Supervisor',
+  'Analista',
+  'Técnico',
+  'Assistente',
+  'Auxiliar'
 ];
 
 const rawUnidades = [
@@ -372,7 +368,6 @@ export const HABILIDADES_TECNICAS_TI = filterAndValidate(rawHabilidadesTecnicasT
 export const HABILIDADES_COMPORTAMENTAIS = filterAndValidate(rawHabilidadesComportamentais, 'HABILIDADES_COMPORTAMENTAIS');
 export const IDIOMAS = filterAndValidate(rawIdiomas, 'IDIOMAS');
 export const CARGOS = filterAndValidate(rawCargos, 'CARGOS');
-export const FUNCOES = filterAndValidate(rawFuncoes, 'FUNCOES');
 export const UNIDADES = filterAndValidate(rawUnidades, 'UNIDADES');
 export const NIVEIS_FORMACAO = filterAndValidate(rawNiveisFormacao, 'NIVEIS_FORMACAO');
 export const TIPOS_COLABORACAO = filterAndValidate(rawTiposColaboracao, 'TIPOS_COLABORACAO');

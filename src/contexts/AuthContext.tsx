@@ -1,23 +1,12 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User as SupabaseUser, Session } from '@supabase/supabase-js';
-import { supabase } from '../integrations/supabase/client';
-
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  matricula: string;
-  role: 'admin' | 'user';
-  profileId?: string;
-}
+import { User } from '../types';
+import { mockUsers } from '../data/mockData';
 
 interface AuthContextType {
   user: User | null;
-  session: Session | null;
-  login: (email: string, password: string) => Promise<{ error?: string }>;
-  signup: (email: string, password: string, name: string, matricula: string) => Promise<{ error?: string }>;
-  logout: () => Promise<void>;
+  login: (username: string, password: string) => boolean;
+  logout: () => void;
   isLoading: boolean;
 }
 
@@ -33,160 +22,33 @@ export const useAuth = () => {
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch user profile data from Supabase
-  const fetchUserProfile = async (supabaseUser: SupabaseUser): Promise<User | null> => {
-    try {
-      const { data: profile, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', supabaseUser.id)
-        .single();
-
-      if (error) {
-        console.error('Error fetching user profile:', error);
-        return null;
-      }
-
-      return {
-        id: supabaseUser.id,
-        email: profile.email,
-        name: profile.name,
-        matricula: profile.matricula,
-        role: profile.role || 'user',
-        profileId: profile.id
-      };
-    } catch (error) {
-      console.error('Error in fetchUserProfile:', error);
-      return null;
-    }
-  };
-
-  // Initialize auth state
   useEffect(() => {
-    console.log('AuthContext: Initializing auth state');
-
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('AuthContext: Auth state changed:', event, session?.user?.email);
-        
-        setSession(session);
-        
-        if (session?.user) {
-          // Fetch user profile with a small delay to ensure database is ready
-          setTimeout(async () => {
-            const userProfile = await fetchUserProfile(session.user);
-            setUser(userProfile);
-            setIsLoading(false);
-          }, 100);
-        } else {
-          setUser(null);
-          setIsLoading(false);
-        }
-      }
-    );
-
-    // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log('AuthContext: Checking existing session:', session?.user?.email);
-      if (session?.user) {
-        fetchUserProfile(session.user).then(userProfile => {
-          setUser(userProfile);
-          setSession(session);
-          setIsLoading(false);
-        });
-      } else {
-        setIsLoading(false);
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
+    const storedUser = localStorage.getItem('mprj_user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+    setIsLoading(false);
   }, []);
 
-  const login = async (email: string, password: string): Promise<{ error?: string }> => {
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
-        console.error('Login error:', error);
-        return { error: error.message };
-      }
-
-      console.log('Login successful:', data.user?.email);
-      return {};
-    } catch (error) {
-      console.error('Login error:', error);
-      return { error: 'Erro inesperado durante o login' };
+  const login = (username: string, password: string): boolean => {
+    const foundUser = mockUsers.find(u => u.username === username && u.password === password);
+    if (foundUser) {
+      setUser(foundUser);
+      localStorage.setItem('mprj_user', JSON.stringify(foundUser));
+      return true;
     }
+    return false;
   };
 
-  const signup = async (email: string, password: string, name: string, matricula: string): Promise<{ error?: string }> => {
-    try {
-      const redirectUrl = `${window.location.origin}/`;
-      
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: redirectUrl,
-          data: {
-            name: name,
-            matricula: matricula
-          }
-        }
-      });
-
-      if (error) {
-        console.error('Signup error:', error);
-        return { error: error.message };
-      }
-
-      // If user was created successfully, update their profile
-      if (data.user) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .update({
-            name: name,
-            matricula: matricula
-          })
-          .eq('user_id', data.user.id);
-
-        if (profileError) {
-          console.error('Profile update error:', profileError);
-        }
-      }
-
-      console.log('Signup successful:', data.user?.email);
-      return {};
-    } catch (error) {
-      console.error('Signup error:', error);
-      return { error: 'Erro inesperado durante o cadastro' };
-    }
-  };
-
-  const logout = async (): Promise<void> => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error('Logout error:', error);
-      }
-      setUser(null);
-      setSession(null);
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem('mprj_user');
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, login, signup, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, login, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

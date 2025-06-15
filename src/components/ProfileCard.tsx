@@ -1,9 +1,9 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Profile } from '../types';
 import { Card, CardContent, CardHeader } from './ui/card';
 import { Badge } from './ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Mail, Phone, Calendar, MapPin } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -19,36 +19,17 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   };
 
-  console.log('ProfileCard rendering:', profile.name, 'fotoUrl:', profile.fotoUrl);
-
   return (
     <Card className="h-full hover:shadow-lg transition-shadow duration-200">
       <CardHeader className="pb-4">
         <div className="flex items-start space-x-4">
-          {/* Photo container with increased size */}
+          {/* Increased photo size from w-20 h-28 to w-30 h-42 (50% increase) */}
           <div className="w-30 h-42 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border">
             {profile.fotoUrl ? (
               <img 
                 src={profile.fotoUrl} 
                 alt={profile.name} 
                 className="w-full h-full object-cover"
-                onLoad={() => console.log('Image loaded successfully for:', profile.name, 'URL:', profile.fotoUrl)}
-                onError={(e) => {
-                  console.error('Image failed to load for:', profile.name, 'URL:', profile.fotoUrl);
-                  // Fallback to initials if image fails to load
-                  const target = e.target as HTMLImageElement;
-                  target.style.display = 'none';
-                  const parent = target.parentElement;
-                  if (parent && !parent.querySelector('.fallback-initials')) {
-                    parent.innerHTML = `
-                      <div class="w-full h-full bg-red-100 flex items-center justify-center fallback-initials">
-                        <span class="text-red-900 font-semibold text-xl">
-                          ${getInitials(profile.name)}
-                        </span>
-                      </div>
-                    `;
-                  }
-                }}
               />
             ) : (
               <div className="w-full h-full bg-red-100 flex items-center justify-center">
@@ -71,15 +52,6 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
                 </Badge>
               ))}
             </div>
-            {profile.funcao && profile.funcao.length > 0 && (
-              <div className="flex flex-wrap gap-1 mt-1">
-                {profile.funcao.map((funcao, index) => (
-                  <Badge key={index} variant="outline" className="text-xs">
-                    {funcao}
-                  </Badge>
-                ))}
-              </div>
-            )}
           </div>
         </div>
       </CardHeader>

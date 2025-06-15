@@ -1,125 +1,118 @@
 
 import React from 'react';
-import { UseFormReturn, useFieldArray } from 'react-hook-form';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
-import { Label } from '../ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { GraduationCap, Plus, Trash2 } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
 
-interface AcademicFormationProps {
-  form: UseFormReturn<any>;
+interface Formation {
+  nivel: string;
+  instituicao: string;
+  curso: string;
+  ano: number;
 }
 
-const AcademicFormation: React.FC<AcademicFormationProps> = ({ form }) => {
-  const { register, control, formState: { errors } } = form;
-  
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: 'formacaoAcademica'
-  });
+interface AcademicFormationProps {
+  formacoes: Formation[];
+  setFormacoes: React.Dispatch<React.SetStateAction<Formation[]>>;
+  safeNiveisFormacao: string[];
+  isValidSelectValue: (value: any) => boolean;
+}
 
-  const addFormation = () => {
-    append({
-      nivel: '',
-      instituicao: '',
-      curso: '',
-      ano: new Date().getFullYear()
-    });
+const AcademicFormation: React.FC<AcademicFormationProps> = ({ 
+  formacoes, 
+  setFormacoes, 
+  safeNiveisFormacao, 
+  isValidSelectValue 
+}) => {
+  const adicionarFormacao = () => {
+    setFormacoes([...formacoes, { nivel: '', instituicao: '', curso: '', ano: new Date().getFullYear() }]);
+  };
+
+  const removerFormacao = (index: number) => {
+    setFormacoes(formacoes.filter((_, i) => i !== index));
   };
 
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <GraduationCap className="w-5 h-5" />
-            <span>Formação Acadêmica</span>
-          </div>
-          <Button type="button" onClick={addFormation} size="sm">
+          <span>Formação Acadêmica</span>
+          <Button type="button" onClick={adicionarFormacao} size="sm" variant="outline">
             <Plus className="w-4 h-4 mr-2" />
             Adicionar
           </Button>
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        {fields.length === 0 ? (
-          <div className="text-center py-8">
-            <p className="text-gray-500 mb-4">Nenhuma formação acadêmica adicionada</p>
-            <Button type="button" onClick={addFormation} variant="outline">
-              <Plus className="w-4 h-4 mr-2" />
-              Adicionar Primeira Formação
-            </Button>
+      <CardContent className="space-y-4">
+        {formacoes.map((formacao, index) => (
+          <div key={index} className="border rounded-lg p-4 space-y-3">
+            <div className="flex justify-between items-start">
+              <h4 className="font-medium">Formação {index + 1}</h4>
+              <Button
+                type="button"
+                onClick={() => removerFormacao(index)}
+                size="sm"
+                variant="ghost"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+              <Select
+                value={formacao.nivel}
+                onValueChange={(value) => {
+                  console.log('Formacao nivel selected:', value, 'Type:', typeof value);
+                  if (isValidSelectValue(value)) {
+                    const novas = [...formacoes];
+                    novas[index].nivel = value;
+                    setFormacoes(novas);
+                  }
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Nível" />
+                </SelectTrigger>
+                <SelectContent>
+                  {safeNiveisFormacao.map((nivel, nivelIndex) => (
+                    <SelectItem key={`nivel-${nivelIndex}-${nivel}`} value={nivel}>
+                      {nivel}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Input
+                placeholder="Instituição"
+                value={formacao.instituicao}
+                onChange={(e) => {
+                  const novas = [...formacoes];
+                  novas[index].instituicao = e.target.value;
+                  setFormacoes(novas);
+                }}
+              />
+              <Input
+                placeholder="Curso"
+                value={formacao.curso}
+                onChange={(e) => {
+                  const novas = [...formacoes];
+                  novas[index].curso = e.target.value;
+                  setFormacoes(novas);
+                }}
+              />
+              <Input
+                type="number"
+                placeholder="Ano"
+                value={formacao.ano}
+                onChange={(e) => {
+                  const novas = [...formacoes];
+                  novas[index].ano = parseInt(e.target.value);
+                  setFormacoes(novas);
+                }}
+              />
+            </div>
           </div>
-        ) : (
-          <div className="space-y-6">
-            {fields.map((field, index) => (
-              <div key={field.id} className="border border-gray-200 rounded-lg p-4">
-                <div className="flex justify-between items-center mb-4">
-                  <h4 className="font-medium">Formação {index + 1}</h4>
-                  <Button
-                    type="button"
-                    onClick={() => remove(index)}
-                    variant="outline"
-                    size="sm"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-                
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div>
-                    <Label htmlFor={`formacaoAcademica.${index}.nivel`}>Nível</Label>
-                    <Select onValueChange={(value) => {
-                      register(`formacaoAcademica.${index}.nivel`).onChange({
-                        target: { value, name: `formacaoAcademica.${index}.nivel` }
-                      });
-                    }}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione o nível" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Ensino Médio">Ensino Médio</SelectItem>
-                        <SelectItem value="Técnico">Técnico</SelectItem>
-                        <SelectItem value="Graduação">Graduação</SelectItem>
-                        <SelectItem value="Especialização">Especialização</SelectItem>
-                        <SelectItem value="Mestrado">Mestrado</SelectItem>
-                        <SelectItem value="Doutorado">Doutorado</SelectItem>
-                        <SelectItem value="Pós-Doutorado">Pós-Doutorado</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <Label htmlFor={`formacaoAcademica.${index}.ano`}>Ano de Conclusão</Label>
-                    <Input
-                      type="number"
-                      {...register(`formacaoAcademica.${index}.ano`, { valueAsNumber: true })}
-                      placeholder="Ano"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor={`formacaoAcademica.${index}.instituicao`}>Instituição</Label>
-                    <Input
-                      {...register(`formacaoAcademica.${index}.instituicao`)}
-                      placeholder="Nome da instituição"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor={`formacaoAcademica.${index}.curso`}>Curso</Label>
-                    <Input
-                      {...register(`formacaoAcademica.${index}.curso`)}
-                      placeholder="Nome do curso"
-                    />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+        ))}
       </CardContent>
     </Card>
   );

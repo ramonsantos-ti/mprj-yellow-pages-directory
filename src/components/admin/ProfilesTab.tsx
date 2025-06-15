@@ -1,17 +1,13 @@
-
-import React, { useState } from 'react';
+import React from 'react';
 import { Profile } from '../../types';
 import { Card, CardContent } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Input } from '../ui/input';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../ui/alert-dialog';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
-import { Search, UserCheck, UserX, Shield, Trash2, CheckCircle, XCircle, Edit } from 'lucide-react';
+import { Search, UserCheck, UserX, Shield, Trash2, CheckCircle, XCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import AdminProfileEditModal from './AdminProfileEditModal';
-import { useToast } from '@/hooks/use-toast';
 
 interface ProfilesTabProps {
   searchTerm: string;
@@ -20,7 +16,6 @@ interface ProfilesTabProps {
   toggleProfileStatus: (profileId: string) => void;
   promoteToAdmin: (profileId: string) => void;
   deleteProfile: (profileId: string) => void;
-  updateProfile: (profileId: string, updatedData: Partial<Profile>) => void;
 }
 
 const ProfilesTab: React.FC<ProfilesTabProps> = ({
@@ -29,13 +24,8 @@ const ProfilesTab: React.FC<ProfilesTabProps> = ({
   filteredProfiles,
   toggleProfileStatus,
   promoteToAdmin,
-  deleteProfile,
-  updateProfile
+  deleteProfile
 }) => {
-  const [editingProfile, setEditingProfile] = useState<Profile | null>(null);
-  const [deletingProfile, setDeletingProfile] = useState<Profile | null>(null);
-  const { toast } = useToast();
-
   const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   };
@@ -43,24 +33,6 @@ const ProfilesTab: React.FC<ProfilesTabProps> = ({
   const isRecentlyUpdated = (lastUpdated: Date) => {
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
     return new Date(lastUpdated) > oneDayAgo;
-  };
-
-  const handleDeleteProfile = async (profile: Profile) => {
-    try {
-      await deleteProfile(profile.id);
-      setDeletingProfile(null);
-      toast({
-        title: "Usuário excluído com sucesso",
-        description: `${profile.name} e todos os seus dados foram removidos permanentemente do sistema.`,
-      });
-    } catch (error: any) {
-      console.error('Erro ao excluir usuário:', error);
-      toast({
-        title: "Erro ao excluir usuário",
-        description: error.message || "Ocorreu um erro inesperado ao tentar excluir o usuário.",
-        variant: "destructive",
-      });
-    }
   };
 
   return (
@@ -115,11 +87,6 @@ const ProfilesTab: React.FC<ProfilesTabProps> = ({
                           Atualizado recentemente
                         </Badge>
                       )}
-                      {profile.updatedByAdmin && (
-                        <Badge className="bg-orange-100 text-orange-800 text-xs">
-                          Alterado pelo Administrador
-                        </Badge>
-                      )}
                       <Badge variant={profile.isActive !== false ? "default" : "secondary"}>
                         {profile.isActive !== false ? "Ativo" : "Inativo"}
                       </Badge>
@@ -140,114 +107,34 @@ const ProfilesTab: React.FC<ProfilesTabProps> = ({
                 </div>
                 
                 <div className="flex items-center space-x-2">
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setEditingProfile(profile)}
-                        className="flex items-center space-x-1"
-                      >
-                        <Edit className="w-4 h-4" />
-                        <span>Editar</span>
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                      <DialogHeader>
-                        <DialogTitle>Editar Perfil - {profile.name}</DialogTitle>
-                      </DialogHeader>
-                      {editingProfile && (
-                        <AdminProfileEditModal
-                          profile={editingProfile}
-                          onSave={(updatedData) => {
-                            updateProfile(profile.id, updatedData);
-                            setEditingProfile(null);
-                          }}
-                          onCancel={() => setEditingProfile(null)}
-                        />
-                      )}
-                    </DialogContent>
-                  </Dialog>
-
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex items-center space-x-1"
-                      >
-                        {profile.isActive !== false ? (
-                          <>
-                            <XCircle className="w-4 h-4" />
-                            <span>Desativar</span>
-                          </>
-                        ) : (
-                          <>
-                            <CheckCircle className="w-4 h-4" />
-                            <span>Ativar</span>
-                          </>
-                        )}
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>
-                          {profile.isActive !== false ? 'Desativar Perfil' : 'Ativar Perfil'}
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>
-                          {profile.isActive !== false 
-                            ? `Tem certeza que deseja desativar o perfil de ${profile.name}? O perfil não aparecerá mais nas buscas públicas, mas continuará visível no painel de administração.`
-                            : `Tem certeza que deseja ativar o perfil de ${profile.name}? O perfil voltará a aparecer nas buscas públicas.`
-                          }
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={() => toggleProfileStatus(profile.id)}
-                          className={profile.isActive !== false ? "bg-red-600 hover:bg-red-700" : ""}
-                        >
-                          {profile.isActive !== false ? 'Desativar' : 'Ativar'}
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => toggleProfileStatus(profile.id)}
+                    className="flex items-center space-x-1"
+                  >
+                    {profile.isActive !== false ? (
+                      <>
+                        <XCircle className="w-4 h-4" />
+                        <span>Desativar</span>
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle className="w-4 h-4" />
+                        <span>Ativar</span>
+                      </>
+                    )}
+                  </Button>
                   
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex items-center space-x-1"
-                        showAdminStyle={profile.role === 'admin'}
-                      >
-                        <Shield className="w-4 h-4" />
-                        <span>Admin</span>
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>
-                          {profile.role === 'admin' ? 'Remover Privilégios de Administrador' : 'Promover a Administrador'}
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>
-                          {profile.role === 'admin' 
-                            ? `Tem certeza que deseja remover os privilégios de administrador de ${profile.name}? Esta pessoa perderá o acesso ao painel de administração.`
-                            : `Tem certeza que deseja promover ${profile.name} a administrador? Esta pessoa terá acesso total ao painel de administração.`
-                          }
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={() => promoteToAdmin(profile.id)}
-                          className={profile.role === 'admin' ? "bg-red-600 hover:bg-red-700" : ""}
-                        >
-                          {profile.role === 'admin' ? 'Remover Privilégios' : 'Promover'}
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => promoteToAdmin(profile.id)}
+                    className="flex items-center space-x-1"
+                  >
+                    <Shield className="w-4 h-4" />
+                    <span>Admin</span>
+                  </Button>
                   
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
@@ -255,7 +142,6 @@ const ProfilesTab: React.FC<ProfilesTabProps> = ({
                         variant="outline"
                         size="sm"
                         className="flex items-center space-x-1 text-red-600 hover:text-red-700"
-                        onClick={() => setDeletingProfile(profile)}
                       >
                         <Trash2 className="w-4 h-4" />
                         <span>Excluir</span>
@@ -263,46 +149,19 @@ const ProfilesTab: React.FC<ProfilesTabProps> = ({
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
-                        <AlertDialogTitle className="text-red-600">⚠️ ATENÇÃO: Exclusão Permanente</AlertDialogTitle>
-                        <AlertDialogDescription className="space-y-4">
-                          <div className="font-semibold text-gray-900">
-                            Você está prestes a excluir PERMANENTEMENTE o usuário:
-                          </div>
-                          <div className="bg-gray-50 p-4 rounded-lg border">
-                            <div><strong>Nome:</strong> {profile.name}</div>
-                            <div><strong>Email:</strong> {profile.email}</div>
-                            <div><strong>Matrícula:</strong> {profile.matricula}</div>
-                          </div>
-                          <div className="text-red-700 font-medium">
-                            Esta ação irá excluir TODOS os dados do usuário:
-                          </div>
-                          <ul className="list-disc list-inside text-sm space-y-1 text-gray-700">
-                            <li>Perfil principal e informações pessoais</li>
-                            <li>Todos os projetos cadastrados</li>
-                            <li>Formações acadêmicas</li>
-                            <li>Experiências profissionais</li>
-                            <li>Disponibilidade e preferências de contato</li>
-                            <li>Certificações e publicações</li>
-                          </ul>
-                          <div className="bg-red-50 border border-red-200 p-3 rounded-lg">
-                            <div className="text-red-800 font-semibold text-sm">
-                              ⚠️ ESTA AÇÃO NÃO PODE SER DESFEITA!
-                            </div>
-                            <div className="text-red-700 text-sm mt-1">
-                              Todos os dados serão perdidos permanentemente.
-                            </div>
-                          </div>
+                        <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Tem certeza que deseja excluir o perfil de {profile.name}? 
+                          Esta ação não pode ser desfeita.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel onClick={() => setDeletingProfile(null)}>
-                          Cancelar
-                        </AlertDialogCancel>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
                         <AlertDialogAction
-                          onClick={() => handleDeleteProfile(profile)}
-                          className="bg-red-600 hover:bg-red-700 focus:ring-red-500"
+                          onClick={() => deleteProfile(profile.id)}
+                          className="bg-red-600 hover:bg-red-700"
                         >
-                          SIM, EXCLUIR PERMANENTEMENTE
+                          Excluir
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
