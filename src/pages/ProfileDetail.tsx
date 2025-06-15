@@ -12,7 +12,7 @@ import LoadingState from '../components/profile-detail/LoadingState';
 import ErrorState from '../components/profile-detail/ErrorState';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
-import { User, Briefcase, Target, Book, Award, FileText, Calendar, MessageSquare, Language, Info } from 'lucide-react';
+import { User, Briefcase, Target, Book, Award, FileText, Calendar, MessageSquare, Languages, Info } from 'lucide-react';
 
 const ProfileDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -421,7 +421,7 @@ const ProfileDetail: React.FC = () => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Language className="w-5 h-5 text-red-800" />
+              <Languages className="w-5 h-5 text-red-800" />
               Idiomas
             </CardTitle>
           </CardHeader>
