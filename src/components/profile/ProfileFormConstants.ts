@@ -21,13 +21,9 @@ export const safeCertificacoes = [
 
 export const safeTiposColaboracao = [
   'Consultoria interna',
-  'Formação de equipes',
-  'Capacitações/tutoria',
-  'Grupos de trabalho',
-  'Mentoria',
-  'Coaching',
-  'Grupo de trabalho',
-  'Grupo de atuação'
+  'Parecer técnico',
+  'Capacitação/treinamento',
+  'Projeto especial'
 ];
 
 export const safeDisponibilidadeEstimada = [
@@ -45,28 +41,20 @@ export const safeFormasContato = [
   'Presencial'
 ];
 
-// Mapeamento para valores do banco de dados
+// Mapeamento para valores do banco de dados - usando os enum values corretos
 export const tipoColaboracaoMap: { [key: string]: string } = {
-  'Consultoria interna': 'consultoria_interna',
-  'Formação de equipes': 'formacao_equipes',
-  'Capacitações/tutoria': 'capacitacoes_tutoria',
-  'Grupos de trabalho': 'grupos_trabalho',
-  'Mentoria': 'mentoria',
-  'Coaching': 'coaching',
-  'Grupo de trabalho': 'grupo_trabalho',
-  'Grupo de atuação': 'grupo_atuacao'
+  'Consultoria interna': 'consultoria',
+  'Parecer técnico': 'parecer',
+  'Capacitação/treinamento': 'capacitacao',
+  'Projeto especial': 'projeto'
 };
 
 // Mapeamento reverso para exibição
 export const tipoColaboracaoReverseMap: { [key: string]: string } = {
-  'consultoria_interna': 'Consultoria interna',
-  'formacao_equipes': 'Formação de equipes',
-  'capacitacoes_tutoria': 'Capacitações/tutoria',
-  'grupos_trabalho': 'Grupos de trabalho',
-  'mentoria': 'Mentoria',
-  'coaching': 'Coaching',
-  'grupo_trabalho': 'Grupo de trabalho',
-  'grupo_atuacao': 'Grupo de atuação'
+  'consultoria': 'Consultoria interna',
+  'parecer': 'Parecer técnico',
+  'capacitacao': 'Capacitação/treinamento',
+  'projeto': 'Projeto especial'
 };
 
 // Mapeamento que garante compatibilidade com os enums do banco de dados
