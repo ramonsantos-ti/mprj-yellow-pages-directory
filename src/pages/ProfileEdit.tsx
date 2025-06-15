@@ -73,8 +73,69 @@ const ProfileEdit: React.FC = () => {
       }
 
       if (profile) {
-        setUserProfile(profile);
-        populateFormWithProfile(profile);
+        // Transform Supabase data to Profile interface
+        const transformedProfile: Profile = {
+          id: profile.id,
+          userId: profile.user_id || '',
+          name: profile.name,
+          matricula: profile.matricula,
+          cargo: profile.cargo || [],
+          funcao: profile.funcao || [],
+          unidade: profile.unidade || [],
+          telefone: profile.telefone || '',
+          email: profile.email,
+          biografia: profile.biografia || '',
+          areasConhecimento: profile.areas_conhecimento || [],
+          especializacoes: profile.especializacoes || '',
+          temasInteresse: profile.temas_interesse || [],
+          idiomas: profile.idiomas || [],
+          linkCurriculo: profile.link_curriculo || '',
+          fotoUrl: profile.foto_url || '',
+          certificacoes: profile.certificacoes || [],
+          publicacoes: profile.publicacoes || '',
+          role: profile.role as 'admin' | 'user',
+          isActive: profile.is_active ?? true,
+          aceiteTermos: profile.aceite_termos ?? false,
+          updatedByAdmin: profile.updated_by_admin ?? false,
+          lastUpdated: new Date(profile.updated_at || profile.created_at || new Date()),
+          projetos: profile.projects?.map((p: any) => ({
+            id: p.id,
+            nome: p.nome,
+            dataInicio: new Date(p.data_inicio),
+            dataFim: p.data_fim ? new Date(p.data_fim) : undefined,
+            observacoes: p.observacoes || ''
+          })) || [],
+          formacaoAcademica: profile.academic_formations?.map((f: any) => ({
+            id: f.id,
+            nivel: f.nivel,
+            instituicao: f.instituicao,
+            curso: f.curso,
+            ano: f.ano
+          })) || [],
+          experienciasProfissionais: profile.professional_experiences?.map((e: any) => ({
+            tempoMPRJ: e.tempo_mprj || '',
+            experienciaAnterior: e.experiencia_anterior || '',
+            projetosInternos: e.projetos_internos || '',
+            publicacoes: e.publicacoes || ''
+          })) || [],
+          disponibilidade: profile.availability?.[0] ? {
+            tipoColaboracao: profile.availability[0].tipo_colaboracao || [],
+            disponibilidadeEstimada: profile.availability[0].disponibilidade_estimada || ''
+          } : {
+            tipoColaboracao: [],
+            disponibilidadeEstimada: ''
+          },
+          contato: profile.availability?.[0] ? {
+            formaContato: profile.availability[0].forma_contato || 'email',
+            horarioPreferencial: profile.availability[0].horario_preferencial || ''
+          } : {
+            formaContato: 'email',
+            horarioPreferencial: ''
+          }
+        };
+
+        setUserProfile(transformedProfile);
+        populateFormWithProfile(transformedProfile);
       } else {
         // New profile - set defaults
         setName(user?.email || '');
@@ -89,8 +150,8 @@ const ProfileEdit: React.FC = () => {
     }
   };
 
-  const populateFormWithProfile = (profile: any) => {
-    setFotoPreview(profile.foto_url || '');
+  const populateFormWithProfile = (profile: Profile) => {
+    setFotoPreview(profile.fotoUrl || '');
     setName(profile.name || '');
     setMatricula(profile.matricula || '');
     setEmail(profile.email || '');
@@ -99,26 +160,25 @@ const ProfileEdit: React.FC = () => {
     setCargo(profile.cargo || []);
     setFuncao(profile.funcao || []);
     setUnidade(profile.unidade || []);
-    setAreasConhecimento(profile.areas_conhecimento || []);
+    setAreasConhecimento(profile.areasConhecimento || []);
     setEspecializacoes(profile.especializacoes || '');
-    setTemasInteresse(profile.temas_interesse || []);
+    setTemasInteresse(profile.temasInteresse || []);
     setIdiomas(profile.idiomas || []);
-    setLinkCurriculo(profile.link_curriculo || '');
+    setLinkCurriculo(profile.linkCurriculo || '');
     setCertificacoes(profile.certificacoes || []);
     setPublicacoes(profile.publicacoes || '');
-    setAceiteTermos(profile.aceite_termos || false);
+    setAceiteTermos(profile.aceiteTermos || false);
 
     // Set related data
-    setFormacaoAcademica(profile.academic_formations || []);
-    setProjetos(profile.projects || []);
+    setFormacaoAcademica(profile.formacaoAcademica || []);
+    setProjetos(profile.projetos || []);
     
-    if (profile.availability && profile.availability.length > 0) {
-      const avail = profile.availability[0];
+    if (profile.disponibilidade && profile.contato) {
       setDisponibilidade({
-        tipoColaboracao: avail.tipo_colaboracao || [],
-        disponibilidadeEstimada: avail.disponibilidade_estimada || '',
-        formaContato: avail.forma_contato || 'email',
-        horarioPreferencial: avail.horario_preferencial || ''
+        tipoColaboracao: profile.disponibilidade.tipoColaboracao || [],
+        disponibilidadeEstimada: profile.disponibilidade.disponibilidadeEstimada || '',
+        formaContato: profile.contato.formaContato || 'email',
+        horarioPreferencial: profile.contato.horarioPreferencial || ''
       });
     }
   };
@@ -182,7 +242,45 @@ const ProfileEdit: React.FC = () => {
 
         if (error) throw error;
         profileId = data.id;
-        setUserProfile(data);
+        
+        // Transform and set the new profile
+        const newProfile: Profile = {
+          id: data.id,
+          userId: data.user_id || '',
+          name: data.name,
+          matricula: data.matricula,
+          cargo: data.cargo || [],
+          funcao: data.funcao || [],
+          unidade: data.unidade || [],
+          telefone: data.telefone || '',
+          email: data.email,
+          biografia: data.biografia || '',
+          areasConhecimento: data.areas_conhecimento || [],
+          especializacoes: data.especializacoes || '',
+          temasInteresse: data.temas_interesse || [],
+          idiomas: data.idiomas || [],
+          linkCurriculo: data.link_curriculo || '',
+          fotoUrl: data.foto_url || '',
+          certificacoes: data.certificacoes || [],
+          publicacoes: data.publicacoes || '',
+          role: data.role as 'admin' | 'user',
+          isActive: data.is_active ?? true,
+          aceiteTermos: data.aceite_termos ?? false,
+          updatedByAdmin: data.updated_by_admin ?? false,
+          lastUpdated: new Date(data.updated_at || data.created_at || new Date()),
+          projetos: [],
+          formacaoAcademica: [],
+          experienciasProfissionais: [],
+          disponibilidade: {
+            tipoColaboracao: [],
+            disponibilidadeEstimada: ''
+          },
+          contato: {
+            formaContato: 'email',
+            horarioPreferencial: ''
+          }
+        };
+        setUserProfile(newProfile);
       }
 
       // Save academic formations
@@ -218,8 +316,8 @@ const ProfileEdit: React.FC = () => {
           const projects = projetos.map(p => ({
             profile_id: profileId,
             nome: p.nome,
-            data_inicio: p.dataInicio,
-            data_fim: p.dataFim,
+            data_inicio: p.dataInicio instanceof Date ? p.dataInicio.toISOString().split('T')[0] : p.dataInicio,
+            data_fim: p.dataFim ? (p.dataFim instanceof Date ? p.dataFim.toISOString().split('T')[0] : p.dataFim) : null,
             observacoes: p.observacoes
           }));
 
@@ -311,38 +409,10 @@ const ProfileEdit: React.FC = () => {
             <CardTitle>Foto do Perfil</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center space-x-6">
-              <div className="w-48 h-48 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center overflow-hidden">
-                {fotoPreview ? (
-                  <img src={fotoPreview} alt="Preview" className="w-full h-full object-cover" />
-                ) : (
-                  <div className="text-center">
-                    <div className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-                    <p className="text-sm text-gray-500">Sem foto</p>
-                  </div>
-                )}
-              </div>
-              <div className="space-y-2">
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  className="cursor-pointer"
-                  onClick={() => document.getElementById('foto-upload')?.click()}
-                >
-                  Fazer Upload de Foto
-                </Button>
-                <input
-                  id="foto-upload"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                />
-                <p className="text-sm text-gray-500">
-                  Formatos aceitos: JPG, PNG, GIF. Máximo 5MB.
-                </p>
-              </div>
-            </div>
+            <PhotoUpload 
+              photoUrl={fotoPreview}
+              onPhotoChange={setFotoPreview}
+            />
           </CardContent>
         </Card>
 
@@ -351,58 +421,18 @@ const ProfileEdit: React.FC = () => {
             <CardTitle>Informações Básicas</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Nome</label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  placeholder="Seu nome completo"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Matrícula</label>
-                <input
-                  type="text"
-                  value={matricula}
-                  onChange={(e) => setMatricula(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  placeholder="Sua matrícula"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  placeholder="seu.email@example.com"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Telefone</label>
-                <input
-                  type="tel"
-                  value={telefone}
-                  onChange={(e) => setTelefone(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  placeholder="(21) 99999-9999"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Biografia</label>
-                <textarea
-                  value={biografia}
-                  onChange={(e) => setBiografia(e.target.value)}
-                  rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  placeholder="Conte um pouco sobre sua trajetória profissional..."
-                />
-              </div>
-            </div>
+            <BasicInfo
+              profile={{ name, matricula, email, telefone, biografia }}
+              onChange={(field, value) => {
+                switch (field) {
+                  case 'name': setName(value); break;
+                  case 'matricula': setMatricula(value); break;
+                  case 'email': setEmail(value); break;
+                  case 'telefone': setTelefone(value); break;
+                  case 'biografia': setBiografia(value); break;
+                }
+              }}
+            />
           </CardContent>
         </Card>
 
@@ -411,72 +441,16 @@ const ProfileEdit: React.FC = () => {
             <CardTitle>Cargo e Unidade</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Cargo</label>
-                <select
-                  multiple
-                  value={cargo}
-                  onChange={(e) => {
-                    const options = Array.from(e.target.selectedOptions, option => option.value);
-                    setCargo(options);
-                  }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                >
-                  <option value="Promotor de Justiça">Promotor de Justiça</option>
-                  <option value="Procurador de Justiça">Procurador de Justiça</option>
-                  <option value="Analista">Analista</option>
-                  <option value="Técnico">Técnico</option>
-                  <option value="Assessor">Assessor</option>
-                  <option value="Estagiário">Estagiário</option>
-                  <option value="Residente">Residente</option>
-                </select>
-                <p className="text-xs text-gray-500 mt-1">Segure Ctrl para selecionar múltiplos</p>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Função</label>
-                <select
-                  multiple
-                  value={funcao}
-                  onChange={(e) => {
-                    const options = Array.from(e.target.selectedOptions, option => option.value);
-                    setFuncao(options);
-                  }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                >
-                  <option value="Coordenador">Coordenador</option>
-                  <option value="Gerente">Gerente</option>
-                  <option value="Supervisor">Supervisor</option>
-                  <option value="Chefe de Gabinete">Chefe de Gabinete</option>
-                  <option value="Assessor Jurídico">Assessor Jurídico</option>
-                  <option value="Assessor Técnico">Assessor Técnico</option>
-                </select>
-                <p className="text-xs text-gray-500 mt-1">Segure Ctrl para selecionar múltiplos</p>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Unidade</label>
-                <select
-                  multiple
-                  value={unidade}
-                  onChange={(e) => {
-                    const options = Array.from(e.target.selectedOptions, option => option.value);
-                    setUnidade(options);
-                  }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                >
-                  <option value="GATE">GATE</option>
-                  <option value="STI">STI</option>
-                  <option value="SGDP">SGDP</option>
-                  <option value="CSMP">CSMP</option>
-                  <option value="CRAAI">CRAAI</option>
-                  <option value="Promotoria">Promotoria</option>
-                  <option value="Procuradoria">Procuradoria</option>
-                </select>
-                <p className="text-xs text-gray-500 mt-1">Segure Ctrl para selecionar múltiplos</p>
-              </div>
-            </div>
+            <CargoUnidade
+              profile={{ cargo, funcao, unidade }}
+              onChange={(field, value) => {
+                switch (field) {
+                  case 'cargo': setCargo(value); break;
+                  case 'funcao': setFuncao(value); break;
+                  case 'unidade': setUnidade(value); break;
+                }
+              }}
+            />
           </CardContent>
         </Card>
 
@@ -485,105 +459,24 @@ const ProfileEdit: React.FC = () => {
             <CardTitle>Informações Adicionais</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Áreas de Conhecimento</label>
-                <select
-                  multiple
-                  value={areasConhecimento}
-                  onChange={(e) => {
-                    const options = Array.from(e.target.selectedOptions, option => option.value);
-                    setAreasConhecimento(options);
-                  }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                >
-                  <option value="Direito Penal">Direito Penal</option>
-                  <option value="Direito Civil">Direito Civil</option>
-                  <option value="Direito Administrativo">Direito Administrativo</option>
-                  <option value="Direito Ambiental">Direito Ambiental</option>
-                  <option value="Direito Constitucional">Direito Constitucional</option>
-                  <option value="Direito do Consumidor">Direito do Consumidor</option>
-                  <option value="Direito Eleitoral">Direito Eleitoral</option>
-                  <option value="Tecnologia da Informação">Tecnologia da Informação</option>
-                  <option value="Ciência de Dados">Ciência de Dados</option>
-                  <option value="Inteligência Artificial">Inteligência Artificial</option>
-                  <option value="Engenharia">Engenharia</option>
-                  <option value="Contabilidade">Contabilidade</option>
-                  <option value="Medicina">Medicina</option>
-                  <option value="Psicologia">Psicologia</option>
-                  <option value="Serviço Social">Serviço Social</option>
-                </select>
-                <p className="text-xs text-gray-500 mt-1">Segure Ctrl para selecionar múltiplos</p>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Especializações</label>
-                <textarea
-                  value={especializacoes}
-                  onChange={(e) => setEspecializacoes(e.target.value)}
-                  rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  placeholder="Descreva suas especializações..."
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Temas de Interesse</label>
-                <select
-                  multiple
-                  value={temasInteresse}
-                  onChange={(e) => {
-                    const options = Array.from(e.target.selectedOptions, option => option.value);
-                    setTemasInteresse(options);
-                  }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                >
-                  <option value="Combate à Corrupção">Combate à Corrupção</option>
-                  <option value="Proteção Ambiental">Proteção Ambiental</option>
-                  <option value="Direitos Humanos">Direitos Humanos</option>
-                  <option value="Segurança Pública">Segurança Pública</option>
-                  <option value="Saúde Pública">Saúde Pública</option>
-                  <option value="Educação">Educação</option>
-                  <option value="Transformação Digital">Transformação Digital</option>
-                  <option value="Inovação">Inovação</option>
-                </select>
-                <p className="text-xs text-gray-500 mt-1">Segure Ctrl para selecionar múltiplos</p>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Idiomas</label>
-                <select
-                  multiple
-                  value={idiomas}
-                  onChange={(e) => {
-                    const options = Array.from(e.target.selectedOptions, option => option.value);
-                    setIdiomas(options);
-                  }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                >
-                  <option value="Português">Português</option>
-                  <option value="Inglês">Inglês</option>
-                  <option value="Espanhol">Espanhol</option>
-                  <option value="Francês">Francês</option>
-                  <option value="Alemão">Alemão</option>
-                  <option value="Italiano">Italiano</option>
-                  <option value="Japonês">Japonês</option>
-                  <option value="Mandarim">Mandarim</option>
-                </select>
-                <p className="text-xs text-gray-500 mt-1">Segure Ctrl para selecionar múltiplos</p>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Link do Currículo (Lattes/LinkedIn)</label>
-                <input
-                  type="url"
-                  value={linkCurriculo}
-                  onChange={(e) => setLinkCurriculo(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  placeholder="https://..."
-                />
-              </div>
-            </div>
+            <AdditionalInfo
+              profile={{ 
+                areasConhecimento, 
+                especializacoes, 
+                temasInteresse, 
+                idiomas, 
+                linkCurriculo 
+              }}
+              onChange={(field, value) => {
+                switch (field) {
+                  case 'areasConhecimento': setAreasConhecimento(value); break;
+                  case 'especializacoes': setEspecializacoes(value); break;
+                  case 'temasInteresse': setTemasInteresse(value); break;
+                  case 'idiomas': setIdiomas(value); break;
+                  case 'linkCurriculo': setLinkCurriculo(value); break;
+                }
+              }}
+            />
           </CardContent>
         </Card>
 
@@ -592,40 +485,10 @@ const ProfileEdit: React.FC = () => {
             <CardTitle>Formação Acadêmica</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {formacaoAcademica.map((formacao, index) => (
-                <div key={index} className="p-4 border rounded-md">
-                  <div className="flex justify-between mb-2">
-                    <h4 className="font-medium">{formacao.nivel}</h4>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setFormacaoAcademica(prev => prev.filter((_, i) => i !== index));
-                      }}
-                      className="text-red-600 hover:text-red-800"
-                    >
-                      Remover
-                    </button>
-                  </div>
-                  <p>{formacao.curso} - {formacao.instituicao}, {formacao.ano}</p>
-                </div>
-              ))}
-              
-              <button
-                type="button"
-                onClick={() => {
-                  setFormacaoAcademica(prev => [...prev, {
-                    nivel: '',
-                    instituicao: '',
-                    curso: '',
-                    ano: new Date().getFullYear()
-                  }]);
-                }}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
-              >
-                + Adicionar Formação
-              </button>
-            </div>
+            <AcademicFormation
+              formations={formacaoAcademica}
+              onChange={setFormacaoAcademica}
+            />
           </CardContent>
         </Card>
 
@@ -634,42 +497,10 @@ const ProfileEdit: React.FC = () => {
             <CardTitle>Projetos</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {projetos.map((projeto, index) => (
-                <div key={index} className="p-4 border rounded-md">
-                  <div className="flex justify-between mb-2">
-                    <h4 className="font-medium">{projeto.nome}</h4>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setProjetos(prev => prev.filter((_, i) => i !== index));
-                      }}
-                      className="text-red-600 hover:text-red-800"
-                    >
-                      Remover
-                    </button>
-                  </div>
-                  <p>Período: {new Date(projeto.dataInicio).toLocaleDateString()} - 
-                    {projeto.dataFim ? new Date(projeto.dataFim).toLocaleDateString() : 'Atual'}</p>
-                  {projeto.observacoes && <p className="text-sm text-gray-600">{projeto.observacoes}</p>}
-                </div>
-              ))}
-              
-              <button
-                type="button"
-                onClick={() => {
-                  setProjetos(prev => [...prev, {
-                    nome: '',
-                    dataInicio: new Date(),
-                    dataFim: null,
-                    observacoes: ''
-                  }]);
-                }}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
-              >
-                + Adicionar Projeto
-              </button>
-            </div>
+            <ProjectsManager
+              projects={projetos}
+              onChange={setProjetos}
+            />
           </CardContent>
         </Card>
 
@@ -678,50 +509,10 @@ const ProfileEdit: React.FC = () => {
             <CardTitle>Certificações</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {certificacoes.map((cert, index) => (
-                <div key={index} className="flex items-center justify-between p-2 border rounded">
-                  <span>{cert}</span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setCertificacoes(prev => prev.filter((_, i) => i !== index));
-                    }}
-                    className="text-red-600 hover:text-red-800"
-                  >
-                    Remover
-                  </button>
-                </div>
-              ))}
-              
-              <div className="flex space-x-2">
-                <input
-                  type="text"
-                  placeholder="Adicionar certificação..."
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && e.currentTarget.value.trim()) {
-                      setCertificacoes(prev => [...prev, e.currentTarget.value.trim()]);
-                      e.currentTarget.value = '';
-                      e.preventDefault();
-                    }
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    const input = e.currentTarget.previousSibling as HTMLInputElement;
-                    if (input.value.trim()) {
-                      setCertificacoes(prev => [...prev, input.value.trim()]);
-                      input.value = '';
-                    }
-                  }}
-                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
-                >
-                  Adicionar
-                </button>
-              </div>
-            </div>
+            <CertificationsSection
+              certificacoes={certificacoes}
+              onChange={setCertificacoes}
+            />
           </CardContent>
         </Card>
 
@@ -730,16 +521,10 @@ const ProfileEdit: React.FC = () => {
             <CardTitle>Publicações</CardTitle>
           </CardHeader>
           <CardContent>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Publicações e Trabalhos de Destaque</label>
-              <textarea
-                value={publicacoes}
-                onChange={(e) => setPublicacoes(e.target.value)}
-                rows={5}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                placeholder="Liste suas publicações, cursos ministrados, trabalhos de destaque, etc..."
-              />
-            </div>
+            <PublicationsSection
+              publicacoes={publicacoes}
+              onChange={setPublicacoes}
+            />
           </CardContent>
         </Card>
 
@@ -748,50 +533,10 @@ const ProfileEdit: React.FC = () => {
             <CardTitle>Disponibilidade</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Tipos de Colaboração</label>
-                <select
-                  multiple
-                  value={disponibilidade.tipoColaboracao || []}
-                  onChange={(e) => {
-                    const options = Array.from(e.target.selectedOptions, option => option.value);
-                    setDisponibilidade(prev => ({
-                      ...prev,
-                      tipoColaboracao: options
-                    }));
-                  }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                >
-                  <option value="consultoria">Consultoria</option>
-                  <option value="parecer">Parecer</option>
-                  <option value="capacitacao">Capacitação</option>
-                  <option value="projeto">Projeto</option>
-                </select>
-                <p className="text-xs text-gray-500 mt-1">Segure Ctrl para selecionar múltiplos</p>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Disponibilidade Estimada</label>
-                <select
-                  value={disponibilidade.disponibilidadeEstimada || ''}
-                  onChange={(e) => {
-                    setDisponibilidade(prev => ({
-                      ...prev,
-                      disponibilidadeEstimada: e.target.value
-                    }));
-                  }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                >
-                  <option value="">Selecione...</option>
-                  <option value="Até 2 horas semanais">Até 2 horas semanais</option>
-                  <option value="2 a 4 horas semanais">2 a 4 horas semanais</option>
-                  <option value="4 a 8 horas semanais">4 a 8 horas semanais</option>
-                  <option value="Mais de 8 horas semanais">Mais de 8 horas semanais</option>
-                  <option value="Sob demanda">Sob demanda</option>
-                </select>
-              </div>
-            </div>
+            <AvailabilitySection
+              disponibilidade={disponibilidade}
+              onChange={setDisponibilidade}
+            />
           </CardContent>
         </Card>
 
@@ -800,42 +545,10 @@ const ProfileEdit: React.FC = () => {
             <CardTitle>Preferências de Contato</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Forma de Contato Preferencial</label>
-                <select
-                  value={disponibilidade.formaContato || 'email'}
-                  onChange={(e) => {
-                    setDisponibilidade(prev => ({
-                      ...prev,
-                      formaContato: e.target.value
-                    }));
-                  }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                >
-                  <option value="email">Email</option>
-                  <option value="telefone">Telefone</option>
-                  <option value="teams">Microsoft Teams</option>
-                  <option value="presencial">Presencial</option>
-                </select>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Horário Preferencial</label>
-                <input
-                  type="text"
-                  value={disponibilidade.horarioPreferencial || ''}
-                  onChange={(e) => {
-                    setDisponibilidade(prev => ({
-                      ...prev,
-                      horarioPreferencial: e.target.value
-                    }));
-                  }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  placeholder="Ex: Manhãs, Tardes, Após às 14h, etc."
-                />
-              </div>
-            </div>
+            <ContactPreferences
+              contato={disponibilidade}
+              onChange={setDisponibilidade}
+            />
           </CardContent>
         </Card>
 
