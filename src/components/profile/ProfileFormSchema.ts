@@ -1,4 +1,3 @@
-
 import * as z from 'zod';
 
 const formacaoAcademicaSchema = z.object({
@@ -24,17 +23,15 @@ export const profileSchema = z.object({
   linkCurriculo: z.string().optional(),
   certificacoes: z.array(z.string()),
   aceiteTermos: z.boolean().refine(val => val === true, 'Você deve aceitar os termos'),
-  // Modificação: array opcional e cada item só será checado se algum campo for preenchido
+  // Mantém validacão: array opcional, exige 100% dos campos se iniciado
   formacaoAcademica: z
     .array(formacaoAcademicaSchema)
     .optional()
     .refine(
       (arr) => {
-        // Se não existe array, está OK
-        if (!arr) return true;
-        // Array vazio está OK
-        if (arr.length === 0) return true;
-        // Se o usuário começou a preencher, exige que todas entradas estejam 100% completas
+        if (!arr) return true; // OK se não existe
+        if (arr.length === 0) return true; // OK se array vazio
+        // Exige que todas entradas estejam 100% completas
         return arr.every(
           (item) =>
             item.nivel &&
@@ -52,7 +49,7 @@ export const profileSchema = z.object({
       },
       {
         message:
-          'Se adicionar uma formação acadêmica, todos os campos devem ser preenchidos ou a entrada deve ser removida.'
+          'Se você começou a preencher uma formação acadêmica, complete todos os campos ou exclua a entrada para salvar o perfil.'
       }
     ),
   informacoesComplementares: z.string().optional(),

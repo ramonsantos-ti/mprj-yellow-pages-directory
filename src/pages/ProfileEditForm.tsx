@@ -100,11 +100,14 @@ const ProfileEditForm: React.FC = () => {
         <strong>Corrija os campos obrigatórios:</strong>
         <ul className="list-disc ml-5 mt-1">
           {Object.entries(errors).map(([field, err]: any) => {
-            // Exiba erro especial para formação acadêmica:
+            // Exiba erro especial para formação acadêmica com orientação clara
             if (field === "formacaoAcademica" && err?.message) {
               return (
                 <li key={field}>
-                  {err.message}
+                  <span className="font-bold text-red-700">{err.message}</span>
+                  <div className="text-xs text-red-600 mt-1">
+                    Dica: Revise cada linha da formação acadêmica. Complete todos os campos ("Nível", "Instituição", "Curso" e "Ano") OU clique em excluir para remover entradas incompletas.
+                  </div>
                 </li>
               );
             }
