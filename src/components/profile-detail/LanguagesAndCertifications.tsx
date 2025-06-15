@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
-import { Award } from 'lucide-react';
+import { Award, Languages } from 'lucide-react';
 
 interface LanguagesAndCertificationsProps {
   idiomas: string[];
@@ -18,7 +18,10 @@ const LanguagesAndCertifications: React.FC<LanguagesAndCertificationsProps> = ({
       {/* Languages */}
       <Card>
         <CardHeader>
-          <CardTitle>Idiomas</CardTitle>
+          <CardTitle className="flex items-center space-x-2">
+            <Languages className="w-5 h-5 text-[#7B3F00]" />
+            <span>Idiomas</span>
+          </CardTitle>
         </CardHeader>
         <CardContent>
           {hasIdiomas ? (
@@ -37,7 +40,7 @@ const LanguagesAndCertifications: React.FC<LanguagesAndCertificationsProps> = ({
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
-            <Award className="w-5 h-5" />
+            <Award className="w-5 h-5 text-[#7B3F00]" />
             <span>Certificações</span>
           </CardTitle>
         </CardHeader>
@@ -60,3 +63,4 @@ const LanguagesAndCertifications: React.FC<LanguagesAndCertificationsProps> = ({
 };
 
 export default LanguagesAndCertifications;
+
