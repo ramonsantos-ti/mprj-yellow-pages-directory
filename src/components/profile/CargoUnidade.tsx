@@ -47,7 +47,7 @@ const CargoUnidade: React.FC<CargoUnidadeProps> = ({
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione um cargo" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="scrollbar-brown">
                     {safeCargos.map((cargo, index) => (
                       <SelectItem key={`cargo-${index}-${cargo}`} value={cargo}>
                         {cargo}
