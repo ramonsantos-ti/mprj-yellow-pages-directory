@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
-import { Plus, X } from 'lucide-react';
+import { Plus, X, Construction } from 'lucide-react';
 
 interface Project {
   nome: string;
@@ -31,7 +31,10 @@ const ProjectsManager: React.FC<ProjectsManagerProps> = ({ projetos, setProjetos
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
-          <span>Projetos</span>
+          <span className="flex items-center space-x-2">
+            <Construction className="w-5 h-5" />
+            <span>Projetos</span>
+          </span>
           <Button type="button" onClick={adicionarProjeto} size="sm" variant="outline">
             <Plus className="w-4 h-4 mr-2" />
             Adicionar
