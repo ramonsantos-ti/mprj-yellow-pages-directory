@@ -3,8 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Profile } from '../types';
-import ProfileHeader from '../components/profile-detail/ProfileHeader';
-import ProfileBiography from '../components/profile-detail/ProfileBiography';
+import ProfileCard from '../components/ProfileCard';
 import KnowledgeAreas from '../components/profile-detail/KnowledgeAreas';
 import AcademicFormationCard from '../components/profile-detail/AcademicFormationCard';
 import ProfessionalExperienceCard from '../components/profile-detail/ProfessionalExperienceCard';
@@ -25,15 +24,14 @@ const ProfileDetail: React.FC = () => {
     if (id) {
       loadProfile();
     }
+    // eslint-disable-next-line
   }, [id]);
 
   const loadProfile = async () => {
     try {
       setLoading(true);
       setError(null);
-      console.log('🔍 Carregando perfil com ID:', id);
-      
-      // Buscar dados básicos do perfil primeiro
+
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('*')
@@ -41,52 +39,40 @@ const ProfileDetail: React.FC = () => {
         .single();
 
       if (profileError) {
-        console.error('❌ Erro ao buscar perfil:', profileError);
         setError('Perfil não encontrado');
+        setProfile(null);
         return;
       }
-
       if (!profileData) {
-        console.log('❌ Nenhum perfil encontrado');
         setError('Perfil não encontrado');
+        setProfile(null);
         return;
       }
 
-      console.log('✅ Dados básicos do perfil encontrados:', profileData);
-
-      // Buscar projetos relacionados
-      const { data: projectsData, error: projectsError } = await supabase
+      // Buscar projetos
+      const { data: projectsData } = await supabase
         .from('projects')
         .select('*')
         .eq('profile_id', id);
 
-      console.log('📊 Projetos encontrados:', projectsData?.length || 0, projectsData);
-
       // Buscar formações acadêmicas
-      const { data: formationsData, error: formationsError } = await supabase
+      const { data: formationsData } = await supabase
         .from('academic_formations')
         .select('*')
         .eq('profile_id', id);
 
-      console.log('🎓 Formações encontradas:', formationsData?.length || 0, formationsData);
-
       // Buscar experiências profissionais
-      const { data: experiencesData, error: experiencesError } = await supabase
+      const { data: experiencesData } = await supabase
         .from('professional_experiences')
         .select('*')
         .eq('profile_id', id);
 
-      console.log('💼 Experiências encontradas:', experiencesData?.length || 0, experiencesData);
-
       // Buscar disponibilidade
-      const { data: availabilityData, error: availabilityError } = await supabase
+      const { data: availabilityData } = await supabase
         .from('availability')
         .select('*')
         .eq('profile_id', id);
 
-      console.log('📅 Disponibilidade encontrada:', availabilityData?.length || 0, availabilityData);
-
-      // Transformar dados para o formato esperado
       const transformedProfile: Profile = {
         id: profileData.id,
         userId: profileData.user_id || '',
@@ -147,11 +133,10 @@ const ProfileDetail: React.FC = () => {
         }
       };
 
-      console.log('🔄 Perfil transformado final:', transformedProfile);
       setProfile(transformedProfile);
     } catch (err: any) {
-      console.error('❌ Erro geral ao carregar perfil:', err);
       setError('Erro ao carregar perfil: ' + err.message);
+      setProfile(null);
     } finally {
       setLoading(false);
     }
@@ -169,41 +154,41 @@ const ProfileDetail: React.FC = () => {
     return <ErrorState error={error || 'Erro desconhecido'} />;
   }
 
+  // Reutiliza o Card igual ao Home e depois exibe todos os detalhes completos em blocos, na mesma ordem.
+
   return (
     <div className="max-w-4xl mx-auto space-y-6 p-4">
-      <ProfileHeader profile={profile} getInitials={getInitials} />
-      
-      {/* Biografia - sempre exibir */}
-      <ProfileBiography biografia={profile.biografia} />
-      
-      {/* Áreas de Conhecimento e Temas de Interesse - sempre exibir */}
+      {/* Visualização igual à home */}
+      <ProfileCard profile={profile} />
+
+      {/* Áreas de conhecimento e interesse */}
       <KnowledgeAreas 
         areasConhecimento={profile.areasConhecimento} 
         temasInteresse={profile.temasInteresse} 
       />
-      
-      {/* Formação Acadêmica - sempre exibir */}
-      <AcademicFormationCard formacaoAcademica={profile.formacaoAcademica} />
-      
-      {/* Experiência Profissional - sempre exibir */}
-      <ProfessionalExperienceCard experienciasProfissionais={profile.experienciasProfissionais} />
-      
-      {/* Projetos - sempre exibir */}
+
+      {/* Projetos */}
       <ProjectsCard projetos={profile.projetos} />
-      
-      {/* Idiomas e Certificações - sempre exibir */}
+
+      {/* Formação acadêmica */}
+      <AcademicFormationCard formacaoAcademica={profile.formacaoAcademica} />
+
+      {/* Experiência Profissional */}
+      <ProfessionalExperienceCard experienciasProfissionais={profile.experienciasProfissionais} />
+
+      {/* Idiomas e Certificações */}
       <LanguagesAndCertifications 
         idiomas={profile.idiomas} 
         certificacoes={profile.certificacoes} 
       />
-      
-      {/* Disponibilidade - sempre exibir */}
+
+      {/* Disponibilidade e Contato */}
       <AvailabilityCard 
         disponibilidade={profile.disponibilidade} 
         contato={profile.contato} 
       />
-      
-      {/* Publicações e Currículo - sempre exibir */}
+
+      {/* Publicações, Currículo e Especializações */}
       <PublicationsAndCurriculum 
         publicacoes={profile.publicacoes}
         linkCurriculo={profile.linkCurriculo}
@@ -214,3 +199,4 @@ const ProfileDetail: React.FC = () => {
 };
 
 export default ProfileDetail;
+
