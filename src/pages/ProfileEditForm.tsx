@@ -77,11 +77,37 @@ const ProfileEditForm: React.FC = () => {
     }
   }, [userProfile, user]);
 
+  // Log os erros atuais do formulário toda vez que o form for atualizado.
+  useEffect(() => {
+    // Mostra no console todos os erros do formulário
+    // Útil para entender validação que bloqueia submit.
+    if (Object.keys(form.formState.errors).length > 0) {
+      console.log("[DEBUG] Erros no formulário:", form.formState.errors);
+    }
+  }, [form.formState.errors]);
+
   const handleSave = async (data: any) => {
     console.log('[DEBUG] handleSave foi chamado, dados do formulário:', data);
     const formacaoAcademica = data.formacaoAcademica || [];
     await saveProfile(data, fotoPreview, formacaoAcademica, projetos, disponibilidade);
   };
+
+  function renderFormErrors() {
+    const errors = form.formState.errors;
+    if (Object.keys(errors).length === 0) return null;
+    return (
+      <div className="bg-red-100 border-l-4 border-red-500 text-red-800 p-3 mb-2 rounded">
+        <strong>Corrija os campos obrigatórios:</strong>
+        <ul className="list-disc ml-5 mt-1">
+          {Object.entries(errors).map(([field, err]: any) => (
+            <li key={field}>
+              {err?.message || field + " inválido"}
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -161,6 +187,9 @@ const ProfileEditForm: React.FC = () => {
           </div>
 
           <AdditionalInfo form={form} />
+
+          {/* EXIBE ERROS DE VALIDAÇÃO */}
+          {renderFormErrors()}
 
           <Card>
             <CardContent className="pt-6">
