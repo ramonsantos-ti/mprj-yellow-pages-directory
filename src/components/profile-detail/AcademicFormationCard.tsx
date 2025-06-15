@@ -17,7 +17,7 @@ const AcademicFormationCard: React.FC<AcademicFormationCardProps> = ({ formacaoA
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center space-x-2">
-          <GraduationCap className="w-5 h-5" />
+          <GraduationCap className="w-5 h-5 text-[#7B3F00]" />
           <span>Formação Acadêmica</span>
         </CardTitle>
       </CardHeader>
@@ -41,3 +41,4 @@ const AcademicFormationCard: React.FC<AcademicFormationCardProps> = ({ formacaoA
 };
 
 export default AcademicFormationCard;
+

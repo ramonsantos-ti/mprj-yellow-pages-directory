@@ -15,7 +15,7 @@ const ProjectsCard: React.FC<ProjectsCardProps> = ({ projetos }) => {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center space-x-2">
-          <Construction className="w-5 h-5" />
+          <Construction className="w-5 h-5 text-[#7B3F00]" />
           <span>Projetos</span>
         </CardTitle>
       </CardHeader>
@@ -57,3 +57,4 @@ const ProjectsCard: React.FC<ProjectsCardProps> = ({ projetos }) => {
 };
 
 export default ProjectsCard;
+

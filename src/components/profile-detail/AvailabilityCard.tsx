@@ -15,7 +15,7 @@ const AvailabilityCard: React.FC<AvailabilityCardProps> = ({ disponibilidade, co
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center space-x-2">
-          <Clock className="w-5 h-5" />
+          <Clock className="w-5 h-5 text-[#7B3F00]" />
           <span>Disponibilidade e Contato</span>
         </CardTitle>
       </CardHeader>
