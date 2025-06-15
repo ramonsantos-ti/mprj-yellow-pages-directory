@@ -94,30 +94,27 @@ const ProfileEditForm = () => {
   // const [fotoUrl, setFotoUrl] = React.useState<string | null>(null);
   // const [uploading, setUploading] = React.useState(false);
 
+  // Carrega o perfil do usuário
   useEffect(() => {
     if (userProfile) {
       setTipoColaboracao(userProfile.disponibilidade?.tipoColaboracao || []);
       setDisponibilidadeEstimada(userProfile.disponibilidade?.disponibilidadeEstimada || '');
       setFormaContato(userProfile.contato?.formaContato || 'email');
       setHorarioPreferencial(userProfile.contato?.horarioPreferencial || '');
-      // setSelectedAreasConhecimento(userProfile.areasConhecimento || []);
-      // setSelectedTemasInteresse(userProfile.temasInteresse || []);
-      // setSelectedIdiomas(userProfile.idiomas || []);
       setFotoUrl(userProfile.fotoUrl || null);
     }
-  }, [userProfile]);
+  }, [userProfile, setFotoUrl]);
 
-  // Seta os dados do perfil SOMENTE no primeiro carregamento
+  // Reseta os dados do perfil SOMENTE no primeiro carregamento real
   useEffect(() => {
+    // Adicionando log de debug
     if (userProfile && !isInitialized.current) {
+      // O reset só deve acontecer 1 vez na inicialização
       form.reset({
         ...userProfile,
         cargo: userProfile.cargo || [],
         funcao: userProfile.funcao || [],
         unidade: userProfile.unidade || [],
-        // areasConhecimento: userProfile.areasConhecimento || [],
-        // temasInteresse: userProfile.temasInteresse || [],
-        // idiomas: userProfile.idiomas || [],
         disponibilidade: {
           tipoColaboracao: userProfile.disponibilidade?.tipoColaboracao || [],
           disponibilidadeEstimada: userProfile.disponibilidade?.disponibilidadeEstimada || ''
@@ -130,12 +127,13 @@ const ProfileEditForm = () => {
         experienciasProfissionais: userProfile.experienciasProfissionais || [],
         certificacoes: userProfile.certificacoes || [],
       });
-      isInitialized.current = true;
       setFotoUrl(userProfile.fotoUrl || null);
+      isInitialized.current = true;
+      console.log('RESET: Formulário inicializado com perfil do usuário.');
     }
-    // Não inclui form como dependência para evitar reset ao digitar
+    // Removido `form` das dependências para evitar reset contínuo
     // eslint-disable-next-line
-  }, [userProfile, form, setFotoUrl]);
+  }, [userProfile, setFotoUrl]);
 
   const onSubmit = async (data: any) => {
     try {
