@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -40,30 +41,9 @@ const ProfileDetail: React.FC = () => {
   const loadProfile = async () => {
     try {
       setLoading(true);
-      console.log('🔍 Iniciando busca do perfil com ID:', id);
+      setError(null);
+      console.log('🔍 Carregando perfil com ID:', id);
       
-      // First, let's try a simple query to see if the profile exists
-      const { data: simpleData, error: simpleError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', id)
-        .single();
-
-      console.log('📋 Consulta simples - dados encontrados:', simpleData);
-      console.log('📋 Consulta simples - erro:', simpleError);
-
-      if (simpleError) {
-        console.error('❌ Erro na consulta simples:', simpleError);
-        throw simpleError;
-      }
-
-      if (!simpleData) {
-        console.log('❌ Nenhum perfil encontrado na consulta simples');
-        setError('Perfil não encontrado');
-        return;
-      }
-
-      // Now let's try the complex query with joins
       const { data, error } = await supabase
         .from('profiles')
         .select(`
@@ -76,49 +56,19 @@ const ProfileDetail: React.FC = () => {
         .eq('id', id)
         .single();
 
-      console.log('📊 Consulta completa - dados brutos:', data);
-      console.log('📊 Consulta completa - erro:', error);
-
       if (error) {
-        console.error('❌ Erro na consulta completa:', error);
-        // If complex query fails, fall back to simple data
-        console.log('🔄 Usando dados da consulta simples como fallback');
-        const fallbackProfile = createProfileFromSimpleData(simpleData);
-        setProfile(fallbackProfile);
-        return;
-      }
-
-      if (!data) {
-        console.log('❌ Nenhum dado retornado da consulta completa');
+        console.error('❌ Erro ao buscar perfil:', error);
         setError('Perfil não encontrado');
         return;
       }
 
-      console.log('✅ Dados encontrados, iniciando transformação...');
-      console.log('📸 Foto URL encontrada:', data.foto_url ? 'SIM' : 'NÃO');
-      console.log('📸 Tipo da foto:', data.foto_url ? (data.foto_url.startsWith('data:') ? 'Base64' : 'URL') : 'Nenhuma');
+      if (!data) {
+        console.log('❌ Nenhum perfil encontrado');
+        setError('Perfil não encontrado');
+        return;
+      }
 
-      // Log each field to debug what's missing
-      console.log('🔍 Campos do perfil encontrados:');
-      console.log('- name:', data.name);
-      console.log('- matricula:', data.matricula);
-      console.log('- email:', data.email);
-      console.log('- cargo:', data.cargo);
-      console.log('- funcao:', data.funcao);
-      console.log('- unidade:', data.unidade);
-      console.log('- telefone:', data.telefone);
-      console.log('- biografia:', data.biografia);
-      console.log('- areas_conhecimento:', data.areas_conhecimento);
-      console.log('- especializacoes:', data.especializacoes);
-      console.log('- temas_interesse:', data.temas_interesse);
-      console.log('- idiomas:', data.idiomas);
-      console.log('- certificacoes:', data.certificacoes);
-      console.log('- publicacoes:', data.publicacoes);
-      console.log('- link_curriculo:', data.link_curriculo);
-      console.log('- projects count:', data.projects?.length || 0);
-      console.log('- academic_formations count:', data.academic_formations?.length || 0);
-      console.log('- professional_experiences count:', data.professional_experiences?.length || 0);
-      console.log('- availability count:', data.availability?.length || 0);
+      console.log('✅ Dados do perfil encontrados:', data);
 
       // Transform Supabase data to match our Profile type
       const transformedProfile: Profile = {
@@ -181,16 +131,7 @@ const ProfileDetail: React.FC = () => {
         }
       };
 
-      console.log('🔄 Perfil transformado com sucesso:');
-      console.log('- Nome:', transformedProfile.name);
-      console.log('- Cargo count:', transformedProfile.cargo.length);
-      console.log('- Função count:', transformedProfile.funcao.length);
-      console.log('- Unidade count:', transformedProfile.unidade.length);
-      console.log('- Áreas conhecimento count:', transformedProfile.areasConhecimento.length);
-      console.log('- Projetos count:', transformedProfile.projetos.length);
-      console.log('- Formação count:', transformedProfile.formacaoAcademica.length);
-      console.log('- Foto disponível:', !!transformedProfile.fotoUrl);
-
+      console.log('🔄 Perfil transformado:', transformedProfile);
       setProfile(transformedProfile);
     } catch (err: any) {
       console.error('❌ Erro geral ao carregar perfil:', err);
@@ -198,46 +139,6 @@ const ProfileDetail: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const createProfileFromSimpleData = (data: any): Profile => {
-    console.log('🔄 Criando perfil a partir de dados simples...');
-    return {
-      id: data.id,
-      userId: data.user_id || '',
-      name: data.name || 'Nome não informado',
-      matricula: data.matricula || 'Matrícula não informada',
-      cargo: Array.isArray(data.cargo) ? data.cargo : [],
-      funcao: Array.isArray(data.funcao) ? data.funcao : [],
-      unidade: Array.isArray(data.unidade) ? data.unidade : [],
-      telefone: data.telefone || '',
-      email: data.email || '',
-      biografia: data.biografia || '',
-      areasConhecimento: Array.isArray(data.areas_conhecimento) ? data.areas_conhecimento : [],
-      especializacoes: data.especializacoes || '',
-      temasInteresse: Array.isArray(data.temas_interesse) ? data.temas_interesse : [],
-      idiomas: Array.isArray(data.idiomas) ? data.idiomas : [],
-      linkCurriculo: data.link_curriculo || '',
-      fotoUrl: data.foto_url || '',
-      certificacoes: Array.isArray(data.certificacoes) ? data.certificacoes : [],
-      publicacoes: data.publicacoes || '',
-      role: data.role as 'admin' | 'user' || 'user',
-      isActive: data.is_active ?? true,
-      aceiteTermos: data.aceite_termos ?? false,
-      updatedByAdmin: data.updated_by_admin ?? false,
-      lastUpdated: new Date(data.updated_at || data.created_at || new Date()),
-      projetos: [],
-      formacaoAcademica: [],
-      experienciasProfissionais: [],
-      disponibilidade: {
-        tipoColaboracao: [],
-        disponibilidadeEstimada: ''
-      },
-      contato: {
-        formaContato: 'email',
-        horarioPreferencial: ''
-      }
-    };
   };
 
   const getInitials = (name: string) => {
@@ -277,8 +178,6 @@ const ProfileDetail: React.FC = () => {
     );
   }
 
-  console.log('🎨 Renderizando perfil:', profile.name);
-
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
@@ -288,11 +187,6 @@ const ProfileDetail: React.FC = () => {
             Voltar à busca
           </Button>
         </Link>
-        
-        {/* Debug info */}
-        <div className="text-xs text-gray-400">
-          ID: {profile.id} | Dados carregados: {new Date().toLocaleTimeString()}
-        </div>
       </div>
 
       {/* Header with photo and basic info */}
@@ -306,11 +200,6 @@ const ProfileDetail: React.FC = () => {
                   src={profile.fotoUrl} 
                   alt={profile.name} 
                   className="w-full h-full object-cover"
-                  onLoad={() => console.log('✅ Imagem carregada com sucesso para:', profile.name)}
-                  onError={(e) => {
-                    console.error('❌ Erro ao carregar imagem para:', profile.name);
-                    console.error('URL da imagem:', profile.fotoUrl);
-                  }}
                 />
               ) : (
                 <div className="w-full h-full bg-red-100 flex items-center justify-center">
@@ -340,7 +229,7 @@ const ProfileDetail: React.FC = () => {
                 )}
               </div>
 
-              {/* Cargo and Unidade */}
+              {/* Cargo, Função e Unidade */}
               <div className="mt-4 space-y-2">
                 {profile.cargo && profile.cargo.length > 0 && (
                   <div>
@@ -457,6 +346,50 @@ const ProfileDetail: React.FC = () => {
         </Card>
       )}
 
+      {/* Professional Experiences */}
+      {profile.experienciasProfissionais && profile.experienciasProfissionais.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Briefcase className="w-5 h-5" />
+              <span>Experiência Profissional</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {profile.experienciasProfissionais.map((exp, index) => (
+                <div key={index} className="border-l-4 border-green-200 pl-4">
+                  {exp.tempoMPRJ && (
+                    <div className="mb-2">
+                      <h4 className="font-semibold text-gray-900">Tempo no MPRJ</h4>
+                      <p className="text-gray-700">{exp.tempoMPRJ}</p>
+                    </div>
+                  )}
+                  {exp.experienciaAnterior && (
+                    <div className="mb-2">
+                      <h4 className="font-semibold text-gray-900">Experiência Anterior</h4>
+                      <p className="text-gray-700">{exp.experienciaAnterior}</p>
+                    </div>
+                  )}
+                  {exp.projetosInternos && (
+                    <div className="mb-2">
+                      <h4 className="font-semibold text-gray-900">Projetos Internos</h4>
+                      <p className="text-gray-700">{exp.projetosInternos}</p>
+                    </div>
+                  )}
+                  {exp.publicacoes && (
+                    <div className="mb-2">
+                      <h4 className="font-semibold text-gray-900">Publicações</h4>
+                      <p className="text-gray-700">{exp.publicacoes}</p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Projects */}
       {profile.projetos && profile.projetos.length > 0 && (
         <Card>
@@ -529,7 +462,7 @@ const ProfileDetail: React.FC = () => {
       </div>
 
       {/* Availability */}
-      {profile.disponibilidade && (
+      {(profile.disponibilidade?.tipoColaboracao?.length > 0 || profile.disponibilidade?.disponibilidadeEstimada || profile.contato?.horarioPreferencial) && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
@@ -539,7 +472,7 @@ const ProfileDetail: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 md:grid-cols-2">
-              {profile.disponibilidade.tipoColaboracao && profile.disponibilidade.tipoColaboracao.length > 0 && (
+              {profile.disponibilidade?.tipoColaboracao && profile.disponibilidade.tipoColaboracao.length > 0 && (
                 <div>
                   <h4 className="font-medium text-gray-900 mb-2">Tipos de Colaboração</h4>
                   <div className="flex flex-wrap gap-1">
@@ -550,7 +483,7 @@ const ProfileDetail: React.FC = () => {
                 </div>
               )}
               
-              {profile.disponibilidade.disponibilidadeEstimada && (
+              {profile.disponibilidade?.disponibilidadeEstimada && (
                 <div>
                   <h4 className="font-medium text-gray-900 mb-2">Disponibilidade Estimada</h4>
                   <p className="text-gray-700">{profile.disponibilidade.disponibilidadeEstimada}</p>
@@ -559,10 +492,10 @@ const ProfileDetail: React.FC = () => {
               
               <div>
                 <h4 className="font-medium text-gray-900 mb-2">Forma de Contato Preferencial</h4>
-                <Badge variant="outline">{profile.contato.formaContato}</Badge>
+                <Badge variant="outline">{profile.contato?.formaContato || 'email'}</Badge>
               </div>
               
-              {profile.contato.horarioPreferencial && (
+              {profile.contato?.horarioPreferencial && (
                 <div>
                   <h4 className="font-medium text-gray-900 mb-2">Horário Preferencial</h4>
                   <p className="text-gray-700">{profile.contato.horarioPreferencial}</p>
