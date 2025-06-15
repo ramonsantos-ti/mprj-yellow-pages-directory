@@ -1,4 +1,3 @@
-
 /**
  * Substitui textos conhecidos para versões acentuadas, 
  * capitaliza a primeira letra de cada palavra, 
@@ -9,6 +8,7 @@ const replacementMap: Record<string, string> = {
   atualizacao: 'Atualização',
   funcao: 'Função',
   unidade: 'Unidade',
+  capacitacao: 'Capacitação',
   // Adicione outros termos relevantes aqui se necessário...
   // Exemplo: 'biografia':'Biografia'
 };
