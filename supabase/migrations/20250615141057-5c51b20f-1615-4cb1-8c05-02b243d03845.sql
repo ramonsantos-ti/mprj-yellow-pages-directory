@@ -16,7 +16,8 @@ DECLARE
     'Terceirizado',
     'Comissionado',
     'Residente Jurídico',
-    'Residente Técnico'
+    'Residente Técnico',
+    'Oficial do MP'
   ];
   rec RECORD;
   cargos_corrigidos text[];

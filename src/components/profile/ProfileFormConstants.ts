@@ -12,7 +12,8 @@ export const safeCargos = [
   'Terceirizado',
   'Comissionado',
   'Residente Jurídico',
-  'Residente Técnico'
+  'Residente Técnico',
+  'Oficial do MP'
 ];
 
 export const safeFuncoes = [
