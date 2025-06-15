@@ -23,15 +23,19 @@ export const profileSchema = z.object({
   linkCurriculo: z.string().optional(),
   certificacoes: z.array(z.string()),
   aceiteTermos: z.boolean().refine(val => val === true, 'Você deve aceitar os termos'),
+  // ↓↓↓ CAMPOS NOVOS/ALINHADOS ↓↓↓
+  biografia: z.string().optional(),
+  publicacoes: z.string().optional(),
+  especializacoes: z.string().optional(),
+  informacoesComplementares: z.string().optional(),
   // Mantém validacão: array opcional, exige 100% dos campos se iniciado
   formacaoAcademica: z
     .array(formacaoAcademicaSchema)
     .optional()
     .refine(
       (arr) => {
-        if (!arr) return true; // OK se não existe
-        if (arr.length === 0) return true; // OK se array vazio
-        // Exige que todas entradas estejam 100% completas
+        if (!arr) return true;
+        if (arr.length === 0) return true;
         return arr.every(
           (item) =>
             item.nivel &&
@@ -52,7 +56,6 @@ export const profileSchema = z.object({
           'Se você começou a preencher uma formação acadêmica, complete todos os campos ou exclua a entrada para salvar o perfil.'
       }
     ),
-  informacoesComplementares: z.string().optional(),
 });
 
 export const defaultFormValues = {
@@ -70,5 +73,9 @@ export const defaultFormValues = {
   certificacoes: [],
   aceiteTermos: false,
   formacaoAcademica: [],
+  // ↓↓↓ ALINHADO COM O BANCO ↓↓↓
+  biografia: '',
+  publicacoes: '',
+  especializacoes: '',
   informacoesComplementares: '',
 };

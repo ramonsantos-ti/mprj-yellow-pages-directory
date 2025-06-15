@@ -24,7 +24,6 @@ export const useProfileSave = () => {
     try {
       setSaving(true);
 
-      // Assegura que biografia/publicacoes são string
       const safeBiografia = typeof data.biografia === 'string'
         ? data.biografia
         : (data.biografia ? String(data.biografia) : '');
@@ -32,6 +31,22 @@ export const useProfileSave = () => {
       const safePublicacoes = typeof data.publicacoes === 'string'
         ? data.publicacoes
         : (data.publicacoes ? String(data.publicacoes) : '');
+
+      const safeEspecializacoes = typeof data.especializacoes === 'string'
+        ? data.especializacoes
+        : (data.especializacoes ? String(data.especializacoes) : '');
+
+      // --- INCLUINDO INFORMAÇÕES COMPLEMENTARES IN CASE IT EXISTS
+      const informacoesComplementares =
+        typeof data.informacoesComplementares === 'string'
+          ? data.informacoesComplementares
+          : (data.informacoesComplementares ? String(data.informacoesComplementares) : '');
+
+      // Adiciona informacoesComplementares no campo especializacoes, se existir
+      const finalEspecializacoes =
+        informacoesComplementares && informacoesComplementares.trim() !== ''
+          ? `${safeEspecializacoes}${safeEspecializacoes && informacoesComplementares ? '\n\n' : ''}${informacoesComplementares}`
+          : safeEspecializacoes;
 
       const profileData = {
         user_id: user?.id,
@@ -44,7 +59,7 @@ export const useProfileSave = () => {
         funcao: data.funcao || [],
         unidade: data.unidade || [],
         areas_conhecimento: data.areasConhecimento || [],
-        especializacoes: data.especializacoes || "",
+        especializacoes: finalEspecializacoes || "",
         temas_interesse: data.temasInteresse || [],
         idiomas: data.idiomas || [],
         link_curriculo: data.linkCurriculo || "",

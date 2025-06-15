@@ -23,10 +23,10 @@ const AdditionalInfo: React.FC<AdditionalInfoProps> = ({ form }) => {
         {/* Campo livre de informações complementares */}
         <FormField
           control={form.control}
-          name="informacoesComplementares"
+          name="especializacoes"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Informações Adicionais</FormLabel>
+              <FormLabel>Informações Complementares</FormLabel>
               <FormControl>
                 <Textarea
                   placeholder="Inclua aqui qualquer informação complementar relevante…"

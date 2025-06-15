@@ -30,7 +30,6 @@ export const useProfileFormHandler = ({
 
   const populateFormWithProfile = (profile: Profile) => {
     setFotoPreview(profile.fotoUrl || '');
-
     // Set form values
     form.setValue('name', profile.name || '');
     form.setValue('matricula', profile.matricula || '');
@@ -41,7 +40,7 @@ export const useProfileFormHandler = ({
     form.setValue('funcao', profile.funcao || []);
     form.setValue('unidade', profile.unidade || []);
     form.setValue('areasConhecimento', profile.areasConhecimento || []);
-    form.setValue('especializacoes', profile.especializacoes ?? "");
+    form.setValue('especializacoes', profile.especializacoes ?? ""); // agora "Informações Complementares"
     form.setValue('temasInteresse', profile.temasInteresse || []);
     form.setValue('idiomas', profile.idiomas || []);
     form.setValue('linkCurriculo', profile.linkCurriculo ?? "");
@@ -49,6 +48,7 @@ export const useProfileFormHandler = ({
     form.setValue('publicacoes', profile.publicacoes ?? ""); // força string
     form.setValue('aceiteTermos', profile.aceiteTermos || false);
     form.setValue('formacaoAcademica', profile.formacaoAcademica || []);
+    form.setValue('informacoesComplementares', ""); // opcional, ignorar no preenchimento
 
     setProjetos(profile.projetos || []);
 
