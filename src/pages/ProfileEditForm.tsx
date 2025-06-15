@@ -1,13 +1,14 @@
+
 import React, { useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
-import { Form } from '@/components/ui/form'; // IMPORTANTE!
+import { Form } from '@/components/ui/form';
 import { useProfileData } from '@/hooks/useProfileData';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import BasicInfo from '@/components/profile/BasicInfo';
 import CargoUnidade from '@/components/profile/CargoUnidade';
-// import AreasConhecimento from '@/components/profile/AreasConhecimento';
-// import ProfessionalExperience from '@/components/profile/ProfessionalExperience';
+import AreasConhecimento from '@/components/profile/AreasConhecimento';
+import ProfessionalExperience from '@/components/profile/ProfessionalExperience';
 import AcademicFormation from '@/components/profile/AcademicFormation';
 import AvailabilitySection from '@/components/profile/AvailabilitySection';
 import ContactPreferences from '@/components/profile/ContactPreferences';
@@ -24,18 +25,15 @@ import {
   safeCargos,
   safeFuncoes,
   safeUnidades,
-  // safeAreasConhecimento,
-  // safeTemasInteresse,
-  // safeIdiomas,
+  safeAreasConhecimento,
+  safeTemasInteresse,
+  safeIdiomas,
   safeTiposColaboracao,
   safeDisponibilidadeEstimada,
   safeFormasContato
 } from '@/components/profile/ProfileFormConstants';
 import { supabase } from '@/integrations/supabase/client';
 import { Profile } from '@/types';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
 import { Edit, Loader2 } from 'lucide-react';
 
 const ProfileEditForm = () => {
@@ -54,10 +52,10 @@ const ProfileEditForm = () => {
       telefone: '',
       email: '',
       biografia: '',
-      // areasConhecimento: [],
+      areasConhecimento: [],
       especializacoes: '',
-      // temasInteresse: [],
-      // idiomas: [],
+      temasInteresse: [],
+      idiomas: [],
       linkCurriculo: '',
       fotoUrl: '',
       certificacoes: [],
@@ -85,15 +83,14 @@ const ProfileEditForm = () => {
 
   const { fotoUrl, setFotoUrl, uploading, uploadFoto } = useProfilePhoto(setValue);
 
+  // Seções específicas restauradas
   const [tipoColaboracao, setTipoColaboracao] = React.useState<string[]>([]);
   const [disponibilidadeEstimada, setDisponibilidadeEstimada] = React.useState('');
   const [formaContato, setFormaContato] = React.useState('email');
   const [horarioPreferencial, setHorarioPreferencial] = React.useState('');
-  // const [selectedAreasConhecimento, setSelectedAreasConhecimento] = React.useState<string[]>([]);
-  // const [selectedTemasInteresse, setSelectedTemasInteresse] = React.useState<string[]>([]);
-  // const [selectedIdiomas, setSelectedIdiomas] = React.useState<string[]>([]);
-  // const [fotoUrl, setFotoUrl] = React.useState<string | null>(null);
-  // const [uploading, setUploading] = React.useState(false);
+  const [selectedAreasConhecimento, setSelectedAreasConhecimento] = React.useState<string[]>([]);
+  const [selectedTemasInteresse, setSelectedTemasInteresse] = React.useState<string[]>([]);
+  const [selectedIdiomas, setSelectedIdiomas] = React.useState<string[]>([]);
 
   // Carrega o perfil do usuário
   useEffect(() => {
@@ -103,28 +100,29 @@ const ProfileEditForm = () => {
       setFormaContato(userProfile.contato?.formaContato || 'email');
       setHorarioPreferencial(userProfile.contato?.horarioPreferencial || '');
       setFotoUrl(userProfile.fotoUrl || null);
+      setSelectedAreasConhecimento(userProfile.areasConhecimento || []);
+      setSelectedTemasInteresse(userProfile.temasInteresse || []);
+      setSelectedIdiomas(userProfile.idiomas || []);
     }
   }, [userProfile, setFotoUrl]);
 
-  // NOVO USEEFFECT: sempre tentar buscar o perfil no primeiro carregamento
   useEffect(() => {
     if (!userProfile && !!loadUserProfile) {
       loadUserProfile();
     }
-    // Não adiciona dependências 'form' e 'setFotoUrl' para evitar loops
-    // eslint-disable-next-line
   }, [userProfile, loadUserProfile]);
 
-  // Reseta os dados do perfil SOMENTE no primeiro carregamento real
   useEffect(() => {
-    // Adicionando log de debug
     if (userProfile && !isInitialized.current) {
-      // O reset só deve acontecer 1 vez na inicialização
       form.reset({
         ...userProfile,
         cargo: userProfile.cargo || [],
         funcao: userProfile.funcao || [],
         unidade: userProfile.unidade || [],
+        areasConhecimento: userProfile.areasConhecimento || [],
+        especializacoes: userProfile.especializacoes || '',
+        temasInteresse: userProfile.temasInteresse || [],
+        idiomas: userProfile.idiomas || [],
         disponibilidade: {
           tipoColaboracao: userProfile.disponibilidade?.tipoColaboracao || [],
           disponibilidadeEstimada: userProfile.disponibilidade?.disponibilidadeEstimada || ''
@@ -138,11 +136,11 @@ const ProfileEditForm = () => {
         certificacoes: userProfile.certificacoes || [],
       });
       setFotoUrl(userProfile.fotoUrl || null);
+      setSelectedAreasConhecimento(userProfile.areasConhecimento || []);
+      setSelectedTemasInteresse(userProfile.temasInteresse || []);
+      setSelectedIdiomas(userProfile.idiomas || []);
       isInitialized.current = true;
-      console.log('RESET: Formulário inicializado com perfil do usuário.');
     }
-    // Removido `form` das dependências para evitar reset contínuo
-    // eslint-disable-next-line
   }, [userProfile, setFotoUrl]);
 
   const onSubmit = async (data: any) => {
@@ -152,9 +150,9 @@ const ProfileEditForm = () => {
 
       const updates = {
         ...data,
-        // areas_conhecimento: selectedAreasConhecimento,
-        // temas_interesse: selectedTemasInteresse,
-        // idiomas: selectedIdiomas,
+        areasConhecimento: selectedAreasConhecimento,
+        temasInteresse: selectedTemasInteresse,
+        idiomas: selectedIdiomas,
         disponibilidade: {
           tipo_colaboracao: transformedTipoColaboracao,
           disponibilidade_estimada: disponibilidadeEstimada
@@ -189,13 +187,12 @@ const ProfileEditForm = () => {
         throw error;
       }
 
-      // Atualiza o estado local do perfil
       const updatedProfile: Profile = {
         ...userProfile,
         ...data,
-        // areasConhecimento: selectedAreasConhecimento,
-        // temasInteresse: selectedTemasInteresse,
-        // idiomas: selectedIdiomas,
+        areasConhecimento: selectedAreasConhecimento,
+        temasInteresse: selectedTemasInteresse,
+        idiomas: selectedIdiomas,
         disponibilidade: {
           tipoColaboracao: tipoColaboracao,
           disponibilidadeEstimada: disponibilidadeEstimada
@@ -249,7 +246,8 @@ const ProfileEditForm = () => {
 
         <BasicInfo form={form} />
         <CargoUnidade form={form} safeCargos={safeCargos} safeFuncoes={safeFuncoes} safeUnidades={safeUnidades} isValidSelectValue={isValidSelectValue} />
-        {/* <AreasConhecimento
+
+        <AreasConhecimento
           selectedAreasConhecimento={selectedAreasConhecimento}
           setSelectedAreasConhecimento={setSelectedAreasConhecimento}
           selectedTemasInteresse={selectedTemasInteresse}
@@ -259,9 +257,12 @@ const ProfileEditForm = () => {
           safeAreasConhecimento={safeAreasConhecimento}
           safeTemasInteresse={safeTemasInteresse}
           safeIdiomas={safeIdiomas}
-        /> */}
+        />
+
         <AcademicFormation form={form} />
-        {/* <ProfessionalExperience form={form} /> */}
+
+        <ProfessionalExperience form={form} />
+
         <AvailabilitySection
           tipoColaboracao={tipoColaboracao}
           setTipoColaboracao={setTipoColaboracao}
@@ -271,6 +272,7 @@ const ProfileEditForm = () => {
           safeDisponibilidadeEstimada={safeDisponibilidadeEstimada}
           isValidSelectValue={isValidSelectValue}
         />
+
         <ContactPreferences
           formaContato={formaContato}
           setFormaContato={setFormaContato}
@@ -279,6 +281,7 @@ const ProfileEditForm = () => {
           safeFormasContato={safeFormasContato}
           isValidSelectValue={isValidSelectValue}
         />
+
         <CertificationsSection form={form} />
         <PublicationsSection form={form} />
         <AdditionalInfo form={form} />
