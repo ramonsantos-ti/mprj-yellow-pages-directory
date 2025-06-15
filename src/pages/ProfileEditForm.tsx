@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { useProfileData } from '@/hooks/useProfileData';
@@ -16,6 +15,8 @@ import PublicationsSection from '@/components/profile/PublicationsSection';
 import AdditionalInfo from '@/components/profile/AdditionalInfo';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/components/ui/use-toast";
+import ProfilePhotoSection from '@/components/profile/ProfilePhotoSection';
+import { useProfilePhoto } from "@/hooks/useProfilePhoto";
 import {
   tipoColaboracaoMap,
   formaContatoMap,
@@ -40,8 +41,6 @@ const ProfileEditForm = () => {
   const { userProfile, loading, error, loadUserProfile, setError, setUserProfile } = useProfileData();
   const navigate = useNavigate();
   const { toast } = useToast();
-
-  // Controla se os dados iniciais já foram aplicados ao form
   const isInitialized = useRef(false);
 
   const form = useForm({
@@ -83,6 +82,8 @@ const ProfileEditForm = () => {
     formState: { isSubmitting }
   } = form;
 
+  const { fotoUrl, setFotoUrl, uploading, uploadFoto } = useProfilePhoto(setValue);
+
   const [tipoColaboracao, setTipoColaboracao] = React.useState<string[]>([]);
   const [disponibilidadeEstimada, setDisponibilidadeEstimada] = React.useState('');
   const [formaContato, setFormaContato] = React.useState('email');
@@ -90,8 +91,8 @@ const ProfileEditForm = () => {
   // const [selectedAreasConhecimento, setSelectedAreasConhecimento] = React.useState<string[]>([]);
   // const [selectedTemasInteresse, setSelectedTemasInteresse] = React.useState<string[]>([]);
   // const [selectedIdiomas, setSelectedIdiomas] = React.useState<string[]>([]);
-  const [fotoUrl, setFotoUrl] = React.useState<string | null>(null);
-  const [uploading, setUploading] = React.useState(false);
+  // const [fotoUrl, setFotoUrl] = React.useState<string | null>(null);
+  // const [uploading, setUploading] = React.useState(false);
 
   useEffect(() => {
     if (userProfile) {
@@ -130,10 +131,11 @@ const ProfileEditForm = () => {
         certificacoes: userProfile.certificacoes || [],
       });
       isInitialized.current = true;
+      setFotoUrl(userProfile.fotoUrl || null);
     }
     // Não inclui form como dependência para evitar reset ao digitar
     // eslint-disable-next-line
-  }, [userProfile, form]);
+  }, [userProfile, form, setFotoUrl]);
 
   const onSubmit = async (data: any) => {
     try {
@@ -216,45 +218,6 @@ const ProfileEditForm = () => {
     }
   };
 
-  const uploadFoto = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    setUploading(true);
-
-    try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
-      const filePath = `lovable-uploads/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('uploads')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false
-        });
-
-      if (uploadError) {
-        throw uploadError;
-      }
-
-      const { data } = supabase.storage.from('uploads').getPublicUrl(filePath);
-      if (data && data.publicUrl) {
-        setFotoUrl(data.publicUrl);
-        setValue('fotoUrl', data.publicUrl);
-      }
-    } catch (error: any) {
-      console.error("Error uploading file:", error);
-      toast({
-        variant: "destructive",
-        title: "Erro ao atualizar!",
-        description: "Houve um problema ao fazer upload da foto.",
-      });
-    } finally {
-      setUploading(false);
-    }
-  };
-
   const isValidSelectValue = (value: any): value is string => {
     return typeof value === 'string';
   };
@@ -265,28 +228,13 @@ const ProfileEditForm = () => {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <Card>
-        <CardContent className="flex flex-col items-center justify-center space-y-4">
-          <Avatar className="w-32 h-32">
-            {fotoUrl ? (
-              <AvatarImage src={fotoUrl} alt="Foto de Perfil" />
-            ) : (
-              <AvatarFallback>{userProfile?.name?.substring(0, 2).toUpperCase()}</AvatarFallback>
-            )}
-          </Avatar>
-          <div>
-            <Label htmlFor="foto" className="text-sm font-medium text-gray-900">
-              Atualizar Foto
-            </Label>
-            <Input
-              id="foto"
-              type="file"
-              accept="image/*"
-              onChange={uploadFoto}
-              disabled={uploading}
-              className="mt-2"
-            />
-            {uploading && <Loader2 className="w-4 h-4 animate-spin mt-2" />}
-          </div>
+        <CardContent>
+          <ProfilePhotoSection
+            fotoUrl={fotoUrl}
+            uploading={uploading}
+            userName={userProfile?.name}
+            uploadFoto={uploadFoto}
+          />
         </CardContent>
       </Card>
 
