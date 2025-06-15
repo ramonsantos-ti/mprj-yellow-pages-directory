@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -169,7 +170,7 @@ const ProfileDetail: React.FC = () => {
       <ProjectsCard projetos={profile.projetos} />
 
       {/* Certificações */}
-      <ProfileCertifications certificacoes={profile.certificacoes} />
+      <ProfileCertifications certificacoes={profile.certificacoes ?? []} />
 
       {/* Publicações */}
       <ProfilePublications publicacoes={profile.publicacoes} />
@@ -178,7 +179,7 @@ const ProfileDetail: React.FC = () => {
       <AvailabilityCard disponibilidade={profile.disponibilidade} contato={profile.contato} />
 
       {/* Idiomas */}
-      <LanguagesAndCertifications idiomas={profile.idiomas} certificacoes={[]} />
+      <LanguagesAndCertifications idiomas={profile.idiomas ?? []} certificacoes={profile.certificacoes ?? []} />
 
       {/* Informações Complementares */}
       <ProfileAdditionalInfo especializacoes={profile.informacoesComplementares} />
