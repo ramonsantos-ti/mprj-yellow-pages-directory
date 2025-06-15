@@ -20,11 +20,21 @@ export const safeCertificacoes = [
 ];
 
 export const safeTiposColaboracao = [
-  'Consultoria', 'Treinamento', 'Projetos', 'Palestras', 'Pesquisa'
+  'Consultoria interna',
+  'Formação de equipes',
+  'Capacitações/tutoria',
+  'Grupos de trabalho',
+  'Mentoria',
+  'Coaching',
+  'Grupo de trabalho',
+  'Grupo de atuação'
 ];
 
 export const safeDisponibilidadeEstimada = [
-  'Até 5 horas/semana', '5-10 horas/semana', '10-20 horas/semana', 'Mais de 20 horas/semana'
+  'Até 1h/semana',
+  'Até 2h/semana',
+  'Até 3h/semana',
+  'Até 4h/semana'
 ];
 
 export const safeFormasContato = ['email', 'telefone', 'teams', 'presencial'];

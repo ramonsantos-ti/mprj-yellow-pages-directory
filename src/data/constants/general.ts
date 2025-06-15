@@ -83,7 +83,10 @@ const rawTiposColaboracao = [
   'Formação de equipes',
   'Capacitações/tutoria',
   'Grupos de trabalho',
-  'Mentoria'
+  'Mentoria',
+  'Coaching',
+  'Grupo de trabalho',
+  'Grupo de atuação'
 ];
 
 const rawDisponibilidadeEstimada = [
