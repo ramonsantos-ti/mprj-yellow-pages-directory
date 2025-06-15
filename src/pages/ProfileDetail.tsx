@@ -14,6 +14,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Badge } from '../components/ui/badge';
 import { User, Briefcase, Target, Book, Award, FileText, Calendar, MessageSquare, Languages, Info } from 'lucide-react';
 import { formatText } from '../utils/formatText';
+import ProfileBasicInfo from '../components/profile-detail/ProfileBasicInfo';
+import ProfileBio from '../components/profile-detail/ProfileBio';
+import ProfileInterestAreas from '../components/profile-detail/ProfileInterestAreas';
+import ProfileCertifications from '../components/profile-detail/ProfileCertifications';
+import ProfilePublications from '../components/profile-detail/ProfilePublications';
+import ProfileAdditionalInfo from '../components/profile-detail/ProfileAdditionalInfo';
 
 const ProfileDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -148,297 +154,35 @@ const ProfileDetail: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 p-4">
-      {/* Foto e Informação Básica (lado a lado em telas médias+) */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex flex-col md:flex-row items-start md:space-x-6 space-y-4 md:space-y-0">
-            {/* Foto */}
-            <div className="w-32 h-40 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border">
-              {profile.fotoUrl ? (
-                <img
-                  src={profile.fotoUrl}
-                  alt={formatText(profile.name)}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                  }}
-                />
-              ) : (
-                <div className="w-full h-full bg-red-100 flex items-center justify-center">
-                  <span className="text-red-900 font-semibold text-xl">
-                    {getInitials(formatText(profile.name))}
-                  </span>
-                </div>
-              )}
-            </div>
-            {/* Informação básica */}
-            <div className="flex-1">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center gap-2">
-                <User className="w-6 h-6 text-red-800" /> {formatText(profile.name)}
-              </h1>
-              <p className="text-lg text-gray-600 mb-4">
-                Matrícula: {formatText(profile.matricula)}
-              </p>
-              <div className="space-y-3">
-                <div className="flex items-center space-x-2 text-gray-600">
-                  <MessageSquare className="w-4 h-4" />
-                  <span>{formatText(profile.email)}</span>
-                </div>
-                <div className="flex items-center space-x-2 text-gray-600">
-                  <MessageSquare className="w-4 h-4" />
-                  <span>{profile.telefone ? formatText(profile.telefone) : <span className="italic text-gray-400">Telefone não informado</span>}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Foto e Informação Básica */}
+      <ProfileBasicInfo profile={profile} getInitials={getInitials} />
 
       {/* Biografia */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <User className="w-5 h-5 text-red-800" />
-            Biografia
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {typeof profile.biografia === "string" && profile.biografia.trim() !== "" ? (
-            <p className="text-gray-700 leading-relaxed">{formatText(profile.biografia)}</p>
-          ) : (
-            <span className="text-gray-500 italic">Biografia não informada</span>
-          )}
-        </CardContent>
-      </Card>
+      <ProfileBio biografia={profile.biografia} />
 
       {/* Áreas de Interesse */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Target className="w-5 h-5 text-red-800" />
-            Áreas de Interesse
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-2">
-            {Array.isArray(profile.temasInteresse) && profile.temasInteresse.length > 0 ? (
-              profile.temasInteresse.map((tema, i) => (
-                <Badge key={i} variant="outline">{formatText(tema)}</Badge>
-              ))
-            ) : (
-              <span className="text-gray-500 italic">Nenhuma área de interesse informada</span>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      <ProfileInterestAreas temasInteresse={profile.temasInteresse} />
 
       {/* Formação Acadêmica */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Book className="w-5 h-5 text-red-800" />
-            Formação Acadêmica
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {profile.formacaoAcademica && profile.formacaoAcademica.length > 0 ? (
-              profile.formacaoAcademica.map((formacao, index) => (
-                <div key={formacao.id || index} className="border-l-4 border-red-200 pl-4">
-                  <h4 className="font-semibold text-gray-900">{formatText(formacao.nivel)}</h4>
-                  <p className="text-gray-700">{formatText(formacao.curso)}</p>
-                  <p className="text-sm text-gray-600">{formatText(formacao.instituicao)} • {formacao.ano}</p>
-                </div>
-              ))
-            ) : (
-              <span className="text-gray-500 italic">Nenhuma formação acadêmica informada</span>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      <AcademicFormationCard formacaoAcademica={profile.formacaoAcademica} />
 
       {/* Projetos */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-red-800" />
-            Projetos
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {profile.projetos && profile.projetos.length > 0 ? (
-              profile.projetos.map((projeto, index) => (
-                <div key={projeto.id || index} className="border-l-4 border-yellow-300 pl-4">
-                  <h4 className="font-semibold text-gray-900">{formatText(projeto.nome)}</h4>
-                  <p className="text-sm text-gray-600 mb-2">
-                    {projeto.dataInicio &&
-                      <span>
-                        Início: {projeto.dataInicio instanceof Date
-                          ? projeto.dataInicio.toLocaleDateString("pt-BR")
-                          : new Date(projeto.dataInicio).toLocaleDateString("pt-BR")}
-                      </span>
-                    }
-                    {projeto.dataFim && (
-                      <span>
-                        {" • Fim: "}
-                        {projeto.dataFim instanceof Date
-                          ? projeto.dataFim.toLocaleDateString("pt-BR")
-                          : new Date(projeto.dataFim).toLocaleDateString("pt-BR")}
-                      </span>
-                    )}
-                  </p>
-                  {projeto.observacoes && (
-                    <p className="text-gray-700 text-sm">{formatText(projeto.observacoes)}</p>
-                  )}
-                </div>
-              ))
-            ) : (
-              <span className="text-gray-500 italic">Nenhum projeto informado</span>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      <ProjectsCard projetos={profile.projetos} />
 
       {/* Certificações */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Award className="w-5 h-5 text-red-800" />
-            Certificações
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            {profile.certificacoes && profile.certificacoes.length > 0 ? (
-              profile.certificacoes.map((cert, index) => (
-                <div key={index} className="text-sm text-gray-700">
-                  • {formatText(cert)}
-                </div>
-              ))
-            ) : (
-              <span className="text-gray-500 italic">Nenhuma certificação informada</span>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      <ProfileCertifications certificacoes={profile.certificacoes} />
 
       {/* Publicações */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <FileText className="w-5 h-5 text-red-800" />
-            Publicações
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {typeof profile.publicacoes === "string" && profile.publicacoes.trim() !== "" ? (
-            <p className="text-gray-700 leading-relaxed">{formatText(profile.publicacoes)}</p>
-          ) : (
-            <span className="text-gray-500 italic">Nenhuma publicação informada</span>
-          )}
-        </CardContent>
-      </Card>
+      <ProfilePublications publicacoes={profile.publicacoes} />
 
-      {/* Disponibilidade para Colaboração */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-red-800" />
-            Disponibilidade para Colaboração
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-2">
-            <div>
-              <h4 className="font-medium text-gray-900 mb-2">Tipos de Colaboração</h4>
-              {profile.disponibilidade?.tipoColaboracao && profile.disponibilidade.tipoColaboracao.length > 0 ? (
-                <div className="flex flex-wrap gap-1">
-                  {profile.disponibilidade.tipoColaboracao.map((tipo, index) => (
-                    <Badge key={index} variant="outline">{formatText(tipo)}</Badge>
-                  ))}
-                </div>
-              ) : (
-                <span className="text-gray-500 italic">Não informado</span>
-              )}
-            </div>
-            <div>
-              <h4 className="font-medium text-gray-900 mb-2">Disponibilidade Estimada</h4>
-              {profile.disponibilidade?.disponibilidadeEstimada ? (
-                <p className="text-gray-700">{formatText(profile.disponibilidade.disponibilidadeEstimada)}</p>
-              ) : (
-                <span className="text-gray-500 italic">Não informado</span>
-              )}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Preferências de Contato */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MessageSquare className="w-5 h-5 text-red-800" />
-            Preferências de Contato
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div>
-            <span className="font-medium mr-1">Forma de contato preferencial:</span>
-            {profile.contato && profile.contato.formaContato ? (
-              <Badge variant="outline">{formatText(profile.contato.formaContato)}</Badge>
-            ) : (
-              <span className="text-gray-500 italic">Não informado</span>
-            )}
-          </div>
-          <div className="mt-2">
-            <span className="font-medium mr-1">Horário preferencial:</span>
-            {profile.contato && profile.contato.horarioPreferencial ? (
-              <Badge variant="outline">{formatText(profile.contato.horarioPreferencial)}</Badge>
-            ) : (
-              <span className="text-gray-500 italic">Não informado</span>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      {/* Disponibilidade para Colaboração e Preferências de contato */}
+      <AvailabilityCard disponibilidade={profile.disponibilidade} contato={profile.contato} />
 
       {/* Idiomas */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Languages className="w-5 h-5 text-red-800" />
-            Idiomas
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-2">
-            {profile.idiomas && profile.idiomas.length > 0 ? (
-              profile.idiomas.map((idioma, i) => (
-                <Badge key={i} variant="outline">{formatText(idioma)}</Badge>
-              ))
-            ) : (
-              <span className="text-gray-500 italic">Nenhum idioma informado</span>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      <LanguagesAndCertifications idiomas={profile.idiomas} certificacoes={[]} />
 
       {/* Informações Complementares */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Info className="w-5 h-5 text-red-800" />
-            Informações Complementares
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {typeof profile.especializacoes === "string" && profile.especializacoes.trim() !== "" ? (
-            <p className="text-gray-700">{formatText(profile.especializacoes)}</p>
-          ) : (
-            <span className="text-gray-500 italic">Nenhuma informação complementar informada</span>
-          )}
-        </CardContent>
-      </Card>
+      <ProfileAdditionalInfo especializacoes={profile.especializacoes} />
     </div>
   );
 };
