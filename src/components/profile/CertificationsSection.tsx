@@ -58,7 +58,7 @@ const CertificationsSection: React.FC<CertificationsSectionProps> = ({ form }) =
             />
           </div>
           <div className="flex items-end">
-            <Button type="button" onClick={addCertification}>
+            <Button type="button" onClick={addCertification} variant="logo-brown">
               <Plus className="w-4 h-4" />
             </Button>
           </div>
@@ -99,3 +99,4 @@ const CertificationsSection: React.FC<CertificationsSectionProps> = ({ form }) =
 };
 
 export default CertificationsSection;
+
