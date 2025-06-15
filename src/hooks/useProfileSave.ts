@@ -23,12 +23,9 @@ export const useProfileSave = () => {
     try {
       setSaving(true);
 
-      console.log('Saving profile data:', {
-        data,
-        formacaoAcademica,
-        projetos,
-        disponibilidade
-      });
+      // LOG PARA DEPURAÇÃO (certificar que biografia está chegando do form)
+      console.log('[DEBUG] DATA para salvar perfil:', data);
+      console.log('[DEBUG] Valor de biografia recebido:', data.biografia);
 
       const profileData = {
         user_id: user?.id,
@@ -36,7 +33,7 @@ export const useProfileSave = () => {
         matricula: data.matricula,
         email: data.email,
         telefone: data.telefone || null,
-        biografia: typeof data.biografia === 'string' ? data.biografia : '',
+        biografia: typeof data.biografia === 'string' ? data.biografia : (data.biografia || ''), // ajuste garantido tipo string
         cargo: data.cargo || [],
         funcao: data.funcao || [],
         unidade: data.unidade || [],
@@ -51,6 +48,9 @@ export const useProfileSave = () => {
         aceite_termos: data.aceiteTermos || false,
         updated_at: new Date().toISOString()
       };
+
+      // LOG para checar valor enviado ao banco
+      console.log('[DEBUG] profileData pronto para banco:', profileData);
 
       let profileId = userProfile?.id;
 
