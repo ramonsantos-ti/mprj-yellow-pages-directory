@@ -35,29 +35,31 @@ const BasicInfo: React.FC<BasicInfoProps> = ({ form }) => {
           )}
         </div>
 
-        <div>
-          <Label htmlFor="matricula">Matrícula *</Label>
-          <Input
-            id="matricula"
-            {...register('matricula', { required: 'Matrícula é obrigatória' })}
-            placeholder="Digite sua matrícula"
-          />
-          {errors.matricula && (
-            <p className="text-red-500 text-sm mt-1">{errors.matricula.message as string}</p>
-          )}
-        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="matricula">Matrícula *</Label>
+            <Input
+              id="matricula"
+              {...register('matricula', { required: 'Matrícula é obrigatória' })}
+              placeholder="Digite sua matrícula"
+            />
+            {errors.matricula && (
+              <p className="text-red-500 text-sm mt-1">{errors.matricula.message as string}</p>
+            )}
+          </div>
 
-        <div>
-          <Label htmlFor="email">E-mail *</Label>
-          <Input
-            id="email"
-            type="email"
-            {...register('email', { required: 'E-mail é obrigatório' })}
-            placeholder="Digite seu e-mail"
-          />
-          {errors.email && (
-            <p className="text-red-500 text-sm mt-1">{errors.email.message as string}</p>
-          )}
+          <div>
+            <Label htmlFor="email">E-mail *</Label>
+            <Input
+              id="email"
+              type="email"
+              {...register('email', { required: 'E-mail é obrigatório' })}
+              placeholder="Digite seu e-mail"
+            />
+            {errors.email && (
+              <p className="text-red-500 text-sm mt-1">{errors.email.message as string}</p>
+            )}
+          </div>
         </div>
 
         <div>
