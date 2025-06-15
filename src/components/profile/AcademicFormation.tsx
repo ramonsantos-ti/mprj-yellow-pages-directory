@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { UseFormReturn, useFieldArray } from 'react-hook-form';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
@@ -39,7 +38,12 @@ const AcademicFormation: React.FC<AcademicFormationProps> = ({ form }) => {
             <GraduationCap className="w-5 h-5" />
             <span>Formação Acadêmica</span>
           </div>
-          <Button type="button" onClick={addFormation} size="sm">
+          <Button
+            type="button"
+            onClick={addFormation}
+            size="sm"
+            variant="logo-brown"
+          >
             <Plus className="w-4 h-4 mr-2" />
             Adicionar
           </Button>
@@ -49,7 +53,11 @@ const AcademicFormation: React.FC<AcademicFormationProps> = ({ form }) => {
         {fields.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-gray-500 mb-4">Nenhuma formação acadêmica adicionada</p>
-            <Button type="button" onClick={addFormation} variant="outline">
+            <Button
+              type="button"
+              onClick={addFormation}
+              variant="logo-brown"
+            >
               <Plus className="w-4 h-4 mr-2" />
               Adicionar Primeira Formação
             </Button>
