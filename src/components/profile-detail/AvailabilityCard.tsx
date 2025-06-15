@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { Clock } from 'lucide-react';
 import { Profile } from '../../types';
+import { tipoColaboracaoReverseMap, formaContatoReverseMap } from '../profile/ProfileFormConstants';
 
 interface AvailabilityCardProps {
   disponibilidade: Profile['disponibilidade'];
@@ -26,7 +27,9 @@ const AvailabilityCard: React.FC<AvailabilityCardProps> = ({ disponibilidade, co
             {disponibilidade?.tipoColaboracao && disponibilidade.tipoColaboracao.length > 0 ? (
               <div className="flex flex-wrap gap-1">
                 {disponibilidade.tipoColaboracao.map((tipo, index) => (
-                  <Badge key={index} variant="outline">{tipo}</Badge>
+                  <Badge key={index} variant="outline">
+                    {tipoColaboracaoReverseMap[tipo] || tipo}
+                  </Badge>
                 ))}
               </div>
             ) : (
@@ -45,7 +48,9 @@ const AvailabilityCard: React.FC<AvailabilityCardProps> = ({ disponibilidade, co
           
           <div>
             <h4 className="font-medium text-gray-900 mb-2">Forma de Contato Preferencial</h4>
-            <Badge variant="outline">{contato?.formaContato || 'E-mail'}</Badge>
+            <Badge variant="outline">
+              {formaContatoReverseMap[contato?.formaContato] || contato?.formaContato || 'E-mail'}
+            </Badge>
           </div>
           
           <div>
@@ -63,3 +68,4 @@ const AvailabilityCard: React.FC<AvailabilityCardProps> = ({ disponibilidade, co
 };
 
 export default AvailabilityCard;
+
