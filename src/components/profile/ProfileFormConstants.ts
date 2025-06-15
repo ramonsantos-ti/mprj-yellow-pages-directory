@@ -1,60 +1,66 @@
 export const safeCargos = [
+  'Analista',
+  'Auxiliar',
+  'Cedido (médio)',
+  'Cedido (superior)',
+  'Comissionado',
+  'Estagiário (médio)',
+  'Estagiário (superior)',
+  'Oficial do MP',
   'Procurador de Justiça',
   'Promotor de Justiça',
   'Promotor de Justiça Substituto',
-  'Analista',
-  'Técnico',
-  'Auxiliar',
-  'Cedido (superior)',
-  'Cedido (médio)',
-  'Estagiário (superior)',
-  'Estagiário (médio)',
-  'Terceirizado',
-  'Comissionado',
   'Residente Jurídico',
   'Residente Técnico',
-  'Oficial do MP'
+  'Técnico',
+  'Terceirizado'
 ];
 
 export const safeFuncoes = [
-  "Procurador-Geral de Justiça",
-  "Subprocurador-geral de Justiça",
-  "Corregedor-geral",
-  "Subcorregedor-geral",
-  "Conselheiro",
-  "Coordenador",
-  "Diretor",
-  "Gerente",
-  "Assessor",
-  "Chefe",
-  "Secretário",
-  "Supervisor",
-  "Perito",
-  "Consultor",
-  "Auditor"
+  'Assessor',
+  'Auditor',
+  'Chefe',
+  'Consultor',
+  'Conselheiro',
+  'Coordenador',
+  'Corregedor-geral',
+  'Diretor',
+  'Gerente',
+  'Perito',
+  'Procurador-Geral de Justiça',
+  'Secretário',
+  'Subcorregedor-geral',
+  'Subprocurador-geral de Justiça',
+  'Supervisor'
 ];
 
 export const safeUnidades = [
-  'Procuradoria-Geral de Justiça', 'Subprocuradoria-Geral de Justiça de Assuntos Administrativos',
-  'Corregedoria-Geral do Ministério Público', 'Centro de Apoio Operacional',
-  'Promotoria de Justiça', 'Procuradoria de Justiça'
+  'Centro de Apoio Operacional',
+  'Corregedoria-Geral do Ministério Público',
+  'Procuradoria-Geral de Justiça',
+  'Procuradoria de Justiça',
+  'Promotoria de Justiça',
+  'Subprocuradoria-Geral de Justiça de Assuntos Administrativos'
 ];
 
 export const safeCertificacoes = [
-  'PMP - Project Management Professional', 'ITIL Foundation',
-  'ISO 27001', 'Scrum Master', 'Product Owner'
+  'ISO 27001',
+  'ITIL Foundation',
+  'PMP - Project Management Professional',
+  'Product Owner',
+  'Scrum Master'
 ];
 
 export const safeTiposColaboracao = [
-  'Consultoria interna',
-  'Parecer técnico',
   'Capacitação/treinamento',
-  'Projeto especial',
-  'Mentoria',
   'Coaching',
-  'Grupo de trabalho',
   'Comissão',
-  'Grupo de Atuação Especializada'
+  'Consultoria interna',
+  'Grupo de Atuação Especializada',
+  'Grupo de trabalho',
+  'Mentoria',
+  'Parecer técnico',
+  'Projeto especial'
 ];
 
 export const safeDisponibilidadeEstimada = [
@@ -66,10 +72,10 @@ export const safeDisponibilidadeEstimada = [
 
 export const safeFormasContato = [
   'E-mail',
-  'Telefone', 
   'Microsoft Teams',
-  'WhatsApp',
-  'Presencial'
+  'Presencial',
+  'Telefone', 
+  'WhatsApp'
 ];
 
 // Mapeamento para valores do banco de dados - usando os enum values corretos
