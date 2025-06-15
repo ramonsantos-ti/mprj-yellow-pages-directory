@@ -11,18 +11,26 @@ interface KnowledgeAreasProps {
 
 const KnowledgeAreas: React.FC<KnowledgeAreasProps> = ({ areasConhecimento, temasInteresse }) => {
   console.log('🧠 KnowledgeAreas renderizando:');
-  console.log('- Áreas conhecimento:', areasConhecimento?.length || 0, areasConhecimento);
-  console.log('- Temas interesse:', temasInteresse?.length || 0, temasInteresse);
+  console.log('- Áreas conhecimento recebidas:', areasConhecimento);
+  console.log('- Temas interesse recebidos:', temasInteresse);
+  console.log('- Tipo áreas:', typeof areasConhecimento, Array.isArray(areasConhecimento));
+  console.log('- Tipo temas:', typeof temasInteresse, Array.isArray(temasInteresse));
   
-  const hasAreas = areasConhecimento && areasConhecimento.length > 0;
-  const hasTemas = temasInteresse && temasInteresse.length > 0;
+  // Garantir que são arrays válidos
+  const areas = Array.isArray(areasConhecimento) ? areasConhecimento : [];
+  const temas = Array.isArray(temasInteresse) ? temasInteresse : [];
+  
+  const hasAreas = areas.length > 0;
+  const hasTemas = temas.length > 0;
+  
+  console.log('- hasAreas:', hasAreas, 'hasTemas:', hasTemas);
   
   if (!hasAreas && !hasTemas) {
-    console.log('🧠 KnowledgeAreas: sem dados, não renderizando');
+    console.log('🧠 KnowledgeAreas: sem dados válidos, não renderizando');
     return null;
   }
 
-  console.log('🧠 KnowledgeAreas: renderizando com dados');
+  console.log('🧠 KnowledgeAreas: renderizando com dados válidos');
   return (
     <div className="grid gap-6 md:grid-cols-2">
       {hasAreas && (
@@ -35,7 +43,7 @@ const KnowledgeAreas: React.FC<KnowledgeAreasProps> = ({ areasConhecimento, tema
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2">
-              {areasConhecimento.map((area, index) => (
+              {areas.map((area, index) => (
                 <Badge key={index} className="bg-red-100 text-red-800">
                   {area}
                 </Badge>
@@ -52,7 +60,7 @@ const KnowledgeAreas: React.FC<KnowledgeAreasProps> = ({ areasConhecimento, tema
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2">
-              {temasInteresse.map((tema, index) => (
+              {temas.map((tema, index) => (
                 <Badge key={index} variant="outline">{tema}</Badge>
               ))}
             </div>

@@ -148,16 +148,13 @@ const ProfileDetail: React.FC = () => {
       };
 
       console.log('🔄 Perfil transformado FINAL:', transformedProfile);
-      console.log('📋 Detalhes importantes:');
+      console.log('📋 Dados para componentes:');
       console.log('- Nome:', transformedProfile.name);
-      console.log('- Biografia:', transformedProfile.biografia ? 'SIM' : 'NÃO');
-      console.log('- Áreas conhecimento:', transformedProfile.areasConhecimento?.length || 0);
-      console.log('- Temas interesse:', transformedProfile.temasInteresse?.length || 0);
-      console.log('- Formações:', transformedProfile.formacaoAcademica?.length || 0);
-      console.log('- Experiências:', transformedProfile.experienciasProfissionais?.length || 0);
-      console.log('- Projetos:', transformedProfile.projetos?.length || 0);
-      console.log('- Idiomas:', transformedProfile.idiomas?.length || 0);
-      console.log('- Certificações:', transformedProfile.certificacoes?.length || 0);
+      console.log('- Biografia existe?', !!transformedProfile.biografia, 'Conteúdo:', transformedProfile.biografia);
+      console.log('- Áreas conhecimento:', transformedProfile.areasConhecimento);
+      console.log('- Temas interesse:', transformedProfile.temasInteresse);
+      console.log('- Formações acadêmicas:', transformedProfile.formacaoAcademica);
+      console.log('- Certificações:', transformedProfile.certificacoes);
       
       setProfile(transformedProfile);
     } catch (err: any) {
@@ -185,6 +182,10 @@ const ProfileDetail: React.FC = () => {
   }
 
   console.log('✅ Renderizando perfil completo para:', profile.name);
+  console.log('🔍 Dados que serão passados para componentes:');
+  console.log('- ProfileBiography biografia:', profile.biografia);
+  console.log('- KnowledgeAreas areasConhecimento:', profile.areasConhecimento);
+  console.log('- KnowledgeAreas temasInteresse:', profile.temasInteresse);
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 p-4">

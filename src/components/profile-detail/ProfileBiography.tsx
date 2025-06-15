@@ -9,9 +9,11 @@ interface ProfileBiographyProps {
 
 const ProfileBiography: React.FC<ProfileBiographyProps> = ({ biografia }) => {
   console.log('📝 ProfileBiography renderizando com biografia:', biografia ? 'SIM' : 'NÃO', biografia?.length || 0, 'caracteres');
+  console.log('📝 Biografia recebida:', JSON.stringify(biografia));
   
-  if (!biografia || biografia.trim() === '') {
-    console.log('📝 ProfileBiography: biografia vazia, não renderizando');
+  // Verificar se biografia existe e não é apenas string vazia
+  if (!biografia || biografia.trim() === '' || biografia === null || biografia === undefined) {
+    console.log('📝 ProfileBiography: biografia vazia ou nula, não renderizando');
     return null;
   }
 
