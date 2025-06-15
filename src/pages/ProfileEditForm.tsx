@@ -105,6 +105,15 @@ const ProfileEditForm = () => {
     }
   }, [userProfile, setFotoUrl]);
 
+  // NOVO USEEFFECT: sempre tentar buscar o perfil no primeiro carregamento
+  useEffect(() => {
+    if (!userProfile && !!loadUserProfile) {
+      loadUserProfile();
+    }
+    // Não adiciona dependências 'form' e 'setFotoUrl' para evitar loops
+    // eslint-disable-next-line
+  }, [userProfile, loadUserProfile]);
+
   // Reseta os dados do perfil SOMENTE no primeiro carregamento real
   useEffect(() => {
     // Adicionando log de debug
