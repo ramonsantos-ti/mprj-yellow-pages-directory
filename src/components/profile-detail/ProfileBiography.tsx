@@ -8,16 +8,15 @@ interface ProfileBiographyProps {
 }
 
 const ProfileBiography: React.FC<ProfileBiographyProps> = ({ biografia }) => {
-  console.log('📝 ProfileBiography renderizando com biografia:', biografia ? 'SIM' : 'NÃO', biografia?.length || 0, 'caracteres');
-  console.log('📝 Biografia recebida:', JSON.stringify(biografia));
+  console.log('📝 ProfileBiography - biografia recebida:', biografia);
   
-  // Verificar se biografia existe e não é apenas string vazia
-  if (!biografia || biografia.trim() === '' || biografia === null || biografia === undefined) {
-    console.log('📝 ProfileBiography: biografia vazia ou nula, não renderizando');
+  // Se não há biografia, não renderiza nada
+  if (!biografia || biografia.trim() === '') {
+    console.log('📝 ProfileBiography: biografia vazia, não renderizando');
     return null;
   }
 
-  console.log('📝 ProfileBiography: renderizando biografia completa');
+  console.log('📝 ProfileBiography: renderizando biografia');
   return (
     <Card>
       <CardHeader>

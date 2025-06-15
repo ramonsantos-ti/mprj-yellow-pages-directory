@@ -9,20 +9,15 @@ interface AcademicFormationCardProps {
 }
 
 const AcademicFormationCard: React.FC<AcademicFormationCardProps> = ({ formacaoAcademica }) => {
-  console.log('🎓 AcademicFormationCard renderizando:');
-  console.log('- Formações recebidas:', formacaoAcademica);
-  console.log('- Tipo:', typeof formacaoAcademica, Array.isArray(formacaoAcademica));
-  console.log('- Length:', formacaoAcademica?.length);
+  console.log('🎓 AcademicFormationCard - formações recebidas:', formacaoAcademica);
   
-  // Garantir que é um array válido
-  const formacoes = Array.isArray(formacaoAcademica) ? formacaoAcademica : [];
-  
-  if (formacoes.length === 0) {
-    console.log('🎓 AcademicFormationCard: sem formações válidas, não renderizando');
+  // Se não há formações, não renderiza
+  if (!formacaoAcademica || formacaoAcademica.length === 0) {
+    console.log('🎓 AcademicFormationCard: sem formações, não renderizando');
     return null;
   }
 
-  console.log('🎓 AcademicFormationCard: renderizando', formacoes.length, 'formações');
+  console.log('🎓 AcademicFormationCard: renderizando', formacaoAcademica.length, 'formações');
   return (
     <Card>
       <CardHeader>
@@ -33,7 +28,7 @@ const AcademicFormationCard: React.FC<AcademicFormationCardProps> = ({ formacaoA
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {formacoes.map((formacao, index) => (
+          {formacaoAcademica.map((formacao, index) => (
             <div key={formacao.id || index} className="border-l-4 border-red-200 pl-4">
               <h4 className="font-semibold text-gray-900">{formacao.nivel}</h4>
               <p className="text-gray-700">{formacao.curso}</p>

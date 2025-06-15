@@ -147,14 +147,18 @@ const ProfileDetail: React.FC = () => {
         }
       };
 
-      console.log('🔄 Perfil transformado FINAL:', transformedProfile);
-      console.log('📋 Dados para componentes:');
+      console.log('🔄 Perfil transformado final:', transformedProfile);
+      console.log('📊 Resumo dos dados:');
       console.log('- Nome:', transformedProfile.name);
-      console.log('- Biografia existe?', !!transformedProfile.biografia, 'Conteúdo:', transformedProfile.biografia);
-      console.log('- Áreas conhecimento:', transformedProfile.areasConhecimento);
-      console.log('- Temas interesse:', transformedProfile.temasInteresse);
-      console.log('- Formações acadêmicas:', transformedProfile.formacaoAcademica);
-      console.log('- Certificações:', transformedProfile.certificacoes);
+      console.log('- Email:', transformedProfile.email);
+      console.log('- Cargo:', transformedProfile.cargo);
+      console.log('- Telefone:', transformedProfile.telefone || 'Não informado');
+      console.log('- Biografia:', transformedProfile.biografia || 'Não informado');
+      console.log('- Áreas:', transformedProfile.areasConhecimento?.length || 0);
+      console.log('- Temas:', transformedProfile.temasInteresse?.length || 0);
+      console.log('- Formações:', transformedProfile.formacaoAcademica?.length || 0);
+      console.log('- Idiomas:', transformedProfile.idiomas?.length || 0);
+      console.log('- Certificações:', transformedProfile.certificacoes?.length || 0);
       
       setProfile(transformedProfile);
     } catch (err: any) {
@@ -169,7 +173,7 @@ const ProfileDetail: React.FC = () => {
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   };
 
-  console.log('🎨 Renderizando ProfileDetail com loading:', loading, 'error:', error, 'profile:', !!profile);
+  console.log('🎨 Renderizando ProfileDetail - loading:', loading, 'error:', error, 'profile existe:', !!profile);
 
   if (loading) {
     console.log('⏳ Renderizando LoadingState');
@@ -182,38 +186,42 @@ const ProfileDetail: React.FC = () => {
   }
 
   console.log('✅ Renderizando perfil completo para:', profile.name);
-  console.log('🔍 Dados que serão passados para componentes:');
-  console.log('- ProfileBiography biografia:', profile.biografia);
-  console.log('- KnowledgeAreas areasConhecimento:', profile.areasConhecimento);
-  console.log('- KnowledgeAreas temasInteresse:', profile.temasInteresse);
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 p-4">
       <ProfileHeader profile={profile} getInitials={getInitials} />
       
+      {/* Biografia */}
       <ProfileBiography biografia={profile.biografia} />
       
+      {/* Áreas de Conhecimento e Temas de Interesse */}
       <KnowledgeAreas 
         areasConhecimento={profile.areasConhecimento} 
         temasInteresse={profile.temasInteresse} 
       />
       
+      {/* Formação Acadêmica */}
       <AcademicFormationCard formacaoAcademica={profile.formacaoAcademica} />
       
+      {/* Experiência Profissional */}
       <ProfessionalExperienceCard experienciasProfissionais={profile.experienciasProfissionais} />
       
+      {/* Projetos */}
       <ProjectsCard projetos={profile.projetos} />
       
+      {/* Idiomas e Certificações */}
       <LanguagesAndCertifications 
         idiomas={profile.idiomas} 
         certificacoes={profile.certificacoes} 
       />
       
+      {/* Disponibilidade */}
       <AvailabilityCard 
         disponibilidade={profile.disponibilidade} 
         contato={profile.contato} 
       />
       
+      {/* Publicações e Currículo */}
       <PublicationsAndCurriculum 
         publicacoes={profile.publicacoes}
         linkCurriculo={profile.linkCurriculo}
