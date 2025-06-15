@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -448,8 +449,6 @@ const ProfileEdit: React.FC = () => {
             isValidSelectValue={isValidSelectValue}
           />
 
-          <AdditionalInfo form={form} />
-
           <AcademicFormation form={form} />
 
           <Card>
@@ -486,6 +485,8 @@ const ProfileEdit: React.FC = () => {
             safeFormasContato={safeFormasContato}
             isValidSelectValue={isValidSelectValue}
           />
+
+          <AdditionalInfo form={form} />
 
           <Card>
             <CardContent className="pt-6">
