@@ -41,6 +41,8 @@ const ProfileDetail: React.FC = () => {
   const loadProfile = async () => {
     try {
       setLoading(true);
+      console.log('🔍 Buscando perfil com ID:', id);
+      
       const { data, error } = await supabase
         .from('profiles')
         .select(`
@@ -54,7 +56,30 @@ const ProfileDetail: React.FC = () => {
         .eq('is_active', true)
         .single();
 
+      console.log('📊 Dados brutos do Supabase:', data);
+      console.log('❌ Erro do Supabase:', error);
+
       if (error) throw error;
+
+      if (!data) {
+        console.log('❌ Nenhum dado encontrado para o ID:', id);
+        setError('Perfil não encontrado');
+        return;
+      }
+
+      console.log('✅ Dados do perfil encontrados:', {
+        name: data.name,
+        matricula: data.matricula,
+        email: data.email,
+        foto_url: data.foto_url ? data.foto_url.substring(0, 50) + '...' : 'Não definida',
+        cargo: data.cargo,
+        funcao: data.funcao,
+        unidade: data.unidade,
+        areas_conhecimento: data.areas_conhecimento,
+        projects_count: data.projects?.length || 0,
+        academic_formations_count: data.academic_formations?.length || 0,
+        availability_count: data.availability?.length || 0
+      });
 
       // Transform Supabase data to match our Profile type
       const transformedProfile: Profile = {
@@ -117,10 +142,21 @@ const ProfileDetail: React.FC = () => {
         }
       };
 
+      console.log('🔄 Perfil transformado:', {
+        name: transformedProfile.name,
+        cargo: transformedProfile.cargo,
+        funcao: transformedProfile.funcao,
+        unidade: transformedProfile.unidade,
+        areasConhecimento: transformedProfile.areasConhecimento,
+        projetos: transformedProfile.projetos.length,
+        formacaoAcademica: transformedProfile.formacaoAcademica.length,
+        hasPhoto: !!transformedProfile.fotoUrl
+      });
+
       setProfile(transformedProfile);
     } catch (err: any) {
-      console.error('Error loading profile:', err);
-      setError('Perfil não encontrado ou não está ativo');
+      console.error('❌ Erro ao carregar perfil:', err);
+      setError('Erro ao carregar perfil: ' + err.message);
     } finally {
       setLoading(false);
     }
@@ -172,6 +208,11 @@ const ProfileDetail: React.FC = () => {
             Voltar à busca
           </Button>
         </Link>
+        
+        {/* Debug info - Remove in production */}
+        <div className="text-xs text-gray-400">
+          ID: {profile.id}
+        </div>
       </div>
 
       {/* Header with photo and basic info */}
@@ -185,6 +226,11 @@ const ProfileDetail: React.FC = () => {
                   src={profile.fotoUrl} 
                   alt={profile.name} 
                   className="w-full h-full object-cover"
+                  onLoad={() => console.log('✅ Imagem carregada com sucesso para:', profile.name)}
+                  onError={(e) => {
+                    console.error('❌ Erro ao carregar imagem para:', profile.name);
+                    console.error('URL da imagem:', profile.fotoUrl);
+                  }}
                 />
               ) : (
                 <div className="w-full h-full bg-red-100 flex items-center justify-center">
@@ -216,7 +262,7 @@ const ProfileDetail: React.FC = () => {
 
               {/* Cargo and Unidade */}
               <div className="mt-4 space-y-2">
-                {profile.cargo.length > 0 && (
+                {profile.cargo && profile.cargo.length > 0 && (
                   <div>
                     <h3 className="text-sm font-medium text-gray-900 mb-1">Cargo:</h3>
                     <div className="flex flex-wrap gap-1">
@@ -227,7 +273,18 @@ const ProfileDetail: React.FC = () => {
                   </div>
                 )}
                 
-                {profile.unidade.length > 0 && (
+                {profile.funcao && profile.funcao.length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-900 mb-1">Função:</h3>
+                    <div className="flex flex-wrap gap-1">
+                      {profile.funcao.map((f, index) => (
+                        <Badge key={index} variant="outline" className="bg-blue-50">{f}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {profile.unidade && profile.unidade.length > 0 && (
                   <div>
                     <h3 className="text-sm font-medium text-gray-900 mb-1">Unidade:</h3>
                     <div className="flex flex-wrap gap-1">
@@ -260,7 +317,7 @@ const ProfileDetail: React.FC = () => {
 
       <div className="grid gap-6 md:grid-cols-2">
         {/* Areas de Conhecimento */}
-        {profile.areasConhecimento.length > 0 && (
+        {profile.areasConhecimento && profile.areasConhecimento.length > 0 && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
@@ -281,7 +338,7 @@ const ProfileDetail: React.FC = () => {
         )}
 
         {/* Temas de Interesse */}
-        {profile.temasInteresse.length > 0 && (
+        {profile.temasInteresse && profile.temasInteresse.length > 0 && (
           <Card>
             <CardHeader>
               <CardTitle>Temas de Interesse</CardTitle>
@@ -298,7 +355,7 @@ const ProfileDetail: React.FC = () => {
       </div>
 
       {/* Academic Formation */}
-      {profile.formacaoAcademica.length > 0 && (
+      {profile.formacaoAcademica && profile.formacaoAcademica.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
@@ -321,7 +378,7 @@ const ProfileDetail: React.FC = () => {
       )}
 
       {/* Projects */}
-      {profile.projetos.length > 0 && (
+      {profile.projetos && profile.projetos.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
@@ -354,7 +411,7 @@ const ProfileDetail: React.FC = () => {
       {/* Additional Info Grid */}
       <div className="grid gap-6 md:grid-cols-2">
         {/* Languages */}
-        {profile.idiomas.length > 0 && (
+        {profile.idiomas && profile.idiomas.length > 0 && (
           <Card>
             <CardHeader>
               <CardTitle>Idiomas</CardTitle>
@@ -402,7 +459,7 @@ const ProfileDetail: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 md:grid-cols-2">
-              {profile.disponibilidade.tipoColaboracao?.length > 0 && (
+              {profile.disponibilidade.tipoColaboracao && profile.disponibilidade.tipoColaboracao.length > 0 && (
                 <div>
                   <h4 className="font-medium text-gray-900 mb-2">Tipos de Colaboração</h4>
                   <div className="flex flex-wrap gap-1">
