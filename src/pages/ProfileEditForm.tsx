@@ -1,234 +1,346 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { Button } from '../components/ui/button';
-import { Card, CardContent } from '../components/ui/card';
-import { Loader2 } from 'lucide-react';
-import BasicInfo from '../components/profile/BasicInfo';
-import CargoUnidade from '../components/profile/CargoUnidade';
-import AdditionalInfo from '../components/profile/AdditionalInfo';
-import AcademicFormation from '../components/profile/AcademicFormation';
-import ProjectsManager from '../components/profile/ProjectsManager';
-import CertificationsSection from '../components/profile/CertificationsSection';
-import PublicationsSection from '../components/profile/PublicationsSection';
-import AvailabilitySection from '../components/profile/AvailabilitySection';
-import ContactPreferences from '../components/profile/ContactPreferences';
-import PhotoUpload from '../components/profile/PhotoUpload';
-import CurriculumSection from '../components/profile/CurriculumSection';
-import StatusMessages from '../components/profile/StatusMessages';
-import InterestAreaSelector from '../components/InterestAreaSelector';
-import LanguagesSection from '../components/profile/LanguagesSection';
+import React, { useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Form } from '../components/ui/form';
-import { useProfileEdit } from '../hooks/useProfileEdit';
-import { useProfileFormHandler } from '../components/profile/ProfileFormHandler';
-import { profileSchema, defaultFormValues } from '../components/profile/ProfileFormSchema';
+import { useProfileData } from '@/hooks/useProfileData';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import BasicInfo from '@/components/profile/BasicInfo';
+import CargoUnidade from '@/components/profile/CargoUnidade';
+import AreasConhecimento from '@/components/profile/AreasConhecimento';
+import AcademicFormation from '@/components/profile/AcademicFormation';
+import ProfessionalExperience from '@/components/profile/ProfessionalExperience';
+import AvailabilitySection from '@/components/profile/AvailabilitySection';
+import ContactPreferences from '@/components/profile/ContactPreferences';
+import CertificationsSection from '@/components/profile/CertificationsSection';
+import PublicationsSection from '@/components/profile/PublicationsSection';
+import AdditionalInfo from '@/components/profile/AdditionalInfo';
+import { useNavigate } from 'react-router-dom';
+import { useToast } from "@/components/ui/use-toast";
 import {
+  tipoColaboracaoMap,
+  formaContatoMap,
   safeCargos,
   safeFuncoes,
   safeUnidades,
+  safeAreasConhecimento,
+  safeTemasInteresse,
+  safeIdiomas,
   safeTiposColaboracao,
   safeDisponibilidadeEstimada,
-  safeFormasContato,
-  isValidSelectValue
-} from '../components/profile/ProfileFormConstants';
+  safeFormasContato
+} from '@/components/profile/ProfileFormConstants';
+import { supabase } from '@/integrations/supabase/client';
+import { Profile } from '@/types';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Edit, Loader2 } from 'lucide-react';
 
-// Página de formulário separada, para torná-lo mais limpo/reutilizável.
-const ProfileEditForm: React.FC = () => {
-  const { user } = useAuth();
-  const {
-    loading,
-    saving,
-    error,
-    successMessage,
-    userProfile,
-    saveProfile
-  } = useProfileEdit();
+const ProfileEditForm = () => {
+  const { userProfile, loading, error, loadUserProfile, setError, setUserProfile } = useProfileData();
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
-  const [fotoPreview, setFotoPreview] = useState('');
-  const [projetos, setProjetos] = useState<any[]>([]);
-  const [disponibilidade, setDisponibilidade] = useState<any>({});
+  // Controla se os dados iniciais já foram aplicados ao form
+  const isInitialized = useRef(false);
 
   const form = useForm({
-    resolver: zodResolver(profileSchema),
-    defaultValues: defaultFormValues
+    defaultValues: {
+      name: '',
+      matricula: '',
+      cargo: [],
+      funcao: [],
+      unidade: [],
+      telefone: '',
+      email: '',
+      biografia: '',
+      areasConhecimento: [],
+      especializacoes: '',
+      temasInteresse: [],
+      idiomas: [],
+      linkCurriculo: '',
+      fotoUrl: '',
+      certificacoes: [],
+      publicacoes: '',
+      disponibilidade: {
+        tipoColaboracao: [],
+        disponibilidadeEstimada: ''
+      },
+      contato: {
+        formaContato: 'email',
+        horarioPreferencial: ''
+      },
+      formacaoAcademica: [],
+      experienciasProfissionais: [],
+      informacoesComplementares: '',
+      aceiteTermos: false
+    }
   });
 
-  const { populateFormWithProfile, handleFileUpload } = useProfileFormHandler({
-    form,
-    profile: userProfile,
-    fotoPreview,
-    setFotoPreview,
-    formacaoAcademica: [],
-    setFormacaoAcademica: () => {},
-    projetos,
-    setProjetos,
-    disponibilidade,
-    setDisponibilidade
-  });
+  const {
+    handleSubmit,
+    setValue,
+    formState: { isSubmitting }
+  } = form;
+
+  const [tipoColaboracao, setTipoColaboracao] = React.useState<string[]>([]);
+  const [disponibilidadeEstimada, setDisponibilidadeEstimada] = React.useState('');
+  const [formaContato, setFormaContato] = React.useState('email');
+  const [horarioPreferencial, setHorarioPreferencial] = React.useState('');
+  const [selectedAreasConhecimento, setSelectedAreasConhecimento] = React.useState<string[]>([]);
+  const [selectedTemasInteresse, setSelectedTemasInteresse] = React.useState<string[]>([]);
+  const [selectedIdiomas, setSelectedIdiomas] = React.useState<string[]>([]);
+  const [fotoUrl, setFotoUrl] = React.useState<string | null>(null);
+  const [uploading, setUploading] = React.useState(false);
 
   useEffect(() => {
     if (userProfile) {
-      populateFormWithProfile(userProfile);
-    } else if (user) {
-      form.setValue('name', user?.email || '');
-      form.setValue('email', user?.email || '');
-      form.setValue('matricula', '');
+      setTipoColaboracao(userProfile.disponibilidade?.tipoColaboracao || []);
+      setDisponibilidadeEstimada(userProfile.disponibilidade?.disponibilidadeEstimada || '');
+      setFormaContato(userProfile.contato?.formaContato || 'email');
+      setHorarioPreferencial(userProfile.contato?.horarioPreferencial || '');
+      setSelectedAreasConhecimento(userProfile.areasConhecimento || []);
+      setSelectedTemasInteresse(userProfile.temasInteresse || []);
+      setSelectedIdiomas(userProfile.idiomas || []);
+      setFotoUrl(userProfile.fotoUrl || null);
     }
-  }, [userProfile, user]);
+  }, [userProfile]);
 
-  // Log os erros atuais do formulário toda vez que o form for atualizado.
+  // Seta os dados do perfil SOMENTE no primeiro carregamento
   useEffect(() => {
-    // Mostra no console todos os erros do formulário
-    // Útil para entender validação que bloqueia submit.
-    if (Object.keys(form.formState.errors).length > 0) {
-      console.log("[DEBUG] Erros no formulário:", form.formState.errors);
+    if (userProfile && !isInitialized.current) {
+      form.reset({
+        ...userProfile,
+        cargo: userProfile.cargo || [],
+        funcao: userProfile.funcao || [],
+        unidade: userProfile.unidade || [],
+        areasConhecimento: userProfile.areasConhecimento || [],
+        temasInteresse: userProfile.temasInteresse || [],
+        idiomas: userProfile.idiomas || [],
+        disponibilidade: {
+          tipoColaboracao: userProfile.disponibilidade?.tipoColaboracao || [],
+          disponibilidadeEstimada: userProfile.disponibilidade?.disponibilidadeEstimada || ''
+        },
+        contato: {
+          formaContato: userProfile.contato?.formaContato || 'email',
+          horarioPreferencial: userProfile.contato?.horarioPreferencial || ''
+        },
+        formacaoAcademica: userProfile.formacaoAcademica || [],
+        experienciasProfissionais: userProfile.experienciasProfissionais || [],
+        certificacoes: userProfile.certificacoes || [],
+      });
+      isInitialized.current = true;
     }
-  }, [form.formState.errors]);
+    // Não inclui form como dependência para evitar reset ao digitar
+    // eslint-disable-next-line
+  }, [userProfile, form]);
 
-  const handleSave = async (data: any) => {
-    console.log('[DEBUG] handleSave foi chamado, dados do formulário:', data);
-    const formacaoAcademica = data.formacaoAcademica || [];
-    await saveProfile(data, fotoPreview, formacaoAcademica, projetos, disponibilidade);
+  const onSubmit = async (data: any) => {
+    try {
+      const transformedTipoColaboracao = tipoColaboracao.map(tipo => tipoColaboracaoMap[tipo] || tipo);
+      const transformedFormaContato = formaContatoMap[formaContato] || formaContato;
+
+      const updates = {
+        ...data,
+        areas_conhecimento: selectedAreasConhecimento,
+        temas_interesse: selectedTemasInteresse,
+        idiomas: selectedIdiomas,
+        disponibilidade: {
+          tipo_colaboracao: transformedTipoColaboracao,
+          disponibilidade_estimada: disponibilidadeEstimada
+        },
+        contato: {
+          forma_contato: transformedFormaContato,
+          horario_preferencial: horarioPreferencial
+        },
+        foto_url: fotoUrl,
+        updated_at: new Date().toISOString()
+      };
+
+      delete updates.disponibilidadeEstimada;
+      delete updates.formaContato;
+      delete updates.horarioPreferencial;
+      delete updates.tipoColaboracao;
+      delete updates.id;
+      delete updates.userId;
+      delete updates.role;
+      delete updates.isActive;
+      delete updates.updatedByAdmin;
+      delete updates.lastUpdated;
+      delete updates.formacaoAcademica;
+      delete updates.experienciasProfissionais;
+
+      const { error } = await supabase
+        .from('profiles')
+        .update(updates)
+        .eq('user_id', userProfile?.userId);
+
+      if (error) {
+        throw error;
+      }
+
+      // Atualiza o estado local do perfil
+      const updatedProfile: Profile = {
+        ...userProfile,
+        ...data,
+        areasConhecimento: selectedAreasConhecimento,
+        temasInteresse: selectedTemasInteresse,
+        idiomas: selectedIdiomas,
+        disponibilidade: {
+          tipoColaboracao: tipoColaboracao,
+          disponibilidadeEstimada: disponibilidadeEstimada
+        },
+        contato: {
+          formaContato: formaContato,
+          horarioPreferencial: horarioPreferencial
+        },
+        fotoUrl: fotoUrl || '',
+        lastUpdated: new Date()
+      };
+
+      setUserProfile(updatedProfile);
+
+      toast({
+        title: "Perfil atualizado!",
+        description: "Suas informações foram atualizadas com sucesso.",
+      });
+      navigate(`/profile/${userProfile?.id}`);
+    } catch (error: any) {
+      console.error("Error updating profile:", error);
+      setError("Erro ao atualizar o perfil: " + error.message);
+      toast({
+        variant: "destructive",
+        title: "Erro ao atualizar!",
+        description: "Houve um problema ao atualizar suas informações.",
+      });
+    }
   };
 
-  function renderFormErrors() {
-    const errors = form.formState.errors;
-    if (Object.keys(errors).length === 0) return null;
-    return (
-      <div className="bg-red-100 border-l-4 border-red-500 text-red-800 p-3 mb-2 rounded" data-testid="validation-errors">
-        <strong>Corrija os campos obrigatórios:</strong>
-        <ul className="list-disc ml-5 mt-1">
-          {Object.entries(errors).map(([field, err]: any) => {
-            // Exiba erro especial para formação acadêmica com orientação clara
-            if (field === "formacaoAcademica" && err?.message) {
-              return (
-                <li key={field}>
-                  <span className="font-bold text-red-700">{err.message}</span>
-                  <div className="text-xs text-red-600 mt-1">
-                    Dica: Revise cada linha da formação acadêmica. Complete todos os campos ("Nível", "Instituição", "Curso" e "Ano") OU clique em excluir para remover entradas incompletas.
-                  </div>
-                </li>
-              );
-            }
-            // Demais campos: exiba mensagem padrão
-            return (
-              <li key={field}>
-                {err?.message || field + " inválido"}
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-    );
-  }
+  const uploadFoto = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <Loader2 className="w-8 h-8 mx-auto mb-4 animate-spin text-red-600" />
-          <p className="text-gray-600">Carregando perfil...</p>
-        </div>
-      </div>
-    );
-  }
+    setUploading(true);
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `lovable-uploads/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('uploads')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { data } = supabase.storage.from('uploads').getPublicUrl(filePath);
+      if (data && data.publicUrl) {
+        setFotoUrl(data.publicUrl);
+        setValue('fotoUrl', data.publicUrl);
+      }
+    } catch (error: any) {
+      console.error("Error uploading file:", error);
+      toast({
+        variant: "destructive",
+        title: "Erro ao atualizar!",
+        description: "Houve um problema ao fazer upload da foto.",
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const isValidSelectValue = (value: any): value is string => {
+    return typeof value === 'string';
+  };
+
+  if (loading) return <div className="flex items-center justify-center min-h-[400px]"><Loader2 className="w-8 h-8 animate-spin" /></div>;
+  if (error) return <div className="text-red-500">Error: {error}</div>;
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
-      <div className="text-center space-y-4">
-        <h1 className="text-3xl font-bold text-gray-900">
-          {userProfile ? 'Editar Perfil' : 'Criar Perfil'}
-        </h1>
-        <p className="text-lg text-gray-600">
-          Complete suas informações para aparecer nas buscas públicas
-        </p>
-      </div>
-
-      <StatusMessages error={error} successMessage={successMessage} />
-
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSave)} className="space-y-6">
-          <PhotoUpload 
-            fotoPreview={fotoPreview}
-            onFileUpload={handleFileUpload}
-          />
-
-          <BasicInfo form={form} />
-
-          <CargoUnidade
-            form={form}
-            safeCargos={safeCargos}
-            safeFuncoes={safeFuncoes}
-            safeUnidades={safeUnidades}
-            isValidSelectValue={isValidSelectValue}
-          />
-
-          <InterestAreaSelector form={form} fieldName="areasConhecimento" />
-
-          <AcademicFormation form={form} />
-
-          <ProjectsManager
-            projetos={projetos}
-            setProjetos={setProjetos}
-          />
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <CertificationsSection form={form} />
-            <PublicationsSection form={form} />
-          </div>
-
-          <AvailabilitySection
-            tipoColaboracao={disponibilidade.tipoColaboracao || []}
-            setTipoColaboracao={(value) => setDisponibilidade({...disponibilidade, tipoColaboracao: value})}
-            disponibilidadeEstimada={disponibilidade.disponibilidadeEstimada || ''}
-            setDisponibilidadeEstimada={(value) => setDisponibilidade({...disponibilidade, disponibilidadeEstimada: value})}
-            safeTiposColaboracao={safeTiposColaboracao}
-            safeDisponibilidadeEstimada={safeDisponibilidadeEstimada}
-            isValidSelectValue={isValidSelectValue}
-          />
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <ContactPreferences
-              formaContato={disponibilidade.formaContato || 'email'}
-              setFormaContato={(value) => setDisponibilidade({...disponibilidade, formaContato: value})}
-              horarioPreferencial={disponibilidade.horarioPreferencial || ''}
-              setHorarioPreferencial={(value) => setDisponibilidade({...disponibilidade, horarioPreferencial: value})}
-              safeFormasContato={safeFormasContato}
-              isValidSelectValue={isValidSelectValue}
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <Card>
+        <CardContent className="flex flex-col items-center justify-center space-y-4">
+          <Avatar className="w-32 h-32">
+            {fotoUrl ? (
+              <AvatarImage src={fotoUrl} alt="Foto de Perfil" />
+            ) : (
+              <AvatarFallback>{userProfile?.name?.substring(0, 2).toUpperCase()}</AvatarFallback>
+            )}
+          </Avatar>
+          <div>
+            <Label htmlFor="foto" className="text-sm font-medium text-gray-900">
+              Atualizar Foto
+            </Label>
+            <Input
+              id="foto"
+              type="file"
+              accept="image/*"
+              onChange={uploadFoto}
+              disabled={uploading}
+              className="mt-2"
             />
-            <LanguagesSection form={form} />
+            {uploading && <Loader2 className="w-4 h-4 animate-spin mt-2" />}
           </div>
+        </CardContent>
+      </Card>
 
-          <AdditionalInfo form={form} />
+      <BasicInfo form={form} />
+      <CargoUnidade form={form} safeCargos={safeCargos} safeFuncoes={safeFuncoes} safeUnidades={safeUnidades} isValidSelectValue={isValidSelectValue} />
+      <AreasConhecimento
+        selectedAreasConhecimento={selectedAreasConhecimento}
+        setSelectedAreasConhecimento={setSelectedAreasConhecimento}
+        selectedTemasInteresse={selectedTemasInteresse}
+        setSelectedTemasInteresse={setSelectedTemasInteresse}
+        selectedIdiomas={selectedIdiomas}
+        setSelectedIdiomas={setSelectedIdiomas}
+        safeAreasConhecimento={safeAreasConhecimento}
+        safeTemasInteresse={safeTemasInteresse}
+        safeIdiomas={safeIdiomas}
+      />
+      <AcademicFormation form={form} />
+      <ProfessionalExperience form={form} />
+      <AvailabilitySection
+        tipoColaboracao={tipoColaboracao}
+        setTipoColaboracao={setTipoColaboracao}
+        disponibilidadeEstimada={disponibilidadeEstimada}
+        setDisponibilidadeEstimada={setDisponibilidadeEstimada}
+        safeTiposColaboracao={safeTiposColaboracao}
+        safeDisponibilidadeEstimada={safeDisponibilidadeEstimada}
+        isValidSelectValue={isValidSelectValue}
+      />
+      <ContactPreferences
+        formaContato={formaContato}
+        setFormaContato={setFormaContato}
+        horarioPreferencial={horarioPreferencial}
+        setHorarioPreferencial={setHorarioPreferencial}
+        safeFormasContato={safeFormasContato}
+        isValidSelectValue={isValidSelectValue}
+      />
+      <CertificationsSection form={form} />
+      <PublicationsSection form={form} />
+      <AdditionalInfo form={form} />
 
-          {/* EXIBE ERROS DE VALIDAÇÃO */}
-          {renderFormErrors()}
-
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex space-x-4">
-                <Button
-                  type="submit"
-                  disabled={saving}
-                  className="flex-1"
-                  variant="logo-brown"
-                >
-                  {saving ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Salvando...
-                    </>
-                  ) : (
-                    'Salvar Perfil'
-                  )}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </form>
-      </Form>
-    </div>
+      <div className="flex justify-end">
+        <Button type="submit" disabled={isSubmitting} variant="logo-brown">
+          {isSubmitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Aguarde...
+            </>
+          ) : (
+            <>
+              <Edit className="mr-2 h-4 w-4" />
+              Salvar Alterações
+            </>
+          )}
+        </Button>
+      </div>
+    </form>
   );
 };
 
