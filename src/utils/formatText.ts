@@ -15,8 +15,12 @@ const replacementMap: Record<string, string> = {
 
 export function formatText(text: string): string {
   if (!text) return '';
-  // Remove espaços extras e quebra linhas
   let t = String(text).trim().replace(/\s+/g, ' ');
+
+  // Exceção: se for e-mail, retorna exatamente como veio (com trim e espaços normalizados)
+  if (t.includes('@')) {
+    return t;
+  }
 
   // Capitaliza primeira letra de cada palavra e faz substituição se conhecida
   t = t
