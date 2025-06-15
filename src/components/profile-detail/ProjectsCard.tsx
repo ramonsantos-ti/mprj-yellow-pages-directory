@@ -1,14 +1,14 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { FileText, Calendar } from 'lucide-react';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { construction } from 'lucide-react';
 import { Profile } from '../../types';
 
 interface ProjectsCardProps {
   projetos: Profile['projetos'];
 }
+
+const LucideConstruction = construction;
 
 const ProjectsCard: React.FC<ProjectsCardProps> = ({ projetos }) => {
   const hasProjects = projetos && projetos.length > 0;
@@ -17,7 +17,7 @@ const ProjectsCard: React.FC<ProjectsCardProps> = ({ projetos }) => {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center space-x-2">
-          <FileText className="w-5 h-5" />
+          <LucideConstruction className="w-5 h-5" />
           <span>Projetos</span>
         </CardTitle>
       </CardHeader>
@@ -25,13 +25,23 @@ const ProjectsCard: React.FC<ProjectsCardProps> = ({ projetos }) => {
         {hasProjects ? (
           <div className="space-y-4">
             {projetos.map((projeto, index) => (
-              <div key={projeto.id || index} className="border-l-4 border-blue-200 pl-4">
+              <div key={projeto.id || index} className="border-l-4 border-yellow-300 pl-4">
                 <h4 className="font-semibold text-gray-900">{projeto.nome}</h4>
                 <p className="text-sm text-gray-600 mb-2">
-                  <Calendar className="w-4 h-4 inline mr-1" />
-                  {format(new Date(projeto.dataInicio), 'dd/MM/yyyy', { locale: ptBR })}
+                  {projeto.dataInicio &&
+                    <span>
+                      Início: {projeto.dataInicio instanceof Date
+                        ? projeto.dataInicio.toLocaleDateString("pt-BR")
+                        : new Date(projeto.dataInicio).toLocaleDateString("pt-BR")}
+                    </span>
+                  }
                   {projeto.dataFim && (
-                    <> - {format(new Date(projeto.dataFim), 'dd/MM/yyyy', { locale: ptBR })}</>
+                    <span>
+                      {" • Fim: "}
+                      {projeto.dataFim instanceof Date
+                        ? projeto.dataFim.toLocaleDateString("pt-BR")
+                        : new Date(projeto.dataFim).toLocaleDateString("pt-BR")}
+                    </span>
                   )}
                 </p>
                 {projeto.observacoes && (
