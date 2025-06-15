@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,6 +12,7 @@ import LoadingState from '../components/profile-detail/LoadingState';
 import ErrorState from '../components/profile-detail/ErrorState';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
+import { User, Briefcase, Target, Book, Award, FileText, Calendar, MessageSquare, Language, Info } from 'lucide-react';
 
 const ProfileDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -148,13 +148,61 @@ const ProfileDetail: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto space-y-6 p-4">
       {/* Foto e Informação Básica */}
-      <ProfileHeader profile={profile} getInitials={getInitials} />
+      <Card>
+        <CardContent className="pt-6">
+          <div className="flex flex-col md:flex-row items-start space-y-4 md:space-y-0 md:space-x-6">
+            {/* Foto */}
+            <div className="w-32 h-40 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border">
+              {profile.fotoUrl ? (
+                <img
+                  src={profile.fotoUrl}
+                  alt={profile.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+              ) : (
+                <div className="w-full h-full bg-red-100 flex items-center justify-center">
+                  <span className="text-red-900 font-semibold text-xl">
+                    {getInitials(profile.name)}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Informação básica */}
+            <div className="flex-1">
+              <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center gap-2">
+                <User className="w-6 h-6 text-red-800" /> {profile.name}
+              </h1>
+              <p className="text-lg text-gray-600 mb-4">Matrícula: {profile.matricula}</p>
+
+              <div className="space-y-3">
+                <div className="flex items-center space-x-2 text-gray-600">
+                  <MessageSquare className="w-4 h-4" />
+                  <span>{profile.email}</span>
+                </div>
+                {profile.telefone && (
+                  <div className="flex items-center space-x-2 text-gray-600">
+                    <MessageSquare className="w-4 h-4" />
+                    <span>{profile.telefone}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Cargo, Função e Lotação */}
       {(isFieldFilled(profile.cargo) || isFieldFilled(profile.funcao) || isFieldFilled(profile.unidade)) && (
         <Card>
           <CardHeader>
-            <CardTitle>Cargo, Função e Lotação</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Briefcase className="w-5 h-5 text-red-800" />
+              Cargo, Função e Lotação
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
@@ -191,7 +239,10 @@ const ProfileDetail: React.FC = () => {
       {isFieldFilled(profile.temasInteresse) && (
         <Card>
           <CardHeader>
-            <CardTitle>Áreas de Interesse</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Target className="w-5 h-5 text-red-800" />
+              Áreas de Interesse
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2">
@@ -205,42 +256,148 @@ const ProfileDetail: React.FC = () => {
 
       {/* Formação Acadêmica */}
       {isFieldFilled(profile.formacaoAcademica) && (
-        <AcademicFormationCard formacaoAcademica={profile.formacaoAcademica} />
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Book className="w-5 h-5 text-red-800" />
+              Formação Acadêmica
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {profile.formacaoAcademica.map((formacao, index) => (
+                <div key={formacao.id || index} className="border-l-4 border-red-200 pl-4">
+                  <h4 className="font-semibold text-gray-900">{formacao.nivel}</h4>
+                  <p className="text-gray-700">{formacao.curso}</p>
+                  <p className="text-sm text-gray-600">{formacao.instituicao} • {formacao.ano}</p>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       {/* Projetos */}
       {isFieldFilled(profile.projetos) && (
-        <ProjectsCard projetos={profile.projetos} />
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Calendar className="w-5 h-5 text-red-800" />
+              Projetos
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {profile.projetos.map((projeto, index) => (
+                <div key={projeto.id || index} className="border-l-4 border-yellow-300 pl-4">
+                  <h4 className="font-semibold text-gray-900">{projeto.nome}</h4>
+                  <p className="text-sm text-gray-600 mb-2">
+                    {projeto.dataInicio &&
+                      <span>
+                        Início: {projeto.dataInicio instanceof Date
+                          ? projeto.dataInicio.toLocaleDateString("pt-BR")
+                          : new Date(projeto.dataInicio).toLocaleDateString("pt-BR")}
+                      </span>
+                    }
+                    {projeto.dataFim && (
+                      <span>
+                        {" • Fim: "}
+                        {projeto.dataFim instanceof Date
+                          ? projeto.dataFim.toLocaleDateString("pt-BR")
+                          : new Date(projeto.dataFim).toLocaleDateString("pt-BR")}
+                      </span>
+                    )}
+                  </p>
+                  {projeto.observacoes && (
+                    <p className="text-gray-700 text-sm">{projeto.observacoes}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       )}
 
-      {/* Certificações e Idiomas */}
-      {(isFieldFilled(profile.certificacoes) || isFieldFilled(profile.idiomas)) && (
-        <LanguagesAndCertifications 
-          idiomas={profile.idiomas || []} 
-          certificacoes={profile.certificacoes || []} 
-        />
+      {/* Certificações */}
+      {isFieldFilled(profile.certificacoes) && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Award className="w-5 h-5 text-red-800" />
+              Certificações
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {profile.certificacoes.map((cert, index) => (
+                <div key={index} className="text-sm text-gray-700">
+                  • {cert}
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       {/* Publicações */}
       {isFieldFilled(profile.publicacoes) && (
-        <PublicationsAndCurriculum 
-          publicacoes={profile.publicacoes}
-        />
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="w-5 h-5 text-red-800" />
+              Publicações
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-700 leading-relaxed">{profile.publicacoes}</p>
+          </CardContent>
+        </Card>
       )}
 
       {/* Disponibilidade para Colaboração */}
       {isFieldFilled(profile.disponibilidade?.tipoColaboracao) || isFieldFilled(profile.disponibilidade?.disponibilidadeEstimada) ? (
-        <AvailabilityCard 
-          disponibilidade={profile.disponibilidade} 
-          contato={profile.contato} 
-        />
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Calendar className="w-5 h-5 text-red-800" />
+              Disponibilidade para Colaboração
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div>
+                <h4 className="font-medium text-gray-900 mb-2">Tipos de Colaboração</h4>
+                {profile.disponibilidade?.tipoColaboracao && profile.disponibilidade.tipoColaboracao.length > 0 ? (
+                  <div className="flex flex-wrap gap-1">
+                    {profile.disponibilidade.tipoColaboracao.map((tipo, index) => (
+                      <Badge key={index} variant="outline">{tipo}</Badge>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-500 italic">Não informado</p>
+                )}
+              </div>
+              <div>
+                <h4 className="font-medium text-gray-900 mb-2">Disponibilidade Estimada</h4>
+                {profile.disponibilidade?.disponibilidadeEstimada ? (
+                  <p className="text-gray-700">{profile.disponibilidade.disponibilidadeEstimada}</p>
+                ) : (
+                  <p className="text-gray-500 italic">Não informado</p>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       ) : null}
 
       {/* Preferências de Contato */}
       {(isFieldFilled(profile.contato?.formaContato) || isFieldFilled(profile.contato?.horarioPreferencial)) && (
         <Card>
           <CardHeader>
-            <CardTitle>Preferências de Contato</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <MessageSquare className="w-5 h-5 text-red-800" />
+              Preferências de Contato
+            </CardTitle>
           </CardHeader>
           <CardContent>
             {isFieldFilled(profile.contato?.formaContato) && (
@@ -259,11 +416,33 @@ const ProfileDetail: React.FC = () => {
         </Card>
       )}
 
+      {/* Idiomas */}
+      {isFieldFilled(profile.idiomas) && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Language className="w-5 h-5 text-red-800" />
+              Idiomas
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-2">
+              {profile.idiomas.map((idioma, i) => (
+                <Badge key={i} variant="outline">{idioma}</Badge>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Informações Complementares */}
       {isFieldFilled(profile.especializacoes) && (
         <Card>
           <CardHeader>
-            <CardTitle>Informações Complementares</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Info className="w-5 h-5 text-red-800" />
+              Informações Complementares
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-gray-700">{profile.especializacoes}</p>
@@ -275,4 +454,3 @@ const ProfileDetail: React.FC = () => {
 };
 
 export default ProfileDetail;
-
