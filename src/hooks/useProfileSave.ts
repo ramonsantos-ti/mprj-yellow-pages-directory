@@ -24,6 +24,7 @@ export const useProfileSave = () => {
     try {
       setSaving(true);
 
+      // Assegura que biografia/publicacoes são string
       const safeBiografia = typeof data.biografia === 'string'
         ? data.biografia
         : (data.biografia ? String(data.biografia) : '');
@@ -38,25 +39,25 @@ export const useProfileSave = () => {
         matricula: data.matricula,
         email: data.email,
         telefone: data.telefone || null,
-        biografia: safeBiografia ?? '',
+        biografia: safeBiografia || "",
         cargo: data.cargo || [],
         funcao: data.funcao || [],
         unidade: data.unidade || [],
         areas_conhecimento: data.areasConhecimento || [],
-        especializacoes: data.especializacoes || null,
+        especializacoes: data.especializacoes || "",
         temas_interesse: data.temasInteresse || [],
         idiomas: data.idiomas || [],
-        link_curriculo: data.linkCurriculo || null,
-        foto_url: fotoPreview || null,
+        link_curriculo: data.linkCurriculo || "",
+        foto_url: fotoPreview || "",
         certificacoes: data.certificacoes || [],
-        publicacoes: safePublicacoes ?? '',
+        publicacoes: safePublicacoes || "",
         aceite_termos: data.aceiteTermos || false,
         updated_at: new Date().toISOString()
       };
 
       let profileId = userProfile?.id;
       if (userProfile) {
-        const { error, data: updateRet } = await supabase
+        const { error } = await supabase
           .from('profiles')
           .update(profileData)
           .eq('id', userProfile.id)

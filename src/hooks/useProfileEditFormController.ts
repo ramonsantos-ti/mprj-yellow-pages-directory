@@ -44,7 +44,6 @@ export function useProfileEditFormController() {
   const hasPopulatedProfile = useRef(false);
 
   useEffect(() => {
-    // Só popula se userProfile existir, não for null e nunca populado antes
     if (userProfile && !hasPopulatedProfile.current) {
       console.log("[DEBUG] Populando formulário com userProfile:", userProfile);
       populateFormWithProfile(userProfile);
@@ -80,12 +79,24 @@ export function useProfileEditFormController() {
   }, [form.formState.errors]);
 
   const handleSave = async (data: any) => {
+    // Garantir que os campos venham como string
+    const biografia = typeof data.biografia === 'string' ? data.biografia : (data.biografia ? String(data.biografia) : '');
+    const publicacoes = typeof data.publicacoes === 'string' ? data.publicacoes : (data.publicacoes ? String(data.publicacoes) : '');
+
     console.log('[DEBUG][FORM BEFORE SUBMIT]:', {
-      biografia: data.biografia,
-      publicacoes: data.publicacoes
+      biografia,
+      publicacoes,
+      formData: data
     });
-    const formacaoAcademica = data.formacaoAcademica || [];
-    await saveProfile(data, fotoPreview, formacaoAcademica, projetos, disponibilidade);
+
+    // Atualizar os campos de biografia e publicacoes antes do submit
+    await saveProfile(
+      { ...data, biografia, publicacoes },
+      fotoPreview,
+      data.formacaoAcademica || [],
+      projetos,
+      disponibilidade
+    );
   };
 
   return {
