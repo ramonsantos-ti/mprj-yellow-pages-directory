@@ -10,12 +10,22 @@ interface KnowledgeAreasProps {
 }
 
 const KnowledgeAreas: React.FC<KnowledgeAreasProps> = ({ areasConhecimento, temasInteresse }) => {
-  if (!areasConhecimento?.length && !temasInteresse?.length) return null;
+  console.log('🧠 KnowledgeAreas renderizando:');
+  console.log('- Áreas conhecimento:', areasConhecimento?.length || 0, areasConhecimento);
+  console.log('- Temas interesse:', temasInteresse?.length || 0, temasInteresse);
+  
+  const hasAreas = areasConhecimento && areasConhecimento.length > 0;
+  const hasTemas = temasInteresse && temasInteresse.length > 0;
+  
+  if (!hasAreas && !hasTemas) {
+    console.log('🧠 KnowledgeAreas: sem dados, não renderizando');
+    return null;
+  }
 
+  console.log('🧠 KnowledgeAreas: renderizando com dados');
   return (
     <div className="grid gap-6 md:grid-cols-2">
-      {/* Areas de Conhecimento */}
-      {areasConhecimento && areasConhecimento.length > 0 && (
+      {hasAreas && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
@@ -35,8 +45,7 @@ const KnowledgeAreas: React.FC<KnowledgeAreasProps> = ({ areasConhecimento, tema
         </Card>
       )}
 
-      {/* Temas de Interesse */}
-      {temasInteresse && temasInteresse.length > 0 && (
+      {hasTemas && (
         <Card>
           <CardHeader>
             <CardTitle>Temas de Interesse</CardTitle>

@@ -9,8 +9,14 @@ interface AcademicFormationCardProps {
 }
 
 const AcademicFormationCard: React.FC<AcademicFormationCardProps> = ({ formacaoAcademica }) => {
-  if (!formacaoAcademica?.length) return null;
+  console.log('🎓 AcademicFormationCard renderizando:', formacaoAcademica?.length || 0, 'formações', formacaoAcademica);
+  
+  if (!formacaoAcademica || formacaoAcademica.length === 0) {
+    console.log('🎓 AcademicFormationCard: sem formações, não renderizando');
+    return null;
+  }
 
+  console.log('🎓 AcademicFormationCard: renderizando formações');
   return (
     <Card>
       <CardHeader>
