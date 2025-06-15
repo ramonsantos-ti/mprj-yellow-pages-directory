@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -37,7 +36,7 @@ export const useProfileSave = () => {
         matricula: data.matricula,
         email: data.email,
         telefone: data.telefone || null,
-        biografia: data.biografia || null,
+        biografia: typeof data.biografia === 'string' ? data.biografia : '',
         cargo: data.cargo || [],
         funcao: data.funcao || [],
         unidade: data.unidade || [],
