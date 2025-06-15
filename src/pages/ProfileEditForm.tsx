@@ -96,14 +96,25 @@ const ProfileEditForm: React.FC = () => {
     const errors = form.formState.errors;
     if (Object.keys(errors).length === 0) return null;
     return (
-      <div className="bg-red-100 border-l-4 border-red-500 text-red-800 p-3 mb-2 rounded">
+      <div className="bg-red-100 border-l-4 border-red-500 text-red-800 p-3 mb-2 rounded" data-testid="validation-errors">
         <strong>Corrija os campos obrigatórios:</strong>
         <ul className="list-disc ml-5 mt-1">
-          {Object.entries(errors).map(([field, err]: any) => (
-            <li key={field}>
-              {err?.message || field + " inválido"}
-            </li>
-          ))}
+          {Object.entries(errors).map(([field, err]: any) => {
+            // Exiba erro especial para formação acadêmica:
+            if (field === "formacaoAcademica" && err?.message) {
+              return (
+                <li key={field}>
+                  {err.message}
+                </li>
+              );
+            }
+            // Demais campos: exiba mensagem padrão
+            return (
+              <li key={field}>
+                {err?.message || field + " inválido"}
+              </li>
+            );
+          })}
         </ul>
       </div>
     );
