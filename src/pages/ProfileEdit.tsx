@@ -94,7 +94,7 @@ const ProfileEdit: React.FC = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-6xl mx-auto space-y-6">
       <div className="text-center space-y-4">
         <h1 className="text-3xl font-bold text-gray-900">
           {userProfile ? 'Editar Perfil' : 'Criar Perfil'}
@@ -107,7 +107,7 @@ const ProfileEdit: React.FC = () => {
       <StatusMessages error={error} successMessage={successMessage} />
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSave)} className="grid gap-6">
+        <form onSubmit={form.handleSubmit(handleSave)} className="space-y-6">
           <PhotoUpload 
             fotoPreview={fotoPreview}
             onFileUpload={handleFileUpload}
@@ -123,20 +123,25 @@ const ProfileEdit: React.FC = () => {
             isValidSelectValue={isValidSelectValue}
           />
 
-          <AcademicFormation form={form} />
+          {/* Seção Formação Acadêmica e Projetos lado a lado */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <AcademicFormation form={form} />
+            
+            <Card>
+              <CardContent>
+                <ProjectsManager
+                  projetos={projetos}
+                  setProjetos={setProjetos}
+                />
+              </CardContent>
+            </Card>
+          </div>
 
-          <Card>
-            <CardContent>
-              <ProjectsManager
-                projetos={projetos}
-                setProjetos={setProjetos}
-              />
-            </CardContent>
-          </Card>
-
-          <CertificationsSection form={form} />
-
-          <PublicationsSection form={form} />
+          {/* Seção Certificações e Publicações lado a lado */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <CertificationsSection form={form} />
+            <PublicationsSection form={form} />
+          </div>
 
           <AvailabilitySection
             tipoColaboracao={disponibilidade.tipoColaboracao || []}
