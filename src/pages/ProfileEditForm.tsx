@@ -67,14 +67,20 @@ const ProfileEditForm: React.FC = () => {
     setDisponibilidade
   });
 
-  useEffect(() => {
-    if (userProfile) {
+  // Controle para rodar populateFormWithProfile só quando for realmente necessário
+  const hasLoadedProfileRef = React.useRef(false);
+
+  React.useEffect(() => {
+    if (userProfile && !hasLoadedProfileRef.current) {
       populateFormWithProfile(userProfile);
-    } else if (user) {
+      hasLoadedProfileRef.current = true;
+    } else if (user && !userProfile && !hasLoadedProfileRef.current) {
       form.setValue('name', user?.email || '');
       form.setValue('email', user?.email || '');
       form.setValue('matricula', '');
+      hasLoadedProfileRef.current = true;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userProfile, user]);
 
   // Log os erros atuais do formulário toda vez que o form for atualizado.
