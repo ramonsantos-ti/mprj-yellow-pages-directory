@@ -457,8 +457,10 @@ const ProfileEdit: React.FC = () => {
             </CardHeader>
             <CardContent>
               <AcademicFormation
-                formations={formacaoAcademica}
-                onChange={setFormacaoAcademica}
+                formacoes={formacaoAcademica}
+                setFormacoes={setFormacaoAcademica}
+                safeNiveisFormacao={['Graduação', 'Especialização', 'Mestrado', 'Doutorado', 'Pós-Doutorado']}
+                isValidSelectValue={isValidSelectValue}
               />
             </CardContent>
           </Card>
