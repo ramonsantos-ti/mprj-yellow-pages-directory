@@ -101,26 +101,31 @@
 }
 
 /* Barra de rolagem marrom apenas para o select de "Cargos" */
-.scrollbar-brown {
+.scrollbar-brown,
+.scrollbar-brown * {
   scrollbar-color: #7B3F00 #f5e6de;
 }
 
-.scrollbar-brown::-webkit-scrollbar {
+.scrollbar-brown::-webkit-scrollbar,
+.scrollbar-brown *::-webkit-scrollbar {
   width: 8px;
   background: #f5e6de;
 }
 
-.scrollbar-brown::-webkit-scrollbar-thumb {
+.scrollbar-brown::-webkit-scrollbar-thumb,
+.scrollbar-brown *::-webkit-scrollbar-thumb {
   background-color: #7B3F00;
   border-radius: 6px;
 }
 
 /* Opcional: barra no hover */
-.scrollbar-brown::-webkit-scrollbar-thumb:hover {
+.scrollbar-brown::-webkit-scrollbar-thumb:hover,
+.scrollbar-brown *::-webkit-scrollbar-thumb:hover {
   background-color: #633200;
 }
 
 /* Garante alto contraste quando focado/acessível */
-.scrollbar-brown::-webkit-scrollbar-corner {
+.scrollbar-brown::-webkit-scrollbar-corner,
+.scrollbar-brown *::-webkit-scrollbar-corner {
   background: #fff;
 }
