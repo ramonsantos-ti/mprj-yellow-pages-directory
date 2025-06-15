@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
@@ -79,9 +78,6 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ fotoPreview, onFileUpload }) 
               • Formatos aceitos: JPG, PNG, GIF.<br />
               • Tamanho máximo: 5MB.
             </div>
-            <p className="text-sm text-gray-500">
-              Formatos aceitos: JPG, PNG, GIF. Máximo 5MB.
-            </p>
             {errorMsg && (
               <div className="text-sm text-red-700 font-medium">{errorMsg}</div>
             )}
@@ -93,4 +89,3 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ fotoPreview, onFileUpload }) 
 };
 
 export default PhotoUpload;
-
