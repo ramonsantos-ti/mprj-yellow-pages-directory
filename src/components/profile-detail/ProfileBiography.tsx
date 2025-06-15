@@ -10,13 +10,6 @@ interface ProfileBiographyProps {
 const ProfileBiography: React.FC<ProfileBiographyProps> = ({ biografia }) => {
   console.log('📝 ProfileBiography - biografia recebida:', biografia);
   
-  // Se não há biografia, não renderiza nada
-  if (!biografia || biografia.trim() === '') {
-    console.log('📝 ProfileBiography: biografia vazia, não renderizando');
-    return null;
-  }
-
-  console.log('📝 ProfileBiography: renderizando biografia');
   return (
     <Card>
       <CardHeader>
@@ -26,7 +19,11 @@ const ProfileBiography: React.FC<ProfileBiographyProps> = ({ biografia }) => {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="text-gray-700 leading-relaxed">{biografia}</p>
+        {biografia && biografia.trim() !== '' ? (
+          <p className="text-gray-700 leading-relaxed">{biografia}</p>
+        ) : (
+          <p className="text-gray-500 italic">Biografia não informada</p>
+        )}
       </CardContent>
     </Card>
   );

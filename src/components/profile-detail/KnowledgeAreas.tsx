@@ -18,25 +18,18 @@ const KnowledgeAreas: React.FC<KnowledgeAreasProps> = ({ areasConhecimento, tema
   const hasTemas = temasInteresse && temasInteresse.length > 0;
   
   console.log('- hasAreas:', hasAreas, 'hasTemas:', hasTemas);
-  
-  // Se não há nem áreas nem temas, não renderiza
-  if (!hasAreas && !hasTemas) {
-    console.log('🧠 KnowledgeAreas: sem dados, não renderizando');
-    return null;
-  }
 
-  console.log('🧠 KnowledgeAreas: renderizando');
   return (
     <div className="grid gap-6 md:grid-cols-2">
-      {hasAreas && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Briefcase className="w-5 h-5" />
-              <span>Áreas de Conhecimento</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Briefcase className="w-5 h-5" />
+            <span>Áreas de Conhecimento</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {hasAreas ? (
             <div className="flex flex-wrap gap-2">
               {areasConhecimento.map((area, index) => (
                 <Badge key={index} className="bg-red-100 text-red-800">
@@ -44,24 +37,28 @@ const KnowledgeAreas: React.FC<KnowledgeAreasProps> = ({ areasConhecimento, tema
                 </Badge>
               ))}
             </div>
-          </CardContent>
-        </Card>
-      )}
+          ) : (
+            <p className="text-gray-500 italic">Nenhuma área de conhecimento informada</p>
+          )}
+        </CardContent>
+      </Card>
 
-      {hasTemas && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Temas de Interesse</CardTitle>
-          </CardHeader>
-          <CardContent>
+      <Card>
+        <CardHeader>
+          <CardTitle>Temas de Interesse</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {hasTemas ? (
             <div className="flex flex-wrap gap-2">
               {temasInteresse.map((tema, index) => (
                 <Badge key={index} variant="outline">{tema}</Badge>
               ))}
             </div>
-          </CardContent>
-        </Card>
-      )}
+          ) : (
+            <p className="text-gray-500 italic">Nenhum tema de interesse informado</p>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };

@@ -10,36 +10,39 @@ interface LanguagesAndCertificationsProps {
 }
 
 const LanguagesAndCertifications: React.FC<LanguagesAndCertificationsProps> = ({ idiomas, certificacoes }) => {
-  if (!idiomas?.length && !certificacoes?.length) return null;
+  const hasIdiomas = idiomas && idiomas.length > 0;
+  const hasCertificacoes = certificacoes && certificacoes.length > 0;
 
   return (
     <div className="grid gap-6 md:grid-cols-2">
       {/* Languages */}
-      {idiomas && idiomas.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Idiomas</CardTitle>
-          </CardHeader>
-          <CardContent>
+      <Card>
+        <CardHeader>
+          <CardTitle>Idiomas</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {hasIdiomas ? (
             <div className="flex flex-wrap gap-2">
               {idiomas.map((idioma, index) => (
                 <Badge key={index} variant="outline">{idioma}</Badge>
               ))}
             </div>
-          </CardContent>
-        </Card>
-      )}
+          ) : (
+            <p className="text-gray-500 italic">Nenhum idioma informado</p>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Certifications */}
-      {certificacoes && certificacoes.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Award className="w-5 h-5" />
-              <span>Certificações</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Award className="w-5 h-5" />
+            <span>Certificações</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {hasCertificacoes ? (
             <div className="space-y-2">
               {certificacoes.map((cert, index) => (
                 <div key={index} className="text-sm text-gray-700">
@@ -47,9 +50,11 @@ const LanguagesAndCertifications: React.FC<LanguagesAndCertificationsProps> = ({
                 </div>
               ))}
             </div>
-          </CardContent>
-        </Card>
-      )}
+          ) : (
+            <p className="text-gray-500 italic">Nenhuma certificação informada</p>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };
