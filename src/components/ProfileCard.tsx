@@ -19,19 +19,29 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   };
 
+  // Add timestamp to force image reload and bypass cache
+  const imageUrl = profile.fotoUrl ? `${profile.fotoUrl}?t=${Date.now()}` : null;
+
+  console.log(`ProfileCard - ${profile.name}:`);
+  console.log(`  Original URL: ${profile.fotoUrl}`);
+  console.log(`  Cache-busted URL: ${imageUrl}`);
+
   return (
     <Card className="h-full hover:shadow-lg transition-shadow duration-200">
       <CardHeader className="pb-4">
         <div className="flex items-start space-x-4">
           {/* Photo container with increased size */}
           <div className="w-30 h-42 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border">
-            {profile.fotoUrl ? (
+            {imageUrl ? (
               <img 
-                src={profile.fotoUrl} 
+                src={imageUrl} 
                 alt={profile.name} 
                 className="w-full h-full object-cover"
                 onError={(e) => {
-                  console.error(`Erro ao carregar imagem para ${profile.name}: ${profile.fotoUrl}`);
+                  console.error(`❌ ERRO ao carregar imagem para ${profile.name}:`);
+                  console.error(`   URL tentada: ${imageUrl}`);
+                  console.error(`   Erro:`, e);
+                  
                   // Fallback to initials if image fails to load
                   const target = e.target as HTMLImageElement;
                   target.style.display = 'none';
@@ -46,8 +56,10 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
                     `;
                   }
                 }}
-                onLoad={() => {
-                  console.log(`Imagem carregada com sucesso para ${profile.name}: ${profile.fotoUrl}`);
+                onLoad={(e) => {
+                  console.log(`✅ SUCESSO ao carregar imagem para ${profile.name}:`);
+                  console.log(`   URL carregada: ${imageUrl}`);
+                  console.log(`   Dimensões: ${(e.target as HTMLImageElement).naturalWidth}x${(e.target as HTMLImageElement).naturalHeight}`);
                 }}
               />
             ) : (
