@@ -4,16 +4,15 @@ import { useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Profile } from '../types';
 import ProfileHeader from '../components/profile-detail/ProfileHeader';
-import ProfileBiography from '../components/profile-detail/ProfileBiography';
-import KnowledgeAreas from '../components/profile-detail/KnowledgeAreas';
 import AcademicFormationCard from '../components/profile-detail/AcademicFormationCard';
-import ProfessionalExperienceCard from '../components/profile-detail/ProfessionalExperienceCard';
 import ProjectsCard from '../components/profile-detail/ProjectsCard';
 import LanguagesAndCertifications from '../components/profile-detail/LanguagesAndCertifications';
 import AvailabilityCard from '../components/profile-detail/AvailabilityCard';
 import PublicationsAndCurriculum from '../components/profile-detail/PublicationsAndCurriculum';
 import LoadingState from '../components/profile-detail/LoadingState';
 import ErrorState from '../components/profile-detail/ErrorState';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Badge } from '../components/ui/badge';
 
 const ProfileDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -25,15 +24,14 @@ const ProfileDetail: React.FC = () => {
     if (id) {
       loadProfile();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const loadProfile = async () => {
     try {
       setLoading(true);
       setError(null);
-      console.log('🔍 Carregando perfil com ID:', id);
-      
-      // Buscar dados básicos do perfil primeiro
+
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('*')
@@ -41,57 +39,35 @@ const ProfileDetail: React.FC = () => {
         .single();
 
       if (profileError) {
-        console.error('❌ Erro ao buscar perfil:', profileError);
         setError('Perfil não encontrado');
         return;
       }
 
       if (!profileData) {
-        console.log('❌ Nenhum perfil encontrado');
         setError('Perfil não encontrado');
         return;
       }
 
-      console.log('✅ Dados básicos do perfil encontrados:', profileData);
-
-      // Buscar projetos relacionados
-      const { data: projectsData, error: projectsError } = await supabase
+      const { data: projectsData } = await supabase
         .from('projects')
         .select('*')
         .eq('profile_id', id);
 
-      console.log('📊 Projetos encontrados:', projectsData?.length || 0, projectsData);
-
-      // Buscar formações acadêmicas
-      const { data: formationsData, error: formationsError } = await supabase
+      const { data: formationsData } = await supabase
         .from('academic_formations')
         .select('*')
         .eq('profile_id', id);
 
-      console.log('🎓 Formações encontradas:', formationsData?.length || 0, formationsData);
-
-      // Buscar experiências profissionais
-      const { data: experiencesData, error: experiencesError } = await supabase
-        .from('professional_experiences')
-        .select('*')
-        .eq('profile_id', id);
-
-      console.log('💼 Experiências encontradas:', experiencesData?.length || 0, experiencesData);
-
-      // Buscar disponibilidade
-      const { data: availabilityData, error: availabilityError } = await supabase
+      const { data: availabilityData } = await supabase
         .from('availability')
         .select('*')
         .eq('profile_id', id);
 
-      console.log('📅 Disponibilidade encontrada:', availabilityData?.length || 0, availabilityData);
-
-      // Transformar dados para o formato esperado
       const transformedProfile: Profile = {
         id: profileData.id,
         userId: profileData.user_id || '',
-        name: profileData.name || 'Nome não informado',
-        matricula: profileData.matricula || 'Matrícula não informada',
+        name: profileData.name || '',
+        matricula: profileData.matricula || '',
         cargo: Array.isArray(profileData.cargo) ? profileData.cargo : [],
         funcao: Array.isArray(profileData.funcao) ? profileData.funcao : [],
         unidade: Array.isArray(profileData.unidade) ? profileData.unidade : [],
@@ -125,12 +101,7 @@ const ProfileDetail: React.FC = () => {
           curso: f.curso,
           ano: f.ano
         })) || [],
-        experienciasProfissionais: experiencesData?.map((e: any) => ({
-          tempoMPRJ: e.tempo_mprj || '',
-          experienciaAnterior: e.experiencia_anterior || '',
-          projetosInternos: e.projetos_internos || '',
-          publicacoes: e.publicacoes || ''
-        })) || [],
+        experienciasProfissionais: [], // Não será exibido
         disponibilidade: availabilityData?.[0] ? {
           tipoColaboracao: Array.isArray(availabilityData[0].tipo_colaboracao) ? availabilityData[0].tipo_colaboracao : [],
           disponibilidadeEstimada: availabilityData[0].disponibilidade_estimada || ''
@@ -147,14 +118,19 @@ const ProfileDetail: React.FC = () => {
         }
       };
 
-      console.log('🔄 Perfil transformado final:', transformedProfile);
       setProfile(transformedProfile);
     } catch (err: any) {
-      console.error('❌ Erro geral ao carregar perfil:', err);
       setError('Erro ao carregar perfil: ' + err.message);
     } finally {
       setLoading(false);
     }
+  };
+
+  // Utilitário para ocultar blocos vazios (string ou array)
+  const isFieldFilled = (value: any) => {
+    if (Array.isArray(value)) return value.length > 0 && value.some(v => v && String(v).trim() !== '');
+    if (typeof value === 'string') return value.trim() !== '';
+    return !!value;
   };
 
   const getInitials = (name: string) => {
@@ -171,46 +147,132 @@ const ProfileDetail: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 p-4">
+      {/* Foto e Informação Básica */}
       <ProfileHeader profile={profile} getInitials={getInitials} />
-      
-      {/* Biografia - sempre exibir */}
-      <ProfileBiography biografia={profile.biografia} />
-      
-      {/* Áreas de Conhecimento e Temas de Interesse - sempre exibir */}
-      <KnowledgeAreas 
-        areasConhecimento={profile.areasConhecimento} 
-        temasInteresse={profile.temasInteresse} 
-      />
-      
-      {/* Formação Acadêmica - sempre exibir */}
-      <AcademicFormationCard formacaoAcademica={profile.formacaoAcademica} />
-      
-      {/* Experiência Profissional - sempre exibir */}
-      <ProfessionalExperienceCard experienciasProfissionais={profile.experienciasProfissionais} />
-      
-      {/* Projetos - sempre exibir */}
-      <ProjectsCard projetos={profile.projetos} />
-      
-      {/* Idiomas e Certificações - sempre exibir */}
-      <LanguagesAndCertifications 
-        idiomas={profile.idiomas} 
-        certificacoes={profile.certificacoes} 
-      />
-      
-      {/* Disponibilidade - sempre exibir */}
-      <AvailabilityCard 
-        disponibilidade={profile.disponibilidade} 
-        contato={profile.contato} 
-      />
-      
-      {/* Publicações e Currículo - sempre exibir */}
-      <PublicationsAndCurriculum 
-        publicacoes={profile.publicacoes}
-        linkCurriculo={profile.linkCurriculo}
-        especializacoes={profile.especializacoes}
-      />
+
+      {/* Cargo, Função e Lotação */}
+      {(isFieldFilled(profile.cargo) || isFieldFilled(profile.funcao) || isFieldFilled(profile.unidade)) && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Cargo, Função e Lotação</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {isFieldFilled(profile.cargo) && (
+                <div>
+                  <span className="font-medium">Cargo: </span>
+                  {profile.cargo.map((c, i) => (
+                    <Badge key={i} variant="outline" className="mr-1">{c}</Badge>
+                  ))}
+                </div>
+              )}
+              {isFieldFilled(profile.funcao) && (
+                <div>
+                  <span className="font-medium">Função: </span>
+                  {profile.funcao.map((f, i) => (
+                    <Badge key={i} variant="outline" className="mr-1 bg-blue-50">{f}</Badge>
+                  ))}
+                </div>
+              )}
+              {isFieldFilled(profile.unidade) && (
+                <div>
+                  <span className="font-medium">Lotação: </span>
+                  {profile.unidade.map((u, i) => (
+                    <Badge key={i} variant="outline" className="mr-1">{u}</Badge>
+                  ))}
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Áreas de Interesse */}
+      {isFieldFilled(profile.temasInteresse) && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Áreas de Interesse</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-2">
+              {profile.temasInteresse.map((tema, i) => (
+                <Badge key={i} variant="outline">{tema}</Badge>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Formação Acadêmica */}
+      {isFieldFilled(profile.formacaoAcademica) && (
+        <AcademicFormationCard formacaoAcademica={profile.formacaoAcademica} />
+      )}
+
+      {/* Projetos */}
+      {isFieldFilled(profile.projetos) && (
+        <ProjectsCard projetos={profile.projetos} />
+      )}
+
+      {/* Certificações e Idiomas */}
+      {(isFieldFilled(profile.certificacoes) || isFieldFilled(profile.idiomas)) && (
+        <LanguagesAndCertifications 
+          idiomas={profile.idiomas || []} 
+          certificacoes={profile.certificacoes || []} 
+        />
+      )}
+
+      {/* Publicações */}
+      {isFieldFilled(profile.publicacoes) && (
+        <PublicationsAndCurriculum 
+          publicacoes={profile.publicacoes}
+        />
+      )}
+
+      {/* Disponibilidade para Colaboração */}
+      {isFieldFilled(profile.disponibilidade?.tipoColaboracao) || isFieldFilled(profile.disponibilidade?.disponibilidadeEstimada) ? (
+        <AvailabilityCard 
+          disponibilidade={profile.disponibilidade} 
+          contato={profile.contato} 
+        />
+      ) : null}
+
+      {/* Preferências de Contato */}
+      {(isFieldFilled(profile.contato?.formaContato) || isFieldFilled(profile.contato?.horarioPreferencial)) && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Preferências de Contato</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isFieldFilled(profile.contato?.formaContato) && (
+              <div>
+                <span className="font-medium mr-1">Forma de contato preferencial:</span>
+                <Badge variant="outline">{profile.contato.formaContato}</Badge>
+              </div>
+            )}
+            {isFieldFilled(profile.contato?.horarioPreferencial) && (
+              <div className="mt-2">
+                <span className="font-medium mr-1">Horário preferencial:</span>
+                <Badge variant="outline">{profile.contato.horarioPreferencial}</Badge>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Informações Complementares */}
+      {isFieldFilled(profile.especializacoes) && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Informações Complementares</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-700">{profile.especializacoes}</p>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };
 
 export default ProfileDetail;
+
