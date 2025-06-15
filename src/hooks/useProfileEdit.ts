@@ -79,7 +79,9 @@ export const useProfileEdit = () => {
             publicacoes: e.publicacoes || ''
           })) || [],
           disponibilidade: profile.availability?.[0] ? {
-            tipoColaboracao: profile.availability[0].tipo_colaboracao || [],
+            tipoColaboracao: Array.isArray(profile.availability[0].tipo_colaboracao) 
+              ? profile.availability[0].tipo_colaboracao 
+              : [],
             disponibilidadeEstimada: profile.availability[0].disponibilidade_estimada || ''
           } : {
             tipoColaboracao: [],
@@ -114,25 +116,32 @@ export const useProfileEdit = () => {
       setError(null);
       setSuccessMessage(null);
 
+      console.log('Saving profile data:', {
+        data,
+        formacaoAcademica,
+        projetos,
+        disponibilidade
+      });
+
       const profileData = {
         user_id: user?.id,
         name: data.name,
         matricula: data.matricula,
         email: data.email,
-        telefone: data.telefone,
-        biografia: data.biografia,
-        cargo: data.cargo,
-        funcao: data.funcao,
-        unidade: data.unidade,
-        areas_conhecimento: data.areasConhecimento,
-        especializacoes: data.especializacoes,
-        temas_interesse: data.temasInteresse,
-        idiomas: data.idiomas,
-        link_curriculo: data.linkCurriculo,
-        foto_url: fotoPreview,
-        certificacoes: data.certificacoes,
-        publicacoes: data.publicacoes,
-        aceite_termos: data.aceiteTermos,
+        telefone: data.telefone || null,
+        biografia: data.biografia || null,
+        cargo: data.cargo || [],
+        funcao: data.funcao || [],
+        unidade: data.unidade || [],
+        areas_conhecimento: data.areasConhecimento || [],
+        especializacoes: data.especializacoes || null,
+        temas_interesse: data.temasInteresse || [],
+        idiomas: data.idiomas || [],
+        link_curriculo: data.linkCurriculo || null,
+        foto_url: fotoPreview || null,
+        certificacoes: data.certificacoes || [],
+        publicacoes: data.publicacoes || null,
+        aceite_termos: data.aceiteTermos || false,
         updated_at: new Date().toISOString()
       };
 
@@ -160,40 +169,66 @@ export const useProfileEdit = () => {
       if (profileId) {
         // Academic formations
         await supabase.from('academic_formations').delete().eq('profile_id', profileId);
-        if (formacaoAcademica.length > 0) {
+        if (formacaoAcademica && formacaoAcademica.length > 0) {
           const formations = formacaoAcademica.map(f => ({
             profile_id: profileId,
             nivel: f.nivel,
             instituicao: f.instituicao,
             curso: f.curso,
-            ano: f.ano
+            ano: parseInt(f.ano)
           }));
-          await supabase.from('academic_formations').insert(formations);
+          const { error: formError } = await supabase.from('academic_formations').insert(formations);
+          if (formError) {
+            console.error('Error saving formations:', formError);
+          }
         }
 
         // Projects
         await supabase.from('projects').delete().eq('profile_id', profileId);
-        if (projetos.length > 0) {
+        if (projetos && projetos.length > 0) {
           const projects = projetos.map(p => ({
             profile_id: profileId,
             nome: p.nome,
             data_inicio: p.dataInicio instanceof Date ? p.dataInicio.toISOString().split('T')[0] : p.dataInicio,
             data_fim: p.dataFim ? (p.dataFim instanceof Date ? p.dataFim.toISOString().split('T')[0] : p.dataFim) : null,
-            observacoes: p.observacoes
+            observacoes: p.observacoes || null
           }));
-          await supabase.from('projects').insert(projects);
+          const { error: projError } = await supabase.from('projects').insert(projects);
+          if (projError) {
+            console.error('Error saving projects:', projError);
+          }
+        }
+
+        // Professional experiences
+        await supabase.from('professional_experiences').delete().eq('profile_id', profileId);
+        if (data.experienciasProfissionais && data.experienciasProfissionais.length > 0) {
+          const experiences = data.experienciasProfissionais.map((exp: any) => ({
+            profile_id: profileId,
+            tempo_mprj: exp.tempoMPRJ || null,
+            experiencia_anterior: exp.experienciaAnterior || null,
+            projetos_internos: exp.projetosInternos || null,
+            publicacoes: exp.publicacoes || null
+          }));
+          const { error: expError } = await supabase.from('professional_experiences').insert(experiences);
+          if (expError) {
+            console.error('Error saving experiences:', expError);
+          }
         }
 
         // Availability
         await supabase.from('availability').delete().eq('profile_id', profileId);
-        if (disponibilidade.tipoColaboracao?.length > 0) {
-          await supabase.from('availability').insert({
+        if (disponibilidade && (disponibilidade.tipoColaboracao?.length > 0 || disponibilidade.disponibilidadeEstimada || disponibilidade.formaContato)) {
+          const availabilityData = {
             profile_id: profileId,
-            tipo_colaboracao: disponibilidade.tipoColaboracao,
-            disponibilidade_estimada: disponibilidade.disponibilidadeEstimada,
-            forma_contato: disponibilidade.formaContato,
-            horario_preferencial: disponibilidade.horarioPreferencial
-          });
+            tipo_colaboracao: disponibilidade.tipoColaboracao || [],
+            disponibilidade_estimada: disponibilidade.disponibilidadeEstimada || null,
+            forma_contato: disponibilidade.formaContato || 'email',
+            horario_preferencial: disponibilidade.horarioPreferencial || null
+          };
+          const { error: availError } = await supabase.from('availability').insert(availabilityData);
+          if (availError) {
+            console.error('Error saving availability:', availError);
+          }
         }
       }
 

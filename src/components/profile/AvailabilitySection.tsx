@@ -23,6 +23,14 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
   safeDisponibilidadeEstimada,
   isValidSelectValue
 }) => {
+  const handleTipoColaboracaoChange = (tipo: string, checked: boolean) => {
+    if (checked) {
+      setTipoColaboracao([...tipoColaboracao, tipo]);
+    } else {
+      setTipoColaboracao(tipoColaboracao.filter(t => t !== tipo));
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -37,13 +45,7 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
                 <Checkbox
                   id={`tipo-${index}`}
                   checked={tipoColaboracao.includes(tipo)}
-                  onCheckedChange={() => {
-                    if (tipoColaboracao.includes(tipo)) {
-                      setTipoColaboracao(tipoColaboracao.filter(t => t !== tipo));
-                    } else {
-                      setTipoColaboracao([...tipoColaboracao, tipo]);
-                    }
-                  }}
+                  onCheckedChange={(checked) => handleTipoColaboracaoChange(tipo, checked as boolean)}
                 />
                 <label htmlFor={`tipo-${index}`} className="text-sm">{tipo}</label>
               </div>

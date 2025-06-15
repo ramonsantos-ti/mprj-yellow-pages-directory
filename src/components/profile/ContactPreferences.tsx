@@ -40,7 +40,7 @@ const ContactPreferences: React.FC<ContactPreferencesProps> = ({
             </SelectTrigger>
             <SelectContent>
               {safeFormasContato.map((forma, formaIndex) => (
-                <SelectItem key={`forma-${formaIndex}-${forma}`} value={forma}>
+                <SelectItem key={`forma-${formaIndex}-${forma}`} value={forma.toLowerCase()}>
                   {forma}
                 </SelectItem>
               ))}

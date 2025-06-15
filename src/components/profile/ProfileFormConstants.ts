@@ -37,7 +37,13 @@ export const safeDisponibilidadeEstimada = [
   'Até 4h/semana'
 ];
 
-export const safeFormasContato = ['email', 'telefone', 'teams', 'presencial'];
+export const safeFormasContato = [
+  'E-mail',
+  'Telefone', 
+  'Microsoft Teams',
+  'WhatsApp',
+  'Presencial'
+];
 
 export const isValidSelectValue = (value: any): boolean => {
   return typeof value === 'string' && value.trim().length > 0;
