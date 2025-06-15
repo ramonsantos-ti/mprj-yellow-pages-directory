@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -42,9 +43,16 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <div className="flex justify-between items-center h-16">
             {/* Logo Principal */}
             <Link to="/" className="flex items-center space-x-3">
-              <span className="text-xl font-semibold text-gray-900">
-                Páginas Amarelas
-              </span>
+              <div className="flex items-center space-x-2">
+                <img 
+                  src="/lovable-uploads/67816a9d-4783-48d7-a5ea-020683c86e12.png" 
+                  alt="MPRJ Logo Principal" 
+                  className="h-12 w-auto"
+                />
+                <span className="text-xl font-semibold text-gray-900 hidden sm:inline">
+                  Páginas Amarelas
+                </span>
+              </div>
             </Link>
 
             {/* Navigation */}
