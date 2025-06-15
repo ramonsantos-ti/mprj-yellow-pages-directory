@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -16,6 +15,7 @@ import PublicationsSection from '../components/profile/PublicationsSection';
 import AvailabilitySection from '../components/profile/AvailabilitySection';
 import ContactPreferences from '../components/profile/ContactPreferences';
 import PhotoUpload from '../components/profile/PhotoUpload';
+import CurriculumSection from '../components/profile/CurriculumSection';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -485,6 +485,8 @@ const ProfileEdit: React.FC = () => {
             safeFormasContato={safeFormasContato}
             isValidSelectValue={isValidSelectValue}
           />
+
+          <CurriculumSection form={form} />
 
           <AdditionalInfo form={form} />
 

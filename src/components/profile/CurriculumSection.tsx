@@ -2,40 +2,40 @@
 import React from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Textarea } from '../ui/textarea';
+import { Input } from '../ui/input';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '../ui/form';
-import { FileText } from 'lucide-react';
+import { Link as LinkIcon } from 'lucide-react';
 
-interface PublicationsSectionProps {
+interface CurriculumSectionProps {
   form: UseFormReturn<any>;
 }
 
-const PublicationsSection: React.FC<PublicationsSectionProps> = ({ form }) => {
+const CurriculumSection: React.FC<CurriculumSectionProps> = ({ form }) => {
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center space-x-2">
-          <FileText className="w-5 h-5" />
-          <span>Publicações</span>
+          <LinkIcon className="w-5 h-5" />
+          <span>Currículo</span>
         </CardTitle>
       </CardHeader>
       <CardContent>
         <FormField
           control={form.control}
-          name="publicacoes"
+          name="linkCurriculo"
           render={({ field }) => (
             <FormItem>
-              <FormLabel htmlFor="publicacoes">Publicações Relevantes</FormLabel>
+              <FormLabel htmlFor="linkCurriculo">Link do Currículo</FormLabel>
               <FormControl>
-                <Textarea
-                  id="publicacoes"
+                <Input
+                  id="linkCurriculo"
+                  type="url"
                   {...field}
-                  placeholder="Liste suas publicações, artigos, livros ou trabalhos acadêmicos relevantes"
-                  rows={6}
+                  placeholder="https://exemplo.com/curriculo"
                 />
               </FormControl>
               <p className="text-sm text-gray-500 mt-1">
-                Descreva suas principais publicações e contribuições acadêmicas
+                Link para seu currículo completo (Lattes, LinkedIn, etc.)
               </p>
               <FormMessage />
             </FormItem>
@@ -46,4 +46,4 @@ const PublicationsSection: React.FC<PublicationsSectionProps> = ({ form }) => {
   );
 };
 
-export default PublicationsSection;
+export default CurriculumSection;

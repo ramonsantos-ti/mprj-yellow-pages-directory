@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Input } from '../ui/input';
 import { Checkbox } from '../ui/checkbox';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '../ui/form';
 import { UseFormReturn } from 'react-hook-form';
@@ -17,20 +16,6 @@ const AdditionalInfo: React.FC<AdditionalInfoProps> = ({ form }) => {
         <CardTitle>Informações Adicionais</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <FormField
-          control={form.control}
-          name="linkCurriculo"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel htmlFor="linkCurriculo">Link do Currículo (Lattes/LinkedIn)</FormLabel>
-              <FormControl>
-                <Input {...field} id="linkCurriculo" placeholder="https://..." />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
         <FormField
           control={form.control}
           name="aceiteTermos"
