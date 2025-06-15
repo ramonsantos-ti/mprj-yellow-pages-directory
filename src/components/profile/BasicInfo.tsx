@@ -62,13 +62,15 @@ const BasicInfo: React.FC<BasicInfoProps> = ({ form }) => {
           </div>
         </div>
 
-        <div>
-          <Label htmlFor="telefone">Telefone</Label>
-          <Input
-            id="telefone"
-            {...register('telefone')}
-            placeholder="Digite seu telefone"
-          />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="telefone">Telefone</Label>
+            <Input
+              id="telefone"
+              {...register('telefone')}
+              placeholder="Digite seu telefone"
+            />
+          </div>
         </div>
 
         <div>
