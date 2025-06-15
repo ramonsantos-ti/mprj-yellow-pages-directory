@@ -49,6 +49,7 @@ const ProfileEditForm: React.FC = () => {
   const [projetos, setProjetos] = useState<any[]>([]);
   const [disponibilidade, setDisponibilidade] = useState<any>({});
 
+  // Criar o form SÓ com os valores default. Preenchimento será feito depois, se necessário.
   const form = useForm({
     resolver: zodResolver(profileSchema),
     defaultValues: defaultFormValues
@@ -71,17 +72,37 @@ const ProfileEditForm: React.FC = () => {
   const hasLoadedProfileRef = React.useRef(false);
 
   React.useEffect(() => {
+    // LOG extra para depuração
+    console.log("[DEBUG] userProfile carregado do banco:", userProfile);
     if (userProfile && !hasLoadedProfileRef.current) {
       populateFormWithProfile(userProfile);
       hasLoadedProfileRef.current = true;
+      // LOG extra para depuração
+      console.log("[DEBUG] populateFormWithProfile executado");
     } else if (user && !userProfile && !hasLoadedProfileRef.current) {
       form.setValue('name', user?.email || '');
       form.setValue('email', user?.email || '');
       form.setValue('matricula', '');
       hasLoadedProfileRef.current = true;
+      console.log("[DEBUG] Form setado para dados mínimos");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userProfile, user]);
+
+  // Se o userProfile mudar após o primeiro carregamento (ex: editar/salvar e carregar o novo), resetar controle
+  React.useEffect(() => {
+    hasLoadedProfileRef.current = false;
+  }, [userProfile?.id]);
+
+  // Verificar se o form está de fato preenchido corretamente após o populate (ajuda a depurar)
+  useEffect(() => {
+    if (userProfile) {
+      // Aguarda um "tick" do React para garantir update
+      setTimeout(() => {
+        console.log("[DEBUG] Campos do formulário preenchidos após populate:", form.getValues());
+      }, 100);
+    }
+  }, [userProfile, form]);
 
   // Log os erros atuais do formulário toda vez que o form for atualizado.
   useEffect(() => {
