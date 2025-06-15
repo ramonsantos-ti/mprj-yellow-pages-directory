@@ -16,6 +16,7 @@ import PhotoUpload from '../components/profile/PhotoUpload';
 import CurriculumSection from '../components/profile/CurriculumSection';
 import StatusMessages from '../components/profile/StatusMessages';
 import InterestAreaSelector from '../components/InterestAreaSelector';
+import LanguagesSection from '../components/profile/LanguagesSection';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form } from '../components/ui/form';
@@ -169,7 +170,7 @@ const ProfileEdit: React.FC = () => {
             isValidSelectValue={isValidSelectValue}
           />
 
-          <CurriculumSection form={form} />
+          <LanguagesSection form={form} />
 
           <AdditionalInfo form={form} />
 

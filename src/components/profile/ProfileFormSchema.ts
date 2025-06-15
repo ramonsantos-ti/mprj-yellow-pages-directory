@@ -13,19 +13,17 @@ export const profileSchema = z.object({
   matricula: z.string().min(1, 'Matrícula é obrigatória'),
   email: z.string().email('Email inválido'),
   telefone: z.string().optional(),
-  biografia: z.string().optional(),
   cargo: z.array(z.string()).min(1, 'Pelo menos um cargo é obrigatório'),
   funcao: z.array(z.string()),
   unidade: z.array(z.string()).min(1, 'Pelo menos uma unidade é obrigatória'),
   areasConhecimento: z.array(z.string()),
-  especializacoes: z.string().optional(),
   temasInteresse: z.array(z.string()),
   idiomas: z.array(z.string()),
   linkCurriculo: z.string().optional(),
   certificacoes: z.array(z.string()),
-  publicacoes: z.string().optional(),
   aceiteTermos: z.boolean().refine(val => val === true, 'Você deve aceitar os termos'),
-  formacaoAcademica: z.array(formacaoAcademicaSchema).optional()
+  formacaoAcademica: z.array(formacaoAcademicaSchema).optional(),
+  informacoesComplementares: z.string().optional(),
 });
 
 export const defaultFormValues = {
@@ -33,17 +31,15 @@ export const defaultFormValues = {
   matricula: '',
   email: '',
   telefone: '',
-  biografia: '',
   cargo: [],
   funcao: [],
   unidade: [],
   areasConhecimento: [],
-  especializacoes: '',
   temasInteresse: [],
   idiomas: [],
   linkCurriculo: '',
   certificacoes: [],
-  publicacoes: '',
   aceiteTermos: false,
-  formacaoAcademica: []
+  formacaoAcademica: [],
+  informacoesComplementares: '',
 };
