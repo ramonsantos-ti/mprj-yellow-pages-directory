@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -91,7 +90,7 @@ const AreaInput: React.FC<AreaInputProps> = ({ allAreas, selectedAreas, onAddAre
       {!showCustomInput ? (
         <Button
           type="button"
-          variant="outline"
+          variant="logo-brown"
           onClick={() => setShowCustomInput(true)}
           className="flex items-center space-x-2"
         >
