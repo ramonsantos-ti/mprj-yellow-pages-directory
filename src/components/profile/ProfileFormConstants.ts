@@ -36,11 +36,28 @@ export const safeFuncoes = [
 
 export const safeUnidades = [
   'Centro de Apoio Operacional',
-  'Corregedoria-Geral do Ministério Público',
-  'Procuradoria-Geral de Justiça',
+  'Centro Regional de Apoio Administrativo e Institucional',
+  'Comitês/Comissão',
+  'Consultoria Especial',
+  'Coordenadoria de Atuação integrada Regional',
+  'Coordenadoria de Inteligência da Investigação',
+  'Coordenadoria de Segurança e Inteligência',
+  'Coordenadoria-Geral de Movimentação dos Membros do MP',
+  'Gabinete do Procurador-Geral de Justiça',
+  'Grupo de Apoio Técnico Especializado',
+  'Núcleo de Investigação Penal',
+  'Ouvidoria',
   'Procuradoria de Justiça',
+  'Procuradoria-Geral de Justiça do Estado do RJ',
   'Promotoria de Justiça',
-  'Subprocuradoria-Geral de Justiça de Assuntos Administrativos'
+  'Secretaria-Geral de Modernização Tecnológica e Inovação',
+  'Subprocuradoria-Geral de Justiça de Administração',
+  'Subprocuradoria-Geral de Justiça de Atribuição Originária',
+  'Subprocuradoria-Geral de Justiça de Atuação Especializada',
+  'Subprocuradoria-Geral de Justiça de Direitos Humanos e Proteção à Vítima',
+  'Subprocuradoria-Geral de Justiça de Planejamento Institucional',
+  'Subprocuradoria-Geral de Justiça de Recursos Constitucionais',
+  'Subprocuradoria-Geral de Relações Institucionais e Defesa de Prerrogativas'
 ];
 
 export const safeCertificacoes = [
