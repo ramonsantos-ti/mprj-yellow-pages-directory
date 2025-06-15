@@ -9,30 +9,21 @@ const ProfileDetail: React.FC = () => {
   const [searchParams] = useSearchParams();
   const { user } = useAuth();
 
-  // Se estivermos em /profile/:id?edit=1 e o usuário for admin, mostramos o formulário de edição para esse perfil.
-  // Se estivermos em /profile, mostramos o formulário do usuário logado.
-  // Em outras situações, mostra somente visualização.
-
+  // Edit mode if query param "edit=1"
   const isEditMode = Boolean(searchParams.get("edit") === "1");
   const profileId = id;
 
-  // Se estiver sem id, estamos no perfil do usuário logado (edição dele mesmo)
+  // If no id, show logged-in user's profile for editing
   if (!profileId) {
     return <ProfileEditForm />;
   }
 
-  // Caso contrário, estamos em outro perfil:
-  // Se edit=1 na query e o usuário for admin, mostrar formulário de edição apontando para esse profileId
-  // Caso contrário, só visualização
-
-  // (Aqui você pode criar um novo ProfileEditForm que aceite profileId para editar outro usuário; nesta implementação base estamos só diferenciando, ajuste conforme componentes reais.)
-
+  // If edit=1 and admin, show edit form for specific profile
   if (isEditMode && user?.role === 'admin') {
-    // TODO: Crie/ajuste um ProfileEditForm que aceite profileId como prop para editar outro usuário
     return <ProfileEditForm profileId={profileId} isAdminEdit />;
   }
 
-  // Visualização apenas
+  // Otherwise, view only
   return <ProfileDetailView profileId={profileId} />;
 };
 

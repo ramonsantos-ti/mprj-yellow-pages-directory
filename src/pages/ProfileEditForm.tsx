@@ -20,8 +20,13 @@ import { Form } from '../components/ui/form';
 import { safeCargos, safeFuncoes, safeUnidades, safeTiposColaboracao, safeDisponibilidadeEstimada, safeFormasContato, isValidSelectValue } from '../components/profile/ProfileFormConstants';
 import { useProfileEditFormController } from '../hooks/useProfileEditFormController';
 
+interface ProfileEditFormProps {
+  profileId?: string;
+  isAdminEdit?: boolean;
+}
+
 // Componente apenas para renderizar o formulário, lógica ficou separada
-const ProfileEditForm: React.FC = () => {
+const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ profileId, isAdminEdit }) => {
   const {
     userProfile,
     loading,
@@ -142,4 +147,5 @@ const ProfileEditForm: React.FC = () => {
       </Form>
     </div>;
 };
+
 export default ProfileEditForm;
