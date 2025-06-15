@@ -92,6 +92,7 @@ const ProfileDetail: React.FC = () => {
         aceiteTermos: profileData.aceite_termos ?? false,
         updatedByAdmin: profileData.updated_by_admin ?? false,
         lastUpdated: new Date(profileData.updated_at || profileData.created_at || new Date()),
+        informacoesComplementares: profileData.informacoes_complementares || '', // CORRETO AQUI
         projetos: projectsData?.map((p: any) => ({
           id: p.id,
           nome: p.nome,
