@@ -1,4 +1,3 @@
-
 export const safeCargos = [
   'Promotor de Justiça', 'Procurador de Justiça', 'Analista Ministerial',
   'Técnico Ministerial', 'Assessor', 'Estagiário'
@@ -23,7 +22,10 @@ export const safeTiposColaboracao = [
   'Consultoria interna',
   'Parecer técnico',
   'Capacitação/treinamento',
-  'Projeto especial'
+  'Projeto especial',
+  'Mentoria',
+  'Coaching',
+  'Grupo de trabalho'
 ];
 
 export const safeDisponibilidadeEstimada = [
@@ -46,7 +48,10 @@ export const tipoColaboracaoMap: { [key: string]: string } = {
   'Consultoria interna': 'consultoria',
   'Parecer técnico': 'parecer',
   'Capacitação/treinamento': 'capacitacao',
-  'Projeto especial': 'projeto'
+  'Projeto especial': 'projeto',
+  'Mentoria': 'mentoria',
+  'Coaching': 'coaching',
+  'Grupo de trabalho': 'grupo_trabalho'
 };
 
 // Mapeamento reverso para exibição
@@ -54,7 +59,10 @@ export const tipoColaboracaoReverseMap: { [key: string]: string } = {
   'consultoria': 'Consultoria interna',
   'parecer': 'Parecer técnico',
   'capacitacao': 'Capacitação/treinamento',
-  'projeto': 'Projeto especial'
+  'projeto': 'Projeto especial',
+  'mentoria': 'Mentoria',
+  'coaching': 'Coaching',
+  'grupo_trabalho': 'Grupo de trabalho'
 };
 
 // Mapeamento que garante compatibilidade com os enums do banco de dados

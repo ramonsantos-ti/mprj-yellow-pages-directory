@@ -309,7 +309,14 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
-      collaboration_type: "consultoria" | "parecer" | "capacitacao" | "projeto"
+      collaboration_type:
+        | "consultoria"
+        | "parecer"
+        | "capacitacao"
+        | "projeto"
+        | "mentoria"
+        | "coaching"
+        | "grupo_trabalho"
       contact_preference: "email" | "telefone" | "teams" | "presencial"
     }
     CompositeTypes: {
@@ -427,7 +434,15 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
-      collaboration_type: ["consultoria", "parecer", "capacitacao", "projeto"],
+      collaboration_type: [
+        "consultoria",
+        "parecer",
+        "capacitacao",
+        "projeto",
+        "mentoria",
+        "coaching",
+        "grupo_trabalho",
+      ],
       contact_preference: ["email", "telefone", "teams", "presencial"],
     },
   },
