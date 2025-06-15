@@ -35,9 +35,9 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
                   const target = e.target as HTMLImageElement;
                   target.style.display = 'none';
                   const parent = target.parentElement;
-                  if (parent) {
+                  if (parent && !parent.querySelector('.fallback-initials')) {
                     parent.innerHTML = `
-                      <div class="w-full h-full bg-red-100 flex items-center justify-center">
+                      <div class="w-full h-full bg-red-100 flex items-center justify-center fallback-initials">
                         <span class="text-red-900 font-semibold text-xl">
                           ${getInitials(profile.name)}
                         </span>
