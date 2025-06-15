@@ -45,6 +45,46 @@ export const safeFormasContato = [
   'Presencial'
 ];
 
+// Mapeamento para valores do banco de dados
+export const tipoColaboracaoMap: { [key: string]: string } = {
+  'Consultoria interna': 'consultoria_interna',
+  'Formação de equipes': 'formacao_equipes',
+  'Capacitações/tutoria': 'capacitacoes_tutoria',
+  'Grupos de trabalho': 'grupos_trabalho',
+  'Mentoria': 'mentoria',
+  'Coaching': 'coaching',
+  'Grupo de trabalho': 'grupo_trabalho',
+  'Grupo de atuação': 'grupo_atuacao'
+};
+
+// Mapeamento reverso para exibição
+export const tipoColaboracaoReverseMap: { [key: string]: string } = {
+  'consultoria_interna': 'Consultoria interna',
+  'formacao_equipes': 'Formação de equipes',
+  'capacitacoes_tutoria': 'Capacitações/tutoria',
+  'grupos_trabalho': 'Grupos de trabalho',
+  'mentoria': 'Mentoria',
+  'coaching': 'Coaching',
+  'grupo_trabalho': 'Grupo de trabalho',
+  'grupo_atuacao': 'Grupo de atuação'
+};
+
+export const formaContatoMap: { [key: string]: string } = {
+  'E-mail': 'email',
+  'Telefone': 'telefone',
+  'Microsoft Teams': 'microsoft_teams',
+  'WhatsApp': 'whatsapp',
+  'Presencial': 'presencial'
+};
+
+export const formaContatoReverseMap: { [key: string]: string } = {
+  'email': 'E-mail',
+  'telefone': 'Telefone',
+  'microsoft_teams': 'Microsoft Teams',
+  'whatsapp': 'WhatsApp',
+  'presencial': 'Presencial'
+};
+
 export const isValidSelectValue = (value: any): boolean => {
   return typeof value === 'string' && value.trim().length > 0;
 };

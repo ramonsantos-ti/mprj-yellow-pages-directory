@@ -79,9 +79,7 @@ export const useProfileEdit = () => {
             publicacoes: e.publicacoes || ''
           })) || [],
           disponibilidade: profile.availability?.[0] ? {
-            tipoColaboracao: Array.isArray(profile.availability[0].tipo_colaboracao) 
-              ? profile.availability[0].tipo_colaboracao 
-              : [],
+            tipoColaboracao: profile.availability[0].tipo_colaboracao || [],
             disponibilidadeEstimada: profile.availability[0].disponibilidade_estimada || ''
           } : {
             tipoColaboracao: [],
@@ -215,19 +213,43 @@ export const useProfileEdit = () => {
           }
         }
 
-        // Availability
+        // Availability - corrigindo a estrutura dos dados
         await supabase.from('availability').delete().eq('profile_id', profileId);
         if (disponibilidade && (disponibilidade.tipoColaboracao?.length > 0 || disponibilidade.disponibilidadeEstimada || disponibilidade.formaContato)) {
+          console.log('Saving availability data:', disponibilidade);
+          
+          // Mapear os valores para o formato correto do banco
+          const tipoColaboracaoMapped = disponibilidade.tipoColaboracao?.map((tipo: string) => {
+            switch (tipo) {
+              case 'Consultoria interna': return 'consultoria_interna';
+              case 'Formação de equipes': return 'formacao_equipes';
+              case 'Capacitações/tutoria': return 'capacitacoes_tutoria';
+              case 'Grupos de trabalho': return 'grupos_trabalho';
+              case 'Mentoria': return 'mentoria';
+              case 'Coaching': return 'coaching';
+              case 'Grupo de trabalho': return 'grupo_trabalho';
+              case 'Grupo de atuação': return 'grupo_atuacao';
+              default: return tipo.toLowerCase().replace(/\s+/g, '_');
+            }
+          }) || [];
+
+          const formaContatoMapped = disponibilidade.formaContato ? 
+            disponibilidade.formaContato.toLowerCase().replace(/\s+/g, '_').replace(/-/g, '_') : 'email';
+
           const availabilityData = {
             profile_id: profileId,
-            tipo_colaboracao: disponibilidade.tipoColaboracao || [],
+            tipo_colaboracao: tipoColaboracaoMapped,
             disponibilidade_estimada: disponibilidade.disponibilidadeEstimada || null,
-            forma_contato: disponibilidade.formaContato || 'email',
+            forma_contato: formaContatoMapped,
             horario_preferencial: disponibilidade.horarioPreferencial || null
           };
+
+          console.log('Mapped availability data for database:', availabilityData);
+
           const { error: availError } = await supabase.from('availability').insert(availabilityData);
           if (availError) {
             console.error('Error saving availability:', availError);
+            throw new Error('Erro ao salvar disponibilidade: ' + availError.message);
           }
         }
       }
