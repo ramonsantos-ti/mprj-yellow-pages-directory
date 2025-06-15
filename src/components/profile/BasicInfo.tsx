@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
@@ -108,7 +107,6 @@ const BasicInfo: React.FC<BasicInfoProps> = ({ form }) => {
                   value={field.value ?? ""} // previne undefined
                 />
               </FormControl>
-              <span className="text-xs text-gray-400">[DEBUG] biografia: {field.value && field.value.length > 0 ? `"${field.value}"` : "(vazio)"}</span>
               <FormMessage />
             </FormItem>
           )}
@@ -119,4 +117,3 @@ const BasicInfo: React.FC<BasicInfoProps> = ({ form }) => {
 };
 
 export default BasicInfo;
-

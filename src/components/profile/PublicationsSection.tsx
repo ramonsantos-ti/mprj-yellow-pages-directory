@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
@@ -40,7 +39,6 @@ const PublicationsSection: React.FC<PublicationsSectionProps> = ({ form }) => {
                   value={field.value ?? ""}
                 />
               </FormControl>
-              <span className="text-xs text-gray-400">[DEBUG] publicacoes: {field.value && field.value.length > 0 ? `"${field.value}"` : "(vazio)"}</span>
               <p className="text-sm text-gray-500 mt-1">
                 Descreva suas principais publicações e contribuições acadêmicas
               </p>
@@ -54,4 +52,3 @@ const PublicationsSection: React.FC<PublicationsSectionProps> = ({ form }) => {
 };
 
 export default PublicationsSection;
-
