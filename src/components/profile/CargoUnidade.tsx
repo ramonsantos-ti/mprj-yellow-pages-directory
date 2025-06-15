@@ -1,6 +1,5 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Badge as BadgeIcon } from 'lucide-react'; // Ícone de crachá
 import { Badge } from '../ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
@@ -26,7 +25,12 @@ const CargoUnidade: React.FC<CargoUnidadeProps> = ({
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center space-x-2">
-          <BadgeIcon className="w-5 h-5 text-red-900" />
+          <img 
+            src="/lovable-uploads/bb129921-1d4f-4fd7-99a0-b74009d8281c.png"
+            alt="Ícone de crachá"
+            className="w-5 h-5 object-contain"
+            style={{ minWidth: 20, minHeight: 20 }} // garantir o tamanho mínimo
+          />
           <span>Cargo, Função e Lotação</span>
         </CardTitle>
       </CardHeader>
