@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
+import { Form } from '@/components/ui/form'; // IMPORTANTE!
 import { useProfileData } from '@/hooks/useProfileData';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -233,70 +234,72 @@ const ProfileEditForm = () => {
   if (error) return <div className="text-red-500">Error: {error}</div>;
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      <Card>
-        <CardContent>
-          <ProfilePhotoSection
-            fotoUrl={fotoUrl}
-            uploading={uploading}
-            userName={userProfile?.name}
-            uploadFoto={uploadFoto}
-          />
-        </CardContent>
-      </Card>
+    <Form {...form}>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <Card>
+          <CardContent>
+            <ProfilePhotoSection
+              fotoUrl={fotoUrl}
+              uploading={uploading}
+              userName={userProfile?.name}
+              uploadFoto={uploadFoto}
+            />
+          </CardContent>
+        </Card>
 
-      <BasicInfo form={form} />
-      <CargoUnidade form={form} safeCargos={safeCargos} safeFuncoes={safeFuncoes} safeUnidades={safeUnidades} isValidSelectValue={isValidSelectValue} />
-      {/* <AreasConhecimento
-        selectedAreasConhecimento={selectedAreasConhecimento}
-        setSelectedAreasConhecimento={setSelectedAreasConhecimento}
-        selectedTemasInteresse={selectedTemasInteresse}
-        setSelectedTemasInteresse={setSelectedTemasInteresse}
-        selectedIdiomas={selectedIdiomas}
-        setSelectedIdiomas={setSelectedIdiomas}
-        safeAreasConhecimento={safeAreasConhecimento}
-        safeTemasInteresse={safeTemasInteresse}
-        safeIdiomas={safeIdiomas}
-      /> */}
-      <AcademicFormation form={form} />
-      {/* <ProfessionalExperience form={form} /> */}
-      <AvailabilitySection
-        tipoColaboracao={tipoColaboracao}
-        setTipoColaboracao={setTipoColaboracao}
-        disponibilidadeEstimada={disponibilidadeEstimada}
-        setDisponibilidadeEstimada={setDisponibilidadeEstimada}
-        safeTiposColaboracao={safeTiposColaboracao}
-        safeDisponibilidadeEstimada={safeDisponibilidadeEstimada}
-        isValidSelectValue={isValidSelectValue}
-      />
-      <ContactPreferences
-        formaContato={formaContato}
-        setFormaContato={setFormaContato}
-        horarioPreferencial={horarioPreferencial}
-        setHorarioPreferencial={setHorarioPreferencial}
-        safeFormasContato={safeFormasContato}
-        isValidSelectValue={isValidSelectValue}
-      />
-      <CertificationsSection form={form} />
-      <PublicationsSection form={form} />
-      <AdditionalInfo form={form} />
+        <BasicInfo form={form} />
+        <CargoUnidade form={form} safeCargos={safeCargos} safeFuncoes={safeFuncoes} safeUnidades={safeUnidades} isValidSelectValue={isValidSelectValue} />
+        {/* <AreasConhecimento
+          selectedAreasConhecimento={selectedAreasConhecimento}
+          setSelectedAreasConhecimento={setSelectedAreasConhecimento}
+          selectedTemasInteresse={selectedTemasInteresse}
+          setSelectedTemasInteresse={setSelectedTemasInteresse}
+          selectedIdiomas={selectedIdiomas}
+          setSelectedIdiomas={setSelectedIdiomas}
+          safeAreasConhecimento={safeAreasConhecimento}
+          safeTemasInteresse={safeTemasInteresse}
+          safeIdiomas={safeIdiomas}
+        /> */}
+        <AcademicFormation form={form} />
+        {/* <ProfessionalExperience form={form} /> */}
+        <AvailabilitySection
+          tipoColaboracao={tipoColaboracao}
+          setTipoColaboracao={setTipoColaboracao}
+          disponibilidadeEstimada={disponibilidadeEstimada}
+          setDisponibilidadeEstimada={setDisponibilidadeEstimada}
+          safeTiposColaboracao={safeTiposColaboracao}
+          safeDisponibilidadeEstimada={safeDisponibilidadeEstimada}
+          isValidSelectValue={isValidSelectValue}
+        />
+        <ContactPreferences
+          formaContato={formaContato}
+          setFormaContato={setFormaContato}
+          horarioPreferencial={horarioPreferencial}
+          setHorarioPreferencial={setHorarioPreferencial}
+          safeFormasContato={safeFormasContato}
+          isValidSelectValue={isValidSelectValue}
+        />
+        <CertificationsSection form={form} />
+        <PublicationsSection form={form} />
+        <AdditionalInfo form={form} />
 
-      <div className="flex justify-end">
-        <Button type="submit" disabled={isSubmitting} variant="logo-brown">
-          {isSubmitting ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Aguarde...
-            </>
-          ) : (
-            <>
-              <Edit className="mr-2 h-4 w-4" />
-              Salvar Alterações
-            </>
-          )}
-        </Button>
-      </div>
-    </form>
+        <div className="flex justify-end">
+          <Button type="submit" disabled={isSubmitting} variant="logo-brown">
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Aguarde...
+              </>
+            ) : (
+              <>
+                <Edit className="mr-2 h-4 w-4" />
+                Salvar Alterações
+              </>
+            )}
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 };
 
