@@ -18,7 +18,7 @@ export const profileSchema = z.object({
   unidade: z.array(z.string()).min(1, 'Pelo menos uma unidade é obrigatória'),
   areasConhecimento: z.array(z.string()),
   temasInteresse: z.array(z.string()),
-  idiomas: z.array(z.string()),
+  idiomas: z.array(z.string()), // seção própria
   linkCurriculo: z.string().optional(),
   certificacoes: z.array(z.string()),
   aceiteTermos: z.boolean().refine(val => val === true, 'Você deve aceitar os termos'),
@@ -36,7 +36,7 @@ export const defaultFormValues = {
   unidade: [],
   areasConhecimento: [],
   temasInteresse: [],
-  idiomas: [],
+  idiomas: [], // campo separado
   linkCurriculo: '',
   certificacoes: [],
   aceiteTermos: false,

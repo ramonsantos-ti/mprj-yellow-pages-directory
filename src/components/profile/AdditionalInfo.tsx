@@ -16,7 +16,7 @@ const AdditionalInfo: React.FC<AdditionalInfoProps> = ({ form }) => {
         <CardTitle>Informações Complementares</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Campo livre */}
+        {/* Campo livre de informações complementares */}
         <FormField
           control={form.control}
           name="informacoesComplementares"
@@ -34,7 +34,7 @@ const AdditionalInfo: React.FC<AdditionalInfoProps> = ({ form }) => {
             </FormItem>
           )}
         />
-        {/* Termos */}
+        {/* Aceite dos termos */}
         <FormField
           control={form.control}
           name="aceiteTermos"

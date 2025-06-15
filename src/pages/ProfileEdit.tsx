@@ -131,10 +131,8 @@ const ProfileEdit: React.FC = () => {
 
           <InterestAreaSelector form={form} fieldName="areasConhecimento" />
 
-          {/* Seção Formação Acadêmica e Projetos lado a lado */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <AcademicFormation form={form} />
-            
             <Card>
               <CardContent>
                 <ProjectsManager
@@ -145,7 +143,6 @@ const ProfileEdit: React.FC = () => {
             </Card>
           </div>
 
-          {/* Seção Certificações e Publicações lado a lado */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <CertificationsSection form={form} />
             <PublicationsSection form={form} />
@@ -170,8 +167,10 @@ const ProfileEdit: React.FC = () => {
             isValidSelectValue={isValidSelectValue}
           />
 
+          {/* Seção de Idiomas SEPARADA */}
           <LanguagesSection form={form} />
 
+          {/* Informações Complementares reduzidas, somente texto livre + aceite dos termos */}
           <AdditionalInfo form={form} />
 
           <Card>
