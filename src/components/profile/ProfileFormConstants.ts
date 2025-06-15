@@ -17,7 +17,21 @@ export const safeCargos = [
 ];
 
 export const safeFuncoes = [
-  'Coordenador', 'Assessor Técnico', 'Chefe de Seção', 'Supervisor'
+  "Procurador-Geral de Justiça",
+  "Subprocurador-geral de Justiça",
+  "Corregedor-geral",
+  "Subcorregedor-geral",
+  "Conselheiro",
+  "Coordenador",
+  "Diretor",
+  "Gerente",
+  "Assessor",
+  "Chefe",
+  "Secretário",
+  "Supervisor",
+  "Perito",
+  "Consultor",
+  "Auditor"
 ];
 
 export const safeUnidades = [
