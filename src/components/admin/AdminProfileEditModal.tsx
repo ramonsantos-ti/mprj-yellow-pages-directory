@@ -19,7 +19,6 @@ const adminProfileSchema = z.object({
   email: z.string().email('Email inválido'),
   telefone: z.string().optional(),
   biografia: z.string().optional(),
-  especializacoes: z.string().optional(),
   linkCurriculo: z.string().optional(),
   publicacoes: z.string().optional(),
 });
@@ -53,7 +52,6 @@ const AdminProfileEditModal: React.FC<AdminProfileEditModalProps> = ({
       email: profile.email,
       telefone: profile.telefone || '',
       biografia: profile.biografia || '',
-      especializacoes: profile.especializacoes || '',
       linkCurriculo: profile.linkCurriculo || '',
       publicacoes: profile.publicacoes || '',
     }
@@ -292,21 +290,6 @@ const AdminProfileEditModal: React.FC<AdminProfileEditModalProps> = ({
                 </FormItem>
               )}
             />
-            
-            <FormField
-              control={form.control}
-              name="especializacoes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Especializações</FormLabel>
-                  <FormControl>
-                    <Textarea {...field} rows={2} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
             <FormField
               control={form.control}
               name="linkCurriculo"
@@ -320,7 +303,6 @@ const AdminProfileEditModal: React.FC<AdminProfileEditModalProps> = ({
                 </FormItem>
               )}
             />
-            
             <FormField
               control={form.control}
               name="publicacoes"

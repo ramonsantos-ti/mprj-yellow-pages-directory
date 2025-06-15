@@ -167,7 +167,6 @@ export const mockProfiles: Profile[] = [
     telefone: '(21) 99999-1234',
     email: 'mariana.santos@mprj.mp.br',
     biografia: 'Procuradora-Geral de Justiça com mais de 20 anos de experiência no Ministério Público. Especialista em direito constitucional e gestão pública, com foco em modernização institucional e transparência.',
-    especializacoes: 'Doutorado em Direito Constitucional pela USP, MBA em Gestão Pública pela FGV',
     projetos: [
       {
         nome: 'Programa de Modernização do MPRJ',
@@ -227,7 +226,6 @@ export const mockProfiles: Profile[] = [
     telefone: '(21) 99999-5678',
     email: 'roberto.mendes@mprj.mp.br',
     biografia: 'Procurador de Justiça com vasta experiência em corregedoria e controle interno. Especialista em ética no serviço público e compliance institucional.',
-    especializacoes: 'Mestrado em Direito Administrativo pela UERJ, Especialização em Compliance Público',
     projetos: [
       {
         nome: 'Sistema de Integridade MPRJ',
@@ -276,7 +274,6 @@ export const mockProfiles: Profile[] = [
     telefone: '(21) 99999-9012',
     email: 'ana.oliveira@mprj.mp.br',
     biografia: 'Promotora de Justiça especializada em violência doméstica e direitos da mulher. Coordenadora de projetos sociais de prevenção e atendimento às vítimas.',
-    especializacoes: 'Especialização em Violência Doméstica e Familiar pela PUC-Rio',
     projetos: [
       {
         nome: 'Rede de Proteção à Mulher',
@@ -336,7 +333,6 @@ export const mockProfiles: Profile[] = [
     telefone: '(21) 99999-3456',
     email: 'hiroshi.yamamoto@mprj.mp.br',
     biografia: 'Diretor de TI com formação em Engenharia de Software e vasta experiência em transformação digital. Responsável pela modernização tecnológica do MPRJ.',
-    especializacoes: 'Mestrado em Engenharia de Software pela COPPE/UFRJ, Certificação em Cloud Computing',
     projetos: [
       {
         nome: 'MPRJ Digital 2024',
@@ -396,7 +392,6 @@ export const mockProfiles: Profile[] = [
     telefone: '(21) 99999-7890',
     email: 'gabriel.costa@mprj.mp.br',
     biografia: 'Promotor de Justiça especializado em direito ambiental e sustentabilidade. Atua na defesa do meio ambiente e recursos naturais do Estado do Rio de Janeiro.',
-    especializacoes: 'Mestrado em Direito Ambiental pela UERJ, Especialização em Gestão Ambiental',
     projetos: [
       {
         nome: 'Proteção da Mata Atlântica Fluminense',
@@ -456,7 +451,6 @@ export const mockProfiles: Profile[] = [
     telefone: '(21) 99999-4567',
     email: 'carolina.alves@mprj.mp.br',
     biografia: 'Gerente de Comunicação Social com formação em Jornalismo e especialização em comunicação pública. Responsável pela estratégia de comunicação institucional do MPRJ.',
-    especializacoes: 'MBA em Comunicação Estratégica pela ESPM, Especialização em Marketing Digital',
     projetos: [
       {
         nome: 'Nova Identidade Visual MPRJ',
@@ -516,7 +510,6 @@ export const mockProfiles: Profile[] = [
     telefone: '(21) 99999-8901',
     email: 'marcus.johnson@mprj.mp.br',
     biografia: 'Chefe da Assessoria Internacional com formação em Relações Internacionais. Especialista em cooperação jurídica internacional e acordos multilaterais.',
-    especializacoes: 'Mestrado em Relações Internacionais pela UnB, LLM em Direito Internacional pela NYU',
     projetos: [
       {
         nome: 'Acordo de Cooperação com Mercosul',
@@ -576,7 +569,6 @@ export const mockProfiles: Profile[] = [
     telefone: '(21) 99999-2345',
     email: 'diego.martinez@mprj.mp.br',
     biografia: 'Secretário de Planejamento Estratégico com formação em Administração Pública. Especialista em gestão de projetos e indicadores de performance.',
-    especializacoes: 'MBA em Gestão de Projetos pela FGV, Certificação PMP',
     projetos: [
       {
         nome: 'Sistema de Monitoramento Estratégico',
@@ -631,7 +623,6 @@ export const mockProfiles: Profile[] = [
     telefone: '(21) 99999-6789',
     email: 'fatima.hassan@mprj.mp.br',
     biografia: 'Médica residente especializada em medicina legal e perícia médica. Contribui para a modernização dos procedimentos periciais do MPRJ.',
-    especializacoes: 'Residência em Medicina Legal pela UFRJ, Especialização em Toxicologia Forense',
     projetos: [
       {
         nome: 'Protocolos Digitais de Perícia',
@@ -686,7 +677,6 @@ export const mockProfiles: Profile[] = [
     telefone: '(21) 99999-1357',
     email: 'rajesh.patel@mprj.mp.br',
     biografia: 'Economista cedido ao MPRJ, especialista em análise econômica de crimes financeiros e lavagem de dinheiro. Supervisor da equipe de análise econômica.',
-    especializacoes: 'Doutorado em Economia pela LSE (Reino Unido), CFA (Chartered Financial Analyst)',
     projetos: [
       {
         nome: 'Sistema de Detecção de Lavagem de Dinheiro',
@@ -746,7 +736,6 @@ export const mockProfiles: Profile[] = [
     telefone: '(21) 99999-4578',
     email: 'alexandre.santos@mprj.mp.br',
     biografia: 'Promotor de Justiça especializado em investigação criminal e segurança pública. Coordenador de operações complexas envolvendo crimes organizados e corrupção.',
-    especializacoes: 'Mestrado em Ciências Criminais pela PUCRS, Especialização em Investigação Criminal pela Academia Nacional de Polícia',
     projetos: [
       {
         nome: 'Operação Transparência Total',
@@ -806,7 +795,6 @@ export const mockProfiles: Profile[] = [
     telefone: '(21) 99999-7845',
     email: 'camila.lima@mprj.mp.br',
     biografia: 'Gerente de RH com especialização em desenvolvimento organizacional e gestão de pessoas. Responsável por implementar políticas de desenvolvimento de carreira e bem-estar dos servidores.',
-    especializacoes: 'MBA em Gestão de Pessoas pela FGV, Especialização em Psicologia Organizacional pela PUC-Rio',
     projetos: [
       {
         nome: 'Programa Bem-Estar MPRJ',
@@ -866,7 +854,6 @@ export const mockProfiles: Profile[] = [
     telefone: '(21) 99999-9632',
     email: 'fernando.almeida@mprj.mp.br',
     biografia: 'Procurador de Justiça com mais de 25 anos de experiência no Ministério Público. Especialista em gestão administrativa e modernização de processos institucionais.',
-    especializacoes: 'Doutorado em Direito Administrativo pela USP, MBA Executivo em Administração Pública pela FGV',
     projetos: [
       {
         nome: 'Reforma Administrativa MPRJ 2024',
@@ -926,7 +913,6 @@ export const mockProfiles: Profile[] = [
     telefone: '(21) 99999-1593',
     email: 'priscila.silva@mprj.mp.br',
     biografia: 'Promotora de Justiça especializada em direitos sociais e inclusão. Coordenadora de programas de mobilização social e acesso à justiça para comunidades vulneráveis.',
-    especializacoes: 'Mestrado em Direitos Humanos pela PUC-Rio, Especialização em Políticas Públicas Sociais pela UERJ',
     projetos: [
       {
         nome: 'MPRJ na Comunidade',

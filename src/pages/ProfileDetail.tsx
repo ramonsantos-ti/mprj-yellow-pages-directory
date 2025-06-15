@@ -81,7 +81,6 @@ const ProfileDetail: React.FC = () => {
         telefone: profileData.telefone || '',
         email: profileData.email || '',
         biografia: profileData.biografia || '',
-        especializacoes: profileData.especializacoes || '',
         temasInteresse: Array.isArray(profileData.temas_interesse) ? profileData.temas_interesse : [],
         idiomas: Array.isArray(profileData.idiomas) ? profileData.idiomas : [],
         linkCurriculo: profileData.link_curriculo || '',
@@ -181,7 +180,7 @@ const ProfileDetail: React.FC = () => {
       <LanguagesAndCertifications idiomas={profile.idiomas} certificacoes={[]} />
 
       {/* Informações Complementares */}
-      <ProfileAdditionalInfo especializacoes={profile.especializacoes} />
+      <ProfileAdditionalInfo especializacoes={profile.informacoesComplementares} />
     </div>
   );
 };

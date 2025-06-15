@@ -25,19 +25,17 @@ export const useAdminProfiles = () => {
 
       if (error) throw error;
 
-      // Transform Supabase data to match our Profile type
       const transformedProfiles: Profile[] = data.map(profile => ({
         id: profile.id,
         userId: profile.user_id || '',
         name: profile.name,
-        matricula: profile.matricula, // Keep matricula exactly as stored
+        matricula: profile.matricula, 
         cargo: profile.cargo || [],
         funcao: profile.funcao || [],
         unidade: profile.unidade || [],
         telefone: profile.telefone || '',
         email: profile.email,
         biografia: profile.biografia || '',
-        especializacoes: profile.especializacoes || '',
         temasInteresse: profile.temas_interesse || [],
         idiomas: profile.idiomas || [],
         linkCurriculo: profile.link_curriculo || '',
@@ -101,13 +99,12 @@ export const useAdminProfiles = () => {
         .from('profiles')
         .update({
           name: updatedData.name,
-          matricula: updatedData.matricula, // Store matricula exactly as provided
+          matricula: updatedData.matricula, 
           email: updatedData.email,
           cargo: updatedData.cargo,
           unidade: updatedData.unidade,
           telefone: updatedData.telefone,
           biografia: updatedData.biografia,
-          especializacoes: updatedData.especializacoes,
           temas_interesse: updatedData.temasInteresse,
           idiomas: updatedData.idiomas,
           link_curriculo: updatedData.linkCurriculo,
@@ -121,10 +118,9 @@ export const useAdminProfiles = () => {
 
       if (error) throw error;
 
-      // Add audit log
       await addAuditLog('Perfil editado', `Perfil foi editado pelo administrador`);
       
-      await fetchAllProfiles(); // Refresh data
+      await fetchAllProfiles();
     } catch (err: any) {
       console.error('Error updating profile:', err);
       throw err;
@@ -151,7 +147,7 @@ export const useAdminProfiles = () => {
         `Status do perfil ${profile?.name} alterado`
       );
       
-      await fetchAllProfiles(); // Refresh data
+      await fetchAllProfiles();
     } catch (err: any) {
       console.error('Error toggling profile status:', err);
       throw err;
@@ -178,7 +174,7 @@ export const useAdminProfiles = () => {
         `Papel do usuário ${profile?.name} alterado`
       );
       
-      await fetchAllProfiles(); // Refresh data
+      await fetchAllProfiles();
     } catch (err: any) {
       console.error('Error promoting profile:', err);
       throw err;

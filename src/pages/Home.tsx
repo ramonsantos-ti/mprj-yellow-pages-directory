@@ -17,9 +17,7 @@ const Home: React.FC = () => {
         profile.matricula.includes(searchTerm) ||
         profile.temasInteresse.some(area => 
           area.toLowerCase().includes(searchTerm.toLowerCase())
-        ) ||
-        (profile.especializacoes && profile.especializacoes.toLowerCase().includes(searchTerm.toLowerCase()));
-
+        );
       return matchesSearch;
     });
   }, [profiles, searchTerm]);

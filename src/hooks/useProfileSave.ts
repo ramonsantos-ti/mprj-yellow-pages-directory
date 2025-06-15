@@ -31,10 +31,6 @@ export const useProfileSave = () => {
         ? data.publicacoes
         : (data.publicacoes ? String(data.publicacoes) : "");
 
-      const safeEspecializacoes = typeof data.especializacoes === 'string'
-        ? data.especializacoes
-        : (data.especializacoes ? String(data.especializacoes) : "");
-
       // INFO: Agora ignoramos informacoesComplementares no campo especializacoes!
       const informacoesComplementares =
         typeof data.informacoesComplementares === 'string'
@@ -51,7 +47,6 @@ export const useProfileSave = () => {
         cargo: data.cargo || [],
         funcao: data.funcao || [],
         unidade: data.unidade || [],
-        especializacoes: safeEspecializacoes || "",
         informacoes_complementares: informacoesComplementares || "",
         temas_interesse: data.temasInteresse || [],
         idiomas: data.idiomas || [],
@@ -80,7 +75,6 @@ export const useProfileSave = () => {
             cargo,
             funcao,
             unidade,
-            especializacoes,
             temas_interesse,
             idiomas,
             link_curriculo,
@@ -107,7 +101,6 @@ export const useProfileSave = () => {
             cargo,
             funcao,
             unidade,
-            especializacoes,
             temas_interesse,
             idiomas,
             link_curriculo,
