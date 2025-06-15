@@ -38,6 +38,7 @@ const ProfileEditForm: React.FC = () => {
     disponibilidade,
     setDisponibilidade
   } = useProfileEditFormController();
+
   function renderFormErrors() {
     const errors = form.formState.errors;
     if (Object.keys(errors).length === 0) return null;
@@ -118,6 +119,8 @@ const ProfileEditForm: React.FC = () => {
           })} safeFormasContato={safeFormasContato} isValidSelectValue={isValidSelectValue} />
             <LanguagesSection form={form} />
           </div>
+
+          {/* Removido campo "especializacoes" e componentes relativos */}
 
           <AdditionalInfo form={form} />
 

@@ -1,17 +1,14 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 
 interface PublicationsAndCurriculumProps {
   publicacoes?: string;
   linkCurriculo?: string;
-  especializacoes?: string;
 }
 
 const PublicationsAndCurriculum: React.FC<PublicationsAndCurriculumProps> = ({ 
   publicacoes, 
-  linkCurriculo, 
-  especializacoes 
+  linkCurriculo 
 }) => {
   return (
     <>
@@ -50,20 +47,6 @@ const PublicationsAndCurriculum: React.FC<PublicationsAndCurriculumProps> = ({
           </CardContent>
         </Card>
       </div>
-
-      {/* Specializations */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Especializações</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {especializacoes && especializacoes.trim() !== '' ? (
-            <p className="text-gray-700 leading-relaxed">{especializacoes}</p>
-          ) : (
-            <p className="text-gray-500 italic">Nenhuma especialização informada</p>
-          )}
-        </CardContent>
-      </Card>
     </>
   );
 };

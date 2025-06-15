@@ -40,7 +40,6 @@ export const useProfiles = () => {
           telefone: profile.telefone || '',
           email: profile.email,
           biografia: profile.biografia || '',
-          especializacoes: profile.especializacoes || '',
           temasInteresse: profile.temas_interesse || [],
           idiomas: profile.idiomas || [],
           linkCurriculo: profile.link_curriculo || '',

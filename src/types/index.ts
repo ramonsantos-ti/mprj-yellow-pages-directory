@@ -22,9 +22,9 @@ export interface Profile {
   telefone?: string;
   email: string;
   biografia?: string;
-  especializacoes?: string;
+  // especializacoes?: string; // REMOVIDO
   projetos: Project[];
-  temasInteresse: string[]; // ← unificado aqui
+  temasInteresse: string[];
   formacaoAcademica: FormacaoAcademica[];
   experienciasProfissionais: ExperienciaProfissional[];
   idiomas: string[];

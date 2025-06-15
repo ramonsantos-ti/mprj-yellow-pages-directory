@@ -25,21 +25,21 @@ export const useProfileSave = () => {
 
       const safeBiografia = typeof data.biografia === 'string'
         ? data.biografia
-        : (data.biografia ? String(data.biografia) : '');
+        : (data.biografia ? String(data.biografia) : "");
 
       const safePublicacoes = typeof data.publicacoes === 'string'
         ? data.publicacoes
-        : (data.publicacoes ? String(data.publicacoes) : '');
+        : (data.publicacoes ? String(data.publicacoes) : "");
 
       const safeEspecializacoes = typeof data.especializacoes === 'string'
         ? data.especializacoes
-        : (data.especializacoes ? String(data.especializacoes) : '');
+        : (data.especializacoes ? String(data.especializacoes) : "");
 
       // INFO: Agora ignoramos informacoesComplementares no campo especializacoes!
       const informacoesComplementares =
         typeof data.informacoesComplementares === 'string'
           ? data.informacoesComplementares
-          : (data.informacoesComplementares ? String(data.informacoesComplementares) : '');
+          : (data.informacoesComplementares ? String(data.informacoesComplementares) : "");
 
       const profileData = {
         user_id: user?.id,

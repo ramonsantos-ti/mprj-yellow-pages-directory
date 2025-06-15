@@ -1,4 +1,3 @@
-
 import * as z from 'zod';
 
 const formacaoAcademicaSchema = z.object({
@@ -23,7 +22,6 @@ export const profileSchema = z.object({
   aceiteTermos: z.boolean().refine(val => val === true, 'Você deve aceitar os termos'),
   biografia: z.string().optional(),
   publicacoes: z.string().optional(),
-  especializacoes: z.string().optional(),
   informacoesComplementares: z.string().optional(),
   formacaoAcademica: z
     .array(formacaoAcademicaSchema)
@@ -62,7 +60,7 @@ export const defaultFormValues = {
   cargo: [],
   funcao: [],
   unidade: [],
-  temasInteresse: [], // <-- agora aqui!
+  temasInteresse: [],
   idiomas: [],
   linkCurriculo: '',
   certificacoes: [],
@@ -70,6 +68,5 @@ export const defaultFormValues = {
   formacaoAcademica: [],
   biografia: '',
   publicacoes: '',
-  especializacoes: '',
   informacoesComplementares: "",
 };

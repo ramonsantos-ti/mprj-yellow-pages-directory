@@ -1,4 +1,3 @@
-
 import { jsPDF } from 'jspdf';
 import { Profile } from '../types';
 

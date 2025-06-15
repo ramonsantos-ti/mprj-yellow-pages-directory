@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { Profile } from '../../types';
@@ -39,9 +38,8 @@ export const useProfileFormHandler = ({
     form.setValue('cargo', profile.cargo || []);
     form.setValue('funcao', profile.funcao || []);
     form.setValue('unidade', profile.unidade || []);
-    // REMOVIDO: form.setValue('areasConhecimento', profile.areasConhecimento || []);
-    form.setValue('especializacoes', profile.especializacoes ?? "");
-    form.setValue('temasInteresse', profile.temasInteresse || []); // agora é único
+    // form.setValue('especializacoes', profile.especializacoes ?? ""); // REMOVIDO
+    form.setValue('temasInteresse', profile.temasInteresse || []);
     form.setValue('idiomas', profile.idiomas || []);
     form.setValue('linkCurriculo', profile.linkCurriculo ?? "");
     form.setValue('certificacoes', profile.certificacoes || []);

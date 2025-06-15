@@ -182,7 +182,6 @@ export type Database = {
           certificacoes: string[] | null
           created_at: string | null
           email: string
-          especializacoes: string | null
           foto_url: string | null
           funcao: string[] | null
           id: string
@@ -208,7 +207,6 @@ export type Database = {
           certificacoes?: string[] | null
           created_at?: string | null
           email: string
-          especializacoes?: string | null
           foto_url?: string | null
           funcao?: string[] | null
           id?: string
@@ -234,7 +232,6 @@ export type Database = {
           certificacoes?: string[] | null
           created_at?: string | null
           email?: string
-          especializacoes?: string | null
           foto_url?: string | null
           funcao?: string[] | null
           id?: string
