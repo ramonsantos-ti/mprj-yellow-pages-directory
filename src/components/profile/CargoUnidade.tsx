@@ -1,6 +1,6 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Badge as BadgeIcon } from 'lucide-react'; // Ícone de crachá
 import { Badge } from '../ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
@@ -25,7 +25,10 @@ const CargoUnidade: React.FC<CargoUnidadeProps> = ({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Cargo, Função e Lotação</CardTitle>
+        <CardTitle className="flex items-center space-x-2">
+          <BadgeIcon className="w-5 h-5 text-red-900" />
+          <span>Cargo, Função e Lotação</span>
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <FormField
