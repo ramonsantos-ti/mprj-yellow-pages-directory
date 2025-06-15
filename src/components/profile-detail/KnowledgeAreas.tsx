@@ -47,7 +47,7 @@ const KnowledgeAreas: React.FC<KnowledgeAreasProps> = ({ areasConhecimento, tema
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <Target className="w-5 h-5" />
-            <span>Área de Interesse</span>
+            <span>Áreas de Interesse</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
