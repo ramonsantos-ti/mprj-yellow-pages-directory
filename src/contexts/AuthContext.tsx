@@ -1,7 +1,8 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User as SupabaseUser, Session } from '@supabase/supabase-js';
 import { supabase } from '../integrations/supabase/client';
+import { useAutoLogout } from "../hooks/useAutoLogout";
+import { toast } from "../components/ui/sonner";
 
 interface User {
   id: string;
@@ -107,6 +108,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       subscription.unsubscribe();
     };
   }, []);
+
+  // --- NOVO: Logout automático por inatividade ---
+  useAutoLogout(
+    15 * 60 * 1000, // 15 minutos em ms
+    () => {
+      if (user) {
+        toast({
+          title: "Sessão expirada por inatividade",
+          description: "Você foi desconectado por ficar 15 minutos sem usar o sistema.",
+          variant: "destructive",
+        });
+        void logout();
+      }
+    }
+  );
+  // --- FIM NOVO ---
 
   const login = async (email: string, password: string): Promise<{ error?: string }> => {
     try {
