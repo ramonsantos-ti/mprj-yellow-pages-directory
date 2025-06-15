@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Profile } from '../../types';
 import { Card, CardContent } from '../ui/card';
@@ -10,6 +11,7 @@ import { Search, UserCheck, UserX, Shield, Trash2, CheckCircle, XCircle, Edit } 
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import AdminProfileEditModal from './AdminProfileEditModal';
+import { useToast } from '@/hooks/use-toast';
 
 interface ProfilesTabProps {
   searchTerm: string;
@@ -31,6 +33,8 @@ const ProfilesTab: React.FC<ProfilesTabProps> = ({
   updateProfile
 }) => {
   const [editingProfile, setEditingProfile] = useState<Profile | null>(null);
+  const [deletingProfile, setDeletingProfile] = useState<Profile | null>(null);
+  const { toast } = useToast();
 
   const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
@@ -39,6 +43,24 @@ const ProfilesTab: React.FC<ProfilesTabProps> = ({
   const isRecentlyUpdated = (lastUpdated: Date) => {
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
     return new Date(lastUpdated) > oneDayAgo;
+  };
+
+  const handleDeleteProfile = async (profile: Profile) => {
+    try {
+      await deleteProfile(profile.id);
+      setDeletingProfile(null);
+      toast({
+        title: "Usuário excluído com sucesso",
+        description: `${profile.name} e todos os seus dados foram removidos permanentemente do sistema.`,
+      });
+    } catch (error: any) {
+      console.error('Erro ao excluir usuário:', error);
+      toast({
+        title: "Erro ao excluir usuário",
+        description: error.message || "Ocorreu um erro inesperado ao tentar excluir o usuário.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -233,6 +255,7 @@ const ProfilesTab: React.FC<ProfilesTabProps> = ({
                         variant="outline"
                         size="sm"
                         className="flex items-center space-x-1 text-red-600 hover:text-red-700"
+                        onClick={() => setDeletingProfile(profile)}
                       >
                         <Trash2 className="w-4 h-4" />
                         <span>Excluir</span>
@@ -240,19 +263,46 @@ const ProfilesTab: React.FC<ProfilesTabProps> = ({
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Tem certeza que deseja excluir o perfil de {profile.name}? 
-                          Esta ação não pode ser desfeita.
+                        <AlertDialogTitle className="text-red-600">⚠️ ATENÇÃO: Exclusão Permanente</AlertDialogTitle>
+                        <AlertDialogDescription className="space-y-4">
+                          <div className="font-semibold text-gray-900">
+                            Você está prestes a excluir PERMANENTEMENTE o usuário:
+                          </div>
+                          <div className="bg-gray-50 p-4 rounded-lg border">
+                            <div><strong>Nome:</strong> {profile.name}</div>
+                            <div><strong>Email:</strong> {profile.email}</div>
+                            <div><strong>Matrícula:</strong> {profile.matricula}</div>
+                          </div>
+                          <div className="text-red-700 font-medium">
+                            Esta ação irá excluir TODOS os dados do usuário:
+                          </div>
+                          <ul className="list-disc list-inside text-sm space-y-1 text-gray-700">
+                            <li>Perfil principal e informações pessoais</li>
+                            <li>Todos os projetos cadastrados</li>
+                            <li>Formações acadêmicas</li>
+                            <li>Experiências profissionais</li>
+                            <li>Disponibilidade e preferências de contato</li>
+                            <li>Certificações e publicações</li>
+                          </ul>
+                          <div className="bg-red-50 border border-red-200 p-3 rounded-lg">
+                            <div className="text-red-800 font-semibold text-sm">
+                              ⚠️ ESTA AÇÃO NÃO PODE SER DESFEITA!
+                            </div>
+                            <div className="text-red-700 text-sm mt-1">
+                              Todos os dados serão perdidos permanentemente.
+                            </div>
+                          </div>
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogCancel onClick={() => setDeletingProfile(null)}>
+                          Cancelar
+                        </AlertDialogCancel>
                         <AlertDialogAction
-                          onClick={() => deleteProfile(profile.id)}
-                          className="bg-red-600 hover:bg-red-700"
+                          onClick={() => handleDeleteProfile(profile)}
+                          className="bg-red-600 hover:bg-red-700 focus:ring-red-500"
                         >
-                          Excluir
+                          SIM, EXCLUIR PERMANENTEMENTE
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>

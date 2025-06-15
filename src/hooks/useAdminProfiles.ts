@@ -190,22 +190,83 @@ export const useAdminProfiles = () => {
   const deleteProfile = async (profileId: string) => {
     try {
       const profile = profiles.find(p => p.id === profileId);
+      
+      if (!profile) {
+        throw new Error('Perfil não encontrado');
+      }
 
-      const { error } = await supabase
+      console.log(`Iniciando exclusão completa do usuário: ${profile.name} (${profile.email})`);
+
+      // 1. Excluir dados relacionados primeiro (devido às foreign keys)
+      
+      // Excluir projetos
+      const { error: projectsError } = await supabase
+        .from('projects')
+        .delete()
+        .eq('profile_id', profileId);
+      
+      if (projectsError) {
+        console.error('Erro ao excluir projetos:', projectsError);
+        throw new Error(`Erro ao excluir projetos: ${projectsError.message}`);
+      }
+
+      // Excluir formações acadêmicas
+      const { error: academicError } = await supabase
+        .from('academic_formations')
+        .delete()
+        .eq('profile_id', profileId);
+      
+      if (academicError) {
+        console.error('Erro ao excluir formações acadêmicas:', academicError);
+        throw new Error(`Erro ao excluir formações acadêmicas: ${academicError.message}`);
+      }
+
+      // Excluir experiências profissionais
+      const { error: experienceError } = await supabase
+        .from('professional_experiences')
+        .delete()
+        .eq('profile_id', profileId);
+      
+      if (experienceError) {
+        console.error('Erro ao excluir experiências profissionais:', experienceError);
+        throw new Error(`Erro ao excluir experiências profissionais: ${experienceError.message}`);
+      }
+
+      // Excluir disponibilidade
+      const { error: availabilityError } = await supabase
+        .from('availability')
+        .delete()
+        .eq('profile_id', profileId);
+      
+      if (availabilityError) {
+        console.error('Erro ao excluir disponibilidade:', availabilityError);
+        throw new Error(`Erro ao excluir disponibilidade: ${availabilityError.message}`);
+      }
+
+      // 2. Por fim, excluir o perfil principal
+      const { error: profileError } = await supabase
         .from('profiles')
         .delete()
         .eq('id', profileId);
 
-      if (error) throw error;
+      if (profileError) {
+        console.error('Erro ao excluir perfil:', profileError);
+        throw new Error(`Erro ao excluir perfil: ${profileError.message}`);
+      }
 
+      // 3. Registrar no log de auditoria
       await addAuditLog(
-        'Perfil excluído',
-        `Perfil ${profile?.name} foi excluído permanentemente`
+        'Usuário excluído completamente',
+        `Usuário ${profile.name} (${profile.email}) e todos os seus dados foram excluídos permanentemente do sistema`
       );
       
-      await fetchAllProfiles(); // Refresh data
+      console.log(`Usuário ${profile.name} excluído com sucesso`);
+      
+      // Refresh data
+      await fetchAllProfiles();
+      
     } catch (err: any) {
-      console.error('Error deleting profile:', err);
+      console.error('Error deleting profile completely:', err);
       throw err;
     }
   };
