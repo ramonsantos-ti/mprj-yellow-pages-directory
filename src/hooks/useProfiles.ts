@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Profile } from '../types';
@@ -41,7 +40,6 @@ export const useProfiles = () => {
           telefone: profile.telefone || '',
           email: profile.email,
           biografia: profile.biografia || '',
-          areasConhecimento: profile.areas_conhecimento || [],
           especializacoes: profile.especializacoes || '',
           temasInteresse: profile.temas_interesse || [],
           idiomas: profile.idiomas || [],

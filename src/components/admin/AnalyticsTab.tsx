@@ -19,7 +19,7 @@ const AnalyticsTab: React.FC<AnalyticsTabProps> = ({ profiles }) => {
     p.email && 
     p.cargo?.length > 0 && 
     p.unidade?.length > 0 && 
-    p.areasConhecimento?.length > 0
+    p.temasInteresse?.length > 0
   );
   
   const completionRate = totalProfiles > 0 ? Math.round((completeProfiles.length / totalProfiles) * 100) : 0;
@@ -31,12 +31,12 @@ const AnalyticsTab: React.FC<AnalyticsTabProps> = ({ profiles }) => {
   
   const updateRate = totalProfiles > 0 ? Math.round((recentlyUpdated.length / totalProfiles) * 100) : 0;
 
-  const allAreas = [...new Set(profiles.flatMap(p => p.areasConhecimento || []))];
+  const allAreas = [...new Set(profiles.flatMap(p => p.temasInteresse || []))];
   const allUnidades = [...new Set(profiles.flatMap(p => p.unidade || []))];
 
   const specialistsByArea = allAreas.map(area => ({
     area,
-    count: profiles.filter(p => p.areasConhecimento?.includes(area)).length
+    count: profiles.filter(p => p.temasInteresse?.includes(area)).length
   })).sort((a, b) => b.count - a.count);
 
   const specialistsByUnit = allUnidades.map(unit => ({

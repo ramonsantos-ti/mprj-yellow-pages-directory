@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -42,10 +41,8 @@ const AdminProfileEditModal: React.FC<AdminProfileEditModalProps> = ({
   const [selectedFuncoes, setSelectedFuncoes] = useState<string[]>(profile.funcao || []);
   const [selectedUnidades, setSelectedUnidades] = useState<string[]>(profile.unidade || []);
   const [selectedIdiomas, setSelectedIdiomas] = useState<string[]>(profile.idiomas || []);
-  const [selectedAreas, setSelectedAreas] = useState<string[]>(profile.areasConhecimento || []);
   const [selectedTemas, setSelectedTemas] = useState<string[]>(profile.temasInteresse || []);
   const [selectedCertificacoes, setSelectedCertificacoes] = useState<string[]>(profile.certificacoes || []);
-  const [newArea, setNewArea] = useState('');
   const [newTema, setNewTema] = useState('');
   const [newCertificacao, setNewCertificacao] = useState('');
 
@@ -69,7 +66,6 @@ const AdminProfileEditModal: React.FC<AdminProfileEditModalProps> = ({
       funcao: selectedFuncoes,
       unidade: selectedUnidades,
       idiomas: selectedIdiomas,
-      areasConhecimento: selectedAreas,
       temasInteresse: selectedTemas,
       certificacoes: selectedCertificacoes,
       lastUpdated: new Date(),
@@ -223,41 +219,27 @@ const AdminProfileEditModal: React.FC<AdminProfileEditModalProps> = ({
           </CardContent>
         </Card>
 
-        {/* Áreas de Conhecimento */}
+        {/* Idiomas */}
         <Card>
           <CardHeader>
-            <CardTitle>Áreas de Conhecimento</CardTitle>
+            <CardTitle>Idiomas</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex space-x-2">
-              <Input
-                placeholder="Nova área de conhecimento"
-                value={newArea}
-                onChange={(e) => setNewArea(e.target.value)}
-              />
-              <Button
-                type="button"
-                onClick={() => addCustomItem(newArea, selectedAreas, setSelectedAreas, setNewArea)}
-                size="sm"
-              >
-                <Plus className="w-4 h-4" />
-              </Button>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {selectedAreas.map(area => (
-                <Badge key={area} variant="secondary" className="flex items-center space-x-1">
-                  <span>{area}</span>
-                  <X
-                    className="w-3 h-3 cursor-pointer"
-                    onClick={() => removeItem(area, selectedAreas, setSelectedAreas)}
+          <CardContent>
+            <div className="grid grid-cols-4 gap-2">
+              {IDIOMAS.map(idioma => (
+                <div key={idioma} className="flex items-center space-x-2">
+                  <Checkbox
+                    checked={selectedIdiomas.includes(idioma)}
+                    onCheckedChange={() => toggleSelection(idioma, selectedIdiomas, setSelectedIdiomas)}
                   />
-                </Badge>
+                  <span className="text-sm">{idioma}</span>
+                </div>
               ))}
             </div>
           </CardContent>
         </Card>
-
-        {/* Temas de Interesse */}
+        
+        {/* TEMAS DE INTERESSE */}
         <Card>
           <CardHeader>
             <CardTitle>Temas de Interesse</CardTitle>
@@ -286,26 +268,6 @@ const AdminProfileEditModal: React.FC<AdminProfileEditModalProps> = ({
                     onClick={() => removeItem(tema, selectedTemas, setSelectedTemas)}
                   />
                 </Badge>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Idiomas */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Idiomas</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-4 gap-2">
-              {IDIOMAS.map(idioma => (
-                <div key={idioma} className="flex items-center space-x-2">
-                  <Checkbox
-                    checked={selectedIdiomas.includes(idioma)}
-                    onCheckedChange={() => toggleSelection(idioma, selectedIdiomas, setSelectedIdiomas)}
-                  />
-                  <span className="text-sm">{idioma}</span>
-                </div>
               ))}
             </div>
           </CardContent>

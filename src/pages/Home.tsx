@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { useProfiles } from '../hooks/useProfiles';
 import ProfileCard from '../components/ProfileCard';
@@ -16,7 +15,7 @@ const Home: React.FC = () => {
         profile.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         profile.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
         profile.matricula.includes(searchTerm) ||
-        profile.areasConhecimento.some(area => 
+        profile.temasInteresse.some(area => 
           area.toLowerCase().includes(searchTerm.toLowerCase())
         ) ||
         (profile.especializacoes && profile.especializacoes.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -91,7 +90,7 @@ const Home: React.FC = () => {
             <div className="relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
-                placeholder="Buscar por nome, email, matrícula ou área de conhecimento..."
+                placeholder="Buscar por nome, email, matrícula ou tema de interesse..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
