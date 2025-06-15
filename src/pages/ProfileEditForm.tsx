@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { useProfileData } from '@/hooks/useProfileData';
@@ -5,8 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import BasicInfo from '@/components/profile/BasicInfo';
 import CargoUnidade from '@/components/profile/CargoUnidade';
-import AreasConhecimento from '@/components/profile/AreasConhecimento';
-import ProfessionalExperience from '@/components/profile/ProfessionalExperience';
+// import AreasConhecimento from '@/components/profile/AreasConhecimento';
+// import ProfessionalExperience from '@/components/profile/ProfessionalExperience';
 import AcademicFormation from '@/components/profile/AcademicFormation';
 import AvailabilitySection from '@/components/profile/AvailabilitySection';
 import ContactPreferences from '@/components/profile/ContactPreferences';
@@ -21,9 +22,9 @@ import {
   safeCargos,
   safeFuncoes,
   safeUnidades,
-  safeAreasConhecimento,
-  safeTemasInteresse,
-  safeIdiomas,
+  // safeAreasConhecimento,
+  // safeTemasInteresse,
+  // safeIdiomas,
   safeTiposColaboracao,
   safeDisponibilidadeEstimada,
   safeFormasContato
@@ -53,10 +54,10 @@ const ProfileEditForm = () => {
       telefone: '',
       email: '',
       biografia: '',
-      areasConhecimento: [],
+      // areasConhecimento: [],
       especializacoes: '',
-      temasInteresse: [],
-      idiomas: [],
+      // temasInteresse: [],
+      // idiomas: [],
       linkCurriculo: '',
       fotoUrl: '',
       certificacoes: [],
@@ -86,9 +87,9 @@ const ProfileEditForm = () => {
   const [disponibilidadeEstimada, setDisponibilidadeEstimada] = React.useState('');
   const [formaContato, setFormaContato] = React.useState('email');
   const [horarioPreferencial, setHorarioPreferencial] = React.useState('');
-  const [selectedAreasConhecimento, setSelectedAreasConhecimento] = React.useState<string[]>([]);
-  const [selectedTemasInteresse, setSelectedTemasInteresse] = React.useState<string[]>([]);
-  const [selectedIdiomas, setSelectedIdiomas] = React.useState<string[]>([]);
+  // const [selectedAreasConhecimento, setSelectedAreasConhecimento] = React.useState<string[]>([]);
+  // const [selectedTemasInteresse, setSelectedTemasInteresse] = React.useState<string[]>([]);
+  // const [selectedIdiomas, setSelectedIdiomas] = React.useState<string[]>([]);
   const [fotoUrl, setFotoUrl] = React.useState<string | null>(null);
   const [uploading, setUploading] = React.useState(false);
 
@@ -98,9 +99,9 @@ const ProfileEditForm = () => {
       setDisponibilidadeEstimada(userProfile.disponibilidade?.disponibilidadeEstimada || '');
       setFormaContato(userProfile.contato?.formaContato || 'email');
       setHorarioPreferencial(userProfile.contato?.horarioPreferencial || '');
-      setSelectedAreasConhecimento(userProfile.areasConhecimento || []);
-      setSelectedTemasInteresse(userProfile.temasInteresse || []);
-      setSelectedIdiomas(userProfile.idiomas || []);
+      // setSelectedAreasConhecimento(userProfile.areasConhecimento || []);
+      // setSelectedTemasInteresse(userProfile.temasInteresse || []);
+      // setSelectedIdiomas(userProfile.idiomas || []);
       setFotoUrl(userProfile.fotoUrl || null);
     }
   }, [userProfile]);
@@ -113,9 +114,9 @@ const ProfileEditForm = () => {
         cargo: userProfile.cargo || [],
         funcao: userProfile.funcao || [],
         unidade: userProfile.unidade || [],
-        areasConhecimento: userProfile.areasConhecimento || [],
-        temasInteresse: userProfile.temasInteresse || [],
-        idiomas: userProfile.idiomas || [],
+        // areasConhecimento: userProfile.areasConhecimento || [],
+        // temasInteresse: userProfile.temasInteresse || [],
+        // idiomas: userProfile.idiomas || [],
         disponibilidade: {
           tipoColaboracao: userProfile.disponibilidade?.tipoColaboracao || [],
           disponibilidadeEstimada: userProfile.disponibilidade?.disponibilidadeEstimada || ''
@@ -141,9 +142,9 @@ const ProfileEditForm = () => {
 
       const updates = {
         ...data,
-        areas_conhecimento: selectedAreasConhecimento,
-        temas_interesse: selectedTemasInteresse,
-        idiomas: selectedIdiomas,
+        // areas_conhecimento: selectedAreasConhecimento,
+        // temas_interesse: selectedTemasInteresse,
+        // idiomas: selectedIdiomas,
         disponibilidade: {
           tipo_colaboracao: transformedTipoColaboracao,
           disponibilidade_estimada: disponibilidadeEstimada
@@ -182,9 +183,9 @@ const ProfileEditForm = () => {
       const updatedProfile: Profile = {
         ...userProfile,
         ...data,
-        areasConhecimento: selectedAreasConhecimento,
-        temasInteresse: selectedTemasInteresse,
-        idiomas: selectedIdiomas,
+        // areasConhecimento: selectedAreasConhecimento,
+        // temasInteresse: selectedTemasInteresse,
+        // idiomas: selectedIdiomas,
         disponibilidade: {
           tipoColaboracao: tipoColaboracao,
           disponibilidadeEstimada: disponibilidadeEstimada
@@ -291,7 +292,7 @@ const ProfileEditForm = () => {
 
       <BasicInfo form={form} />
       <CargoUnidade form={form} safeCargos={safeCargos} safeFuncoes={safeFuncoes} safeUnidades={safeUnidades} isValidSelectValue={isValidSelectValue} />
-      <AreasConhecimento
+      {/* <AreasConhecimento
         selectedAreasConhecimento={selectedAreasConhecimento}
         setSelectedAreasConhecimento={setSelectedAreasConhecimento}
         selectedTemasInteresse={selectedTemasInteresse}
@@ -301,9 +302,9 @@ const ProfileEditForm = () => {
         safeAreasConhecimento={safeAreasConhecimento}
         safeTemasInteresse={safeTemasInteresse}
         safeIdiomas={safeIdiomas}
-      />
+      /> */}
       <AcademicFormation form={form} />
-      <ProfessionalExperience form={form} />
+      {/* <ProfessionalExperience form={form} /> */}
       <AvailabilitySection
         tipoColaboracao={tipoColaboracao}
         setTipoColaboracao={setTipoColaboracao}
