@@ -74,7 +74,6 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ fotoPreview, onFileUpload }) 
             {/* Requisitos da funcionalidade evidenciados ao usuário */}
             <div className="bg-yellow-50 border border-yellow-200 rounded p-2 text-sm text-yellow-900 font-semibold">
               Requisitos para a foto de perfil:<br />
-              • Apenas uma imagem com <span className="font-bold underline">um único rosto visível</span> será aceita.<br />
               • Formatos aceitos: JPG, PNG, GIF.<br />
               • Tamanho máximo: 5MB.
             </div>
