@@ -13,6 +13,11 @@ interface BasicInfoProps {
 }
 
 const BasicInfo: React.FC<BasicInfoProps> = ({ form }) => {
+  // LOGA o valor atual sempre que mudar
+  React.useEffect(() => {
+    console.log('[DEBUG][BasicInfo] biografia value:', form.watch('biografia'));
+  }, [form.watch('biografia')]);
+
   return (
     <Card>
       <CardHeader>
@@ -100,8 +105,10 @@ const BasicInfo: React.FC<BasicInfoProps> = ({ form }) => {
                   {...field}
                   placeholder="Conte um pouco sobre você, sua experiência e interesses profissionais"
                   rows={4}
+                  value={field.value ?? ""} // previne undefined
                 />
               </FormControl>
+              <span className="text-xs text-gray-400">[DEBUG] biografia: {field.value && field.value.length > 0 ? `"${field.value}"` : "(vazio)"}</span>
               <FormMessage />
             </FormItem>
           )}
@@ -112,3 +119,4 @@ const BasicInfo: React.FC<BasicInfoProps> = ({ form }) => {
 };
 
 export default BasicInfo;
+

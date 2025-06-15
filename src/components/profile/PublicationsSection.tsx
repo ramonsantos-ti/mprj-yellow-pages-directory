@@ -11,6 +11,11 @@ interface PublicationsSectionProps {
 }
 
 const PublicationsSection: React.FC<PublicationsSectionProps> = ({ form }) => {
+  // LOGA o valor atual sempre que mudar
+  React.useEffect(() => {
+    console.log('[DEBUG][Publications] publicacoes value:', form.watch('publicacoes'));
+  }, [form.watch('publicacoes')]);
+
   return (
     <Card>
       <CardHeader>
@@ -32,8 +37,10 @@ const PublicationsSection: React.FC<PublicationsSectionProps> = ({ form }) => {
                   {...field}
                   placeholder="Liste suas publicações, artigos, livros ou trabalhos acadêmicos relevantes"
                   rows={6}
+                  value={field.value ?? ""}
                 />
               </FormControl>
+              <span className="text-xs text-gray-400">[DEBUG] publicacoes: {field.value && field.value.length > 0 ? `"${field.value}"` : "(vazio)"}</span>
               <p className="text-sm text-gray-500 mt-1">
                 Descreva suas principais publicações e contribuições acadêmicas
               </p>
@@ -47,3 +54,4 @@ const PublicationsSection: React.FC<PublicationsSectionProps> = ({ form }) => {
 };
 
 export default PublicationsSection;
+

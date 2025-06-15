@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { Profile } from '../../types';
@@ -37,24 +36,20 @@ export const useProfileFormHandler = ({
     form.setValue('matricula', profile.matricula || '');
     form.setValue('email', profile.email || '');
     form.setValue('telefone', profile.telefone || '');
-    // >>> Garantir que salva o campo corretamente, mesmo se vier undefined/null
-    form.setValue('biografia', typeof profile.biografia === 'string' ? profile.biografia : '');
+    form.setValue('biografia', profile.biografia ?? ""); // força string
     form.setValue('cargo', profile.cargo || []);
     form.setValue('funcao', profile.funcao || []);
     form.setValue('unidade', profile.unidade || []);
     form.setValue('areasConhecimento', profile.areasConhecimento || []);
-    form.setValue('especializacoes', profile.especializacoes || '');
+    form.setValue('especializacoes', profile.especializacoes ?? "");
     form.setValue('temasInteresse', profile.temasInteresse || []);
     form.setValue('idiomas', profile.idiomas || []);
-    form.setValue('linkCurriculo', profile.linkCurriculo || '');
+    form.setValue('linkCurriculo', profile.linkCurriculo ?? "");
     form.setValue('certificacoes', profile.certificacoes || []);
-    form.setValue('publicacoes', profile.publicacoes || '');
+    form.setValue('publicacoes', profile.publicacoes ?? ""); // força string
     form.setValue('aceiteTermos', profile.aceiteTermos || false);
-
-    // Set formação acadêmica directly in the form
     form.setValue('formacaoAcademica', profile.formacaoAcademica || []);
 
-    // Set related data
     setProjetos(profile.projetos || []);
 
     if (profile.disponibilidade && profile.contato) {
@@ -83,4 +78,3 @@ export const useProfileFormHandler = ({
     handleFileUpload
   };
 };
-
