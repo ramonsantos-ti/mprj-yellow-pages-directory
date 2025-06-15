@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
@@ -61,35 +60,62 @@ const ProjectsManager: React.FC<ProjectsManagerProps> = ({ projetos, setProjetos
               </Button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <Input
-                placeholder="Nome do projeto"
-                value={projeto.nome}
-                onChange={(e) => {
-                  const novos = [...projetos];
-                  novos[index].nome = e.target.value;
-                  setProjetos(novos);
-                }}
-              />
-              <Input
-                type="date"
-                placeholder="Data início"
-                value={projeto.dataInicio}
-                onChange={(e) => {
-                  const novos = [...projetos];
-                  novos[index].dataInicio = e.target.value;
-                  setProjetos(novos);
-                }}
-              />
-              <Input
-                type="date"
-                placeholder="Data fim (opcional)"
-                value={projeto.dataFim || ''}
-                onChange={(e) => {
-                  const novos = [...projetos];
-                  novos[index].dataFim = e.target.value;
-                  setProjetos(novos);
-                }}
-              />
+              <div>
+                <label
+                  htmlFor={`projeto-nome-${index}`}
+                  className="block text-xs font-medium text-gray-600 mb-1"
+                >
+                  Nome do projeto
+                </label>
+                <Input
+                  id={`projeto-nome-${index}`}
+                  placeholder="Nome do projeto"
+                  value={projeto.nome}
+                  onChange={(e) => {
+                    const novos = [...projetos];
+                    novos[index].nome = e.target.value;
+                    setProjetos(novos);
+                  }}
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor={`projeto-data-inicio-${index}`}
+                  className="block text-xs font-medium text-gray-600 mb-1"
+                >
+                  Data de início
+                </label>
+                <Input
+                  id={`projeto-data-inicio-${index}`}
+                  type="date"
+                  placeholder="Data início"
+                  value={projeto.dataInicio}
+                  onChange={(e) => {
+                    const novos = [...projetos];
+                    novos[index].dataInicio = e.target.value;
+                    setProjetos(novos);
+                  }}
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor={`projeto-data-fim-${index}`}
+                  className="block text-xs font-medium text-gray-600 mb-1"
+                >
+                  Data de fim (opcional)
+                </label>
+                <Input
+                  id={`projeto-data-fim-${index}`}
+                  type="date"
+                  placeholder="Data fim (opcional)"
+                  value={projeto.dataFim || ''}
+                  onChange={(e) => {
+                    const novos = [...projetos];
+                    novos[index].dataFim = e.target.value;
+                    setProjetos(novos);
+                  }}
+                />
+              </div>
             </div>
             <Textarea
               placeholder="Observações sobre o projeto"
@@ -108,4 +134,3 @@ const ProjectsManager: React.FC<ProjectsManagerProps> = ({ projetos, setProjetos
 };
 
 export default ProjectsManager;
-
