@@ -95,7 +95,8 @@ export const useProfileData = () => {
           } : {
             formaContato: 'E-mail',
             horarioPreferencial: ''
-          }
+          },
+          informacoesComplementares: profile.informacoes_complementares || '', // <-- map DB field to Profile camelCase
         };
 
         setUserProfile(transformedProfile);
