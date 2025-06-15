@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
-import { Briefcase } from 'lucide-react';
+import { Briefcase, Target } from 'lucide-react';
 
 interface KnowledgeAreasProps {
   areasConhecimento: string[];
@@ -45,7 +45,10 @@ const KnowledgeAreas: React.FC<KnowledgeAreasProps> = ({ areasConhecimento, tema
 
       <Card>
         <CardHeader>
-          <CardTitle>Temas de Interesse</CardTitle>
+          <CardTitle className="flex items-center space-x-2">
+            <Target className="w-5 h-5" />
+            <span>Área de Interesse</span>
+          </CardTitle>
         </CardHeader>
         <CardContent>
           {hasTemas ? (
@@ -55,7 +58,7 @@ const KnowledgeAreas: React.FC<KnowledgeAreasProps> = ({ areasConhecimento, tema
               ))}
             </div>
           ) : (
-            <p className="text-gray-500 italic">Nenhum tema de interesse informado</p>
+            <p className="text-gray-500 italic">Nenhuma área de interesse informada</p>
           )}
         </CardContent>
       </Card>
