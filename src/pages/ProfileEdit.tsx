@@ -134,15 +134,11 @@ const ProfileEdit: React.FC = () => {
           {/* Formação Acadêmica */}
           <AcademicFormation form={form} />
 
-          {/* Projetos, sem div ao redor */}
-          <Card>
-            <CardContent>
-              <ProjectsManager
-                projetos={projetos}
-                setProjetos={setProjetos}
-              />
-            </CardContent>
-          </Card>
+          {/* Projetos, agora sem div/Card externo */}
+          <ProjectsManager
+            projetos={projetos}
+            setProjetos={setProjetos}
+          />
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <CertificationsSection form={form} />
