@@ -1,0 +1,29 @@
+
+// Re-export all constants from the specific files
+export {
+  AREAS_JURIDICAS,
+  AREAS_ADMINISTRATIVAS
+} from './areas';
+
+export {
+  HABILIDADES_TECNICAS_ADMINISTRATIVAS,
+  HABILIDADES_TECNICAS_JURIDICAS,
+  HABILIDADES_TECNICAS_TI,
+  HABILIDADES_COMPORTAMENTAIS,
+  HABILIDADES_TECNICAS
+} from './skills';
+
+export {
+  CARGOS,
+  FUNCOES,
+  UNIDADES
+} from './organizational';
+
+export {
+  IDIOMAS,
+  NIVEIS_FORMACAO,
+  TIPOS_COLABORACAO,
+  DISPONIBILIDADE_ESTIMADA,
+  FORMAS_CONTATO,
+  CERTIFICACOES
+} from './general';
