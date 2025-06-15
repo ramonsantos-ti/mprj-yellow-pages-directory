@@ -13,6 +13,7 @@ import ErrorState from '../components/profile-detail/ErrorState';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { User, Briefcase, Target, Book, Award, FileText, Calendar, MessageSquare, Languages, Info } from 'lucide-react';
+import { formatText } from '../utils/formatText';
 
 const ProfileDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -156,7 +157,7 @@ const ProfileDetail: React.FC = () => {
               {profile.fotoUrl ? (
                 <img
                   src={profile.fotoUrl}
-                  alt={profile.name}
+                  alt={formatText(profile.name)}
                   className="w-full h-full object-cover"
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
@@ -165,7 +166,7 @@ const ProfileDetail: React.FC = () => {
               ) : (
                 <div className="w-full h-full bg-red-100 flex items-center justify-center">
                   <span className="text-red-900 font-semibold text-xl">
-                    {getInitials(profile.name)}
+                    {getInitials(formatText(profile.name))}
                   </span>
                 </div>
               )}
@@ -174,19 +175,21 @@ const ProfileDetail: React.FC = () => {
             {/* Informação básica */}
             <div className="flex-1">
               <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center gap-2">
-                <User className="w-6 h-6 text-red-800" /> {profile.name}
+                <User className="w-6 h-6 text-red-800" /> {formatText(profile.name)}
               </h1>
-              <p className="text-lg text-gray-600 mb-4">Matrícula: {profile.matricula}</p>
+              <p className="text-lg text-gray-600 mb-4">
+                Matrícula: {formatText(profile.matricula)}
+              </p>
 
               <div className="space-y-3">
                 <div className="flex items-center space-x-2 text-gray-600">
                   <MessageSquare className="w-4 h-4" />
-                  <span>{profile.email}</span>
+                  <span>{formatText(profile.email)}</span>
                 </div>
                 {profile.telefone && (
                   <div className="flex items-center space-x-2 text-gray-600">
                     <MessageSquare className="w-4 h-4" />
-                    <span>{profile.telefone}</span>
+                    <span>{formatText(profile.telefone)}</span>
                   </div>
                 )}
               </div>
@@ -210,7 +213,7 @@ const ProfileDetail: React.FC = () => {
                 <div>
                   <span className="font-medium">Cargo: </span>
                   {profile.cargo.map((c, i) => (
-                    <Badge key={i} variant="outline" className="mr-1">{c}</Badge>
+                    <Badge key={i} variant="outline" className="mr-1">{formatText(c)}</Badge>
                   ))}
                 </div>
               )}
@@ -218,7 +221,7 @@ const ProfileDetail: React.FC = () => {
                 <div>
                   <span className="font-medium">Função: </span>
                   {profile.funcao.map((f, i) => (
-                    <Badge key={i} variant="outline" className="mr-1 bg-blue-50">{f}</Badge>
+                    <Badge key={i} variant="outline" className="mr-1 bg-blue-50">{formatText(f)}</Badge>
                   ))}
                 </div>
               )}
@@ -226,7 +229,7 @@ const ProfileDetail: React.FC = () => {
                 <div>
                   <span className="font-medium">Lotação: </span>
                   {profile.unidade.map((u, i) => (
-                    <Badge key={i} variant="outline" className="mr-1">{u}</Badge>
+                    <Badge key={i} variant="outline" className="mr-1">{formatText(u)}</Badge>
                   ))}
                 </div>
               )}
@@ -247,7 +250,7 @@ const ProfileDetail: React.FC = () => {
           <CardContent>
             <div className="flex flex-wrap gap-2">
               {profile.temasInteresse.map((tema, i) => (
-                <Badge key={i} variant="outline">{tema}</Badge>
+                <Badge key={i} variant="outline">{formatText(tema)}</Badge>
               ))}
             </div>
           </CardContent>
@@ -267,9 +270,9 @@ const ProfileDetail: React.FC = () => {
             <div className="space-y-4">
               {profile.formacaoAcademica.map((formacao, index) => (
                 <div key={formacao.id || index} className="border-l-4 border-red-200 pl-4">
-                  <h4 className="font-semibold text-gray-900">{formacao.nivel}</h4>
-                  <p className="text-gray-700">{formacao.curso}</p>
-                  <p className="text-sm text-gray-600">{formacao.instituicao} • {formacao.ano}</p>
+                  <h4 className="font-semibold text-gray-900">{formatText(formacao.nivel)}</h4>
+                  <p className="text-gray-700">{formatText(formacao.curso)}</p>
+                  <p className="text-sm text-gray-600">{formatText(formacao.instituicao)} • {formacao.ano}</p>
                 </div>
               ))}
             </div>
@@ -290,7 +293,7 @@ const ProfileDetail: React.FC = () => {
             <div className="space-y-4">
               {profile.projetos.map((projeto, index) => (
                 <div key={projeto.id || index} className="border-l-4 border-yellow-300 pl-4">
-                  <h4 className="font-semibold text-gray-900">{projeto.nome}</h4>
+                  <h4 className="font-semibold text-gray-900">{formatText(projeto.nome)}</h4>
                   <p className="text-sm text-gray-600 mb-2">
                     {projeto.dataInicio &&
                       <span>
@@ -309,7 +312,7 @@ const ProfileDetail: React.FC = () => {
                     )}
                   </p>
                   {projeto.observacoes && (
-                    <p className="text-gray-700 text-sm">{projeto.observacoes}</p>
+                    <p className="text-gray-700 text-sm">{formatText(projeto.observacoes)}</p>
                   )}
                 </div>
               ))}
@@ -331,7 +334,7 @@ const ProfileDetail: React.FC = () => {
             <div className="space-y-2">
               {profile.certificacoes.map((cert, index) => (
                 <div key={index} className="text-sm text-gray-700">
-                  • {cert}
+                  • {formatText(cert)}
                 </div>
               ))}
             </div>
@@ -349,7 +352,7 @@ const ProfileDetail: React.FC = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-gray-700 leading-relaxed">{profile.publicacoes}</p>
+            <p className="text-gray-700 leading-relaxed">{formatText(profile.publicacoes)}</p>
           </CardContent>
         </Card>
       )}
@@ -370,7 +373,7 @@ const ProfileDetail: React.FC = () => {
                 {profile.disponibilidade?.tipoColaboracao && profile.disponibilidade.tipoColaboracao.length > 0 ? (
                   <div className="flex flex-wrap gap-1">
                     {profile.disponibilidade.tipoColaboracao.map((tipo, index) => (
-                      <Badge key={index} variant="outline">{tipo}</Badge>
+                      <Badge key={index} variant="outline">{formatText(tipo)}</Badge>
                     ))}
                   </div>
                 ) : (
@@ -380,7 +383,7 @@ const ProfileDetail: React.FC = () => {
               <div>
                 <h4 className="font-medium text-gray-900 mb-2">Disponibilidade Estimada</h4>
                 {profile.disponibilidade?.disponibilidadeEstimada ? (
-                  <p className="text-gray-700">{profile.disponibilidade.disponibilidadeEstimada}</p>
+                  <p className="text-gray-700">{formatText(profile.disponibilidade.disponibilidadeEstimada)}</p>
                 ) : (
                   <p className="text-gray-500 italic">Não informado</p>
                 )}
@@ -403,13 +406,13 @@ const ProfileDetail: React.FC = () => {
             {isFieldFilled(profile.contato?.formaContato) && (
               <div>
                 <span className="font-medium mr-1">Forma de contato preferencial:</span>
-                <Badge variant="outline">{profile.contato.formaContato}</Badge>
+                <Badge variant="outline">{formatText(profile.contato.formaContato)}</Badge>
               </div>
             )}
             {isFieldFilled(profile.contato?.horarioPreferencial) && (
               <div className="mt-2">
                 <span className="font-medium mr-1">Horário preferencial:</span>
-                <Badge variant="outline">{profile.contato.horarioPreferencial}</Badge>
+                <Badge variant="outline">{formatText(profile.contato.horarioPreferencial)}</Badge>
               </div>
             )}
           </CardContent>
@@ -428,7 +431,7 @@ const ProfileDetail: React.FC = () => {
           <CardContent>
             <div className="flex flex-wrap gap-2">
               {profile.idiomas.map((idioma, i) => (
-                <Badge key={i} variant="outline">{idioma}</Badge>
+                <Badge key={i} variant="outline">{formatText(idioma)}</Badge>
               ))}
             </div>
           </CardContent>
@@ -445,7 +448,7 @@ const ProfileDetail: React.FC = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-gray-700">{profile.especializacoes}</p>
+            <p className="text-gray-700">{formatText(profile.especializacoes)}</p>
           </CardContent>
         </Card>
       )}
