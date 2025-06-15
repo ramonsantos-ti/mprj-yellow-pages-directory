@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { Form } from '@/components/ui/form';
@@ -7,8 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import BasicInfo from '@/components/profile/BasicInfo';
 import CargoUnidade from '@/components/profile/CargoUnidade';
-import AreasConhecimento from '@/components/profile/AreasConhecimento';
-import ProfessionalExperience from '@/components/profile/ProfessionalExperience';
+// import AreasConhecimento from '@/components/profile/AreasConhecimento'; // removed
+// import ProfessionalExperience from '@/components/profile/ProfessionalExperience'; // removed
 import AcademicFormation from '@/components/profile/AcademicFormation';
 import AvailabilitySection from '@/components/profile/AvailabilitySection';
 import ContactPreferences from '@/components/profile/ContactPreferences';
@@ -25,9 +24,9 @@ import {
   safeCargos,
   safeFuncoes,
   safeUnidades,
-  safeAreasConhecimento,
-  safeTemasInteresse,
-  safeIdiomas,
+  // safeAreasConhecimento,  // removed
+  // safeTemasInteresse,     // removed
+  // safeIdiomas,            // removed
   safeTiposColaboracao,
   safeDisponibilidadeEstimada,
   safeFormasContato
@@ -247,7 +246,8 @@ const ProfileEditForm = () => {
         <BasicInfo form={form} />
         <CargoUnidade form={form} safeCargos={safeCargos} safeFuncoes={safeFuncoes} safeUnidades={safeUnidades} isValidSelectValue={isValidSelectValue} />
 
-        <AreasConhecimento
+        {/* AreasConhecimento and related fields temporarily removed */}
+        {/* <AreasConhecimento
           selectedAreasConhecimento={selectedAreasConhecimento}
           setSelectedAreasConhecimento={setSelectedAreasConhecimento}
           selectedTemasInteresse={selectedTemasInteresse}
@@ -257,11 +257,12 @@ const ProfileEditForm = () => {
           safeAreasConhecimento={safeAreasConhecimento}
           safeTemasInteresse={safeTemasInteresse}
           safeIdiomas={safeIdiomas}
-        />
+        /> */}
 
         <AcademicFormation form={form} />
 
-        <ProfessionalExperience form={form} />
+        {/* <ProfessionalExperience form={form} /> */}
+        {/* Temporarily removed missing ProfessionalExperience */}
 
         <AvailabilitySection
           tipoColaboracao={tipoColaboracao}
