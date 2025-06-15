@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -41,8 +40,30 @@ const ProfileDetail: React.FC = () => {
   const loadProfile = async () => {
     try {
       setLoading(true);
-      console.log('🔍 Buscando perfil com ID:', id);
+      console.log('🔍 Iniciando busca do perfil com ID:', id);
       
+      // First, let's try a simple query to see if the profile exists
+      const { data: simpleData, error: simpleError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      console.log('📋 Consulta simples - dados encontrados:', simpleData);
+      console.log('📋 Consulta simples - erro:', simpleError);
+
+      if (simpleError) {
+        console.error('❌ Erro na consulta simples:', simpleError);
+        throw simpleError;
+      }
+
+      if (!simpleData) {
+        console.log('❌ Nenhum perfil encontrado na consulta simples');
+        setError('Perfil não encontrado');
+        return;
+      }
+
+      // Now let's try the complex query with joins
       const { data, error } = await supabase
         .from('profiles')
         .select(`
@@ -53,55 +74,73 @@ const ProfileDetail: React.FC = () => {
           availability(*)
         `)
         .eq('id', id)
-        .eq('is_active', true)
         .single();
 
-      console.log('📊 Dados brutos do Supabase:', data);
-      console.log('❌ Erro do Supabase:', error);
+      console.log('📊 Consulta completa - dados brutos:', data);
+      console.log('📊 Consulta completa - erro:', error);
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Erro na consulta completa:', error);
+        // If complex query fails, fall back to simple data
+        console.log('🔄 Usando dados da consulta simples como fallback');
+        const fallbackProfile = createProfileFromSimpleData(simpleData);
+        setProfile(fallbackProfile);
+        return;
+      }
 
       if (!data) {
-        console.log('❌ Nenhum dado encontrado para o ID:', id);
+        console.log('❌ Nenhum dado retornado da consulta completa');
         setError('Perfil não encontrado');
         return;
       }
 
-      console.log('✅ Dados do perfil encontrados:', {
-        name: data.name,
-        matricula: data.matricula,
-        email: data.email,
-        foto_url: data.foto_url ? data.foto_url.substring(0, 50) + '...' : 'Não definida',
-        cargo: data.cargo,
-        funcao: data.funcao,
-        unidade: data.unidade,
-        areas_conhecimento: data.areas_conhecimento,
-        projects_count: data.projects?.length || 0,
-        academic_formations_count: data.academic_formations?.length || 0,
-        availability_count: data.availability?.length || 0
-      });
+      console.log('✅ Dados encontrados, iniciando transformação...');
+      console.log('📸 Foto URL encontrada:', data.foto_url ? 'SIM' : 'NÃO');
+      console.log('📸 Tipo da foto:', data.foto_url ? (data.foto_url.startsWith('data:') ? 'Base64' : 'URL') : 'Nenhuma');
+
+      // Log each field to debug what's missing
+      console.log('🔍 Campos do perfil encontrados:');
+      console.log('- name:', data.name);
+      console.log('- matricula:', data.matricula);
+      console.log('- email:', data.email);
+      console.log('- cargo:', data.cargo);
+      console.log('- funcao:', data.funcao);
+      console.log('- unidade:', data.unidade);
+      console.log('- telefone:', data.telefone);
+      console.log('- biografia:', data.biografia);
+      console.log('- areas_conhecimento:', data.areas_conhecimento);
+      console.log('- especializacoes:', data.especializacoes);
+      console.log('- temas_interesse:', data.temas_interesse);
+      console.log('- idiomas:', data.idiomas);
+      console.log('- certificacoes:', data.certificacoes);
+      console.log('- publicacoes:', data.publicacoes);
+      console.log('- link_curriculo:', data.link_curriculo);
+      console.log('- projects count:', data.projects?.length || 0);
+      console.log('- academic_formations count:', data.academic_formations?.length || 0);
+      console.log('- professional_experiences count:', data.professional_experiences?.length || 0);
+      console.log('- availability count:', data.availability?.length || 0);
 
       // Transform Supabase data to match our Profile type
       const transformedProfile: Profile = {
         id: data.id,
         userId: data.user_id || '',
-        name: data.name,
-        matricula: data.matricula,
-        cargo: data.cargo || [],
-        funcao: data.funcao || [],
-        unidade: data.unidade || [],
+        name: data.name || 'Nome não informado',
+        matricula: data.matricula || 'Matrícula não informada',
+        cargo: Array.isArray(data.cargo) ? data.cargo : [],
+        funcao: Array.isArray(data.funcao) ? data.funcao : [],
+        unidade: Array.isArray(data.unidade) ? data.unidade : [],
         telefone: data.telefone || '',
-        email: data.email,
+        email: data.email || '',
         biografia: data.biografia || '',
-        areasConhecimento: data.areas_conhecimento || [],
+        areasConhecimento: Array.isArray(data.areas_conhecimento) ? data.areas_conhecimento : [],
         especializacoes: data.especializacoes || '',
-        temasInteresse: data.temas_interesse || [],
-        idiomas: data.idiomas || [],
+        temasInteresse: Array.isArray(data.temas_interesse) ? data.temas_interesse : [],
+        idiomas: Array.isArray(data.idiomas) ? data.idiomas : [],
         linkCurriculo: data.link_curriculo || '',
         fotoUrl: data.foto_url || '',
-        certificacoes: data.certificacoes || [],
+        certificacoes: Array.isArray(data.certificacoes) ? data.certificacoes : [],
         publicacoes: data.publicacoes || '',
-        role: data.role as 'admin' | 'user',
+        role: data.role as 'admin' | 'user' || 'user',
         isActive: data.is_active ?? true,
         aceiteTermos: data.aceite_termos ?? false,
         updatedByAdmin: data.updated_by_admin ?? false,
@@ -109,8 +148,8 @@ const ProfileDetail: React.FC = () => {
         projetos: data.projects?.map((p: any) => ({
           id: p.id,
           nome: p.nome,
-          dataInicio: p.data_inicio,
-          dataFim: p.data_fim,
+          dataInicio: new Date(p.data_inicio),
+          dataFim: p.data_fim ? new Date(p.data_fim) : undefined,
           observacoes: p.observacoes || ''
         })) || [],
         formacaoAcademica: data.academic_formations?.map((f: any) => ({
@@ -127,7 +166,7 @@ const ProfileDetail: React.FC = () => {
           publicacoes: e.publicacoes || ''
         })) || [],
         disponibilidade: data.availability?.[0] ? {
-          tipoColaboracao: data.availability[0].tipo_colaboracao || [],
+          tipoColaboracao: Array.isArray(data.availability[0].tipo_colaboracao) ? data.availability[0].tipo_colaboracao : [],
           disponibilidadeEstimada: data.availability[0].disponibilidade_estimada || ''
         } : {
           tipoColaboracao: [],
@@ -142,24 +181,63 @@ const ProfileDetail: React.FC = () => {
         }
       };
 
-      console.log('🔄 Perfil transformado:', {
-        name: transformedProfile.name,
-        cargo: transformedProfile.cargo,
-        funcao: transformedProfile.funcao,
-        unidade: transformedProfile.unidade,
-        areasConhecimento: transformedProfile.areasConhecimento,
-        projetos: transformedProfile.projetos.length,
-        formacaoAcademica: transformedProfile.formacaoAcademica.length,
-        hasPhoto: !!transformedProfile.fotoUrl
-      });
+      console.log('🔄 Perfil transformado com sucesso:');
+      console.log('- Nome:', transformedProfile.name);
+      console.log('- Cargo count:', transformedProfile.cargo.length);
+      console.log('- Função count:', transformedProfile.funcao.length);
+      console.log('- Unidade count:', transformedProfile.unidade.length);
+      console.log('- Áreas conhecimento count:', transformedProfile.areasConhecimento.length);
+      console.log('- Projetos count:', transformedProfile.projetos.length);
+      console.log('- Formação count:', transformedProfile.formacaoAcademica.length);
+      console.log('- Foto disponível:', !!transformedProfile.fotoUrl);
 
       setProfile(transformedProfile);
     } catch (err: any) {
-      console.error('❌ Erro ao carregar perfil:', err);
+      console.error('❌ Erro geral ao carregar perfil:', err);
       setError('Erro ao carregar perfil: ' + err.message);
     } finally {
       setLoading(false);
     }
+  };
+
+  const createProfileFromSimpleData = (data: any): Profile => {
+    console.log('🔄 Criando perfil a partir de dados simples...');
+    return {
+      id: data.id,
+      userId: data.user_id || '',
+      name: data.name || 'Nome não informado',
+      matricula: data.matricula || 'Matrícula não informada',
+      cargo: Array.isArray(data.cargo) ? data.cargo : [],
+      funcao: Array.isArray(data.funcao) ? data.funcao : [],
+      unidade: Array.isArray(data.unidade) ? data.unidade : [],
+      telefone: data.telefone || '',
+      email: data.email || '',
+      biografia: data.biografia || '',
+      areasConhecimento: Array.isArray(data.areas_conhecimento) ? data.areas_conhecimento : [],
+      especializacoes: data.especializacoes || '',
+      temasInteresse: Array.isArray(data.temas_interesse) ? data.temas_interesse : [],
+      idiomas: Array.isArray(data.idiomas) ? data.idiomas : [],
+      linkCurriculo: data.link_curriculo || '',
+      fotoUrl: data.foto_url || '',
+      certificacoes: Array.isArray(data.certificacoes) ? data.certificacoes : [],
+      publicacoes: data.publicacoes || '',
+      role: data.role as 'admin' | 'user' || 'user',
+      isActive: data.is_active ?? true,
+      aceiteTermos: data.aceite_termos ?? false,
+      updatedByAdmin: data.updated_by_admin ?? false,
+      lastUpdated: new Date(data.updated_at || data.created_at || new Date()),
+      projetos: [],
+      formacaoAcademica: [],
+      experienciasProfissionais: [],
+      disponibilidade: {
+        tipoColaboracao: [],
+        disponibilidadeEstimada: ''
+      },
+      contato: {
+        formaContato: 'email',
+        horarioPreferencial: ''
+      }
+    };
   };
 
   const getInitials = (name: string) => {
@@ -199,6 +277,8 @@ const ProfileDetail: React.FC = () => {
     );
   }
 
+  console.log('🎨 Renderizando perfil:', profile.name);
+
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
@@ -209,9 +289,9 @@ const ProfileDetail: React.FC = () => {
           </Button>
         </Link>
         
-        {/* Debug info - Remove in production */}
+        {/* Debug info */}
         <div className="text-xs text-gray-400">
-          ID: {profile.id}
+          ID: {profile.id} | Dados carregados: {new Date().toLocaleTimeString()}
         </div>
       </div>
 
