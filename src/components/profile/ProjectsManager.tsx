@@ -35,7 +35,12 @@ const ProjectsManager: React.FC<ProjectsManagerProps> = ({ projetos, setProjetos
             <Construction className="w-5 h-5" />
             <span>Projetos</span>
           </span>
-          <Button type="button" onClick={adicionarProjeto} size="sm" variant="outline">
+          <Button
+            type="button"
+            onClick={adicionarProjeto}
+            size="sm"
+            variant="logo-brown"
+          >
             <Plus className="w-4 h-4 mr-2" />
             Adicionar
           </Button>
@@ -103,3 +108,4 @@ const ProjectsManager: React.FC<ProjectsManagerProps> = ({ projetos, setProjetos
 };
 
 export default ProjectsManager;
+
