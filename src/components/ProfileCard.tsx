@@ -31,6 +31,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
                 alt={profile.name} 
                 className="w-full h-full object-cover"
                 onError={(e) => {
+                  console.error(`Erro ao carregar imagem para ${profile.name}: ${profile.fotoUrl}`);
                   // Fallback to initials if image fails to load
                   const target = e.target as HTMLImageElement;
                   target.style.display = 'none';
@@ -44,6 +45,9 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
                       </div>
                     `;
                   }
+                }}
+                onLoad={() => {
+                  console.log(`Imagem carregada com sucesso para ${profile.name}: ${profile.fotoUrl}`);
                 }}
               />
             ) : (
