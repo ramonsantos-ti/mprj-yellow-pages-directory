@@ -177,6 +177,7 @@ const ProfileEdit: React.FC = () => {
                   type="submit"
                   disabled={saving}
                   className="flex-1"
+                  variant="logo-brown"
                 >
                   {saving ? (
                     <>

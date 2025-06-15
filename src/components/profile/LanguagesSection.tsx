@@ -49,7 +49,7 @@ const LanguagesSection: React.FC<LanguagesSectionProps> = ({ form }) => {
               ))}
             </SelectContent>
           </Select>
-          <Button type="button" onClick={addIdioma} disabled={!selectedIdioma} variant="outline">
+          <Button type="button" onClick={addIdioma} disabled={!selectedIdioma} variant="logo-brown">
             Adicionar
           </Button>
         </div>

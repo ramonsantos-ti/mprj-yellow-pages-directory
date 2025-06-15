@@ -26,7 +26,7 @@ const CargoUnidade: React.FC<CargoUnidadeProps> = ({
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center space-x-2">
-          <BriefcaseBusiness className="w-5 h-5 text-red-900" />
+          <BriefcaseBusiness className="w-5 h-5 text-black" /> {/* cor preta */}
           <span>Cargo, Função e Lotação</span>
         </CardTitle>
       </CardHeader>
