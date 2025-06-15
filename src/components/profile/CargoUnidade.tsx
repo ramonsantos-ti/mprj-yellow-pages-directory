@@ -1,6 +1,7 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { BriefcaseBusiness } from 'lucide-react'; // Ícone Lucide solicitado
+import { BriefcaseBusiness } from 'lucide-react';
 import { Badge } from '../ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
@@ -26,7 +27,7 @@ const CargoUnidade: React.FC<CargoUnidadeProps> = ({
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center space-x-2">
-          <BriefcaseBusiness className="w-5 h-5 text-black" /> {/* cor preta */}
+          <BriefcaseBusiness className="w-5 h-5 text-black" />
           <span>Cargo, Função e Lotação</span>
         </CardTitle>
       </CardHeader>
@@ -47,7 +48,6 @@ const CargoUnidade: React.FC<CargoUnidadeProps> = ({
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione um cargo" />
                   </SelectTrigger>
-                  {/* height max for visible scrollbar, add scrollbar-brown for custom scroll */}
                   <SelectContent className="scrollbar-brown max-h-56">
                     {safeCargos.map((cargo, index) => (
                       <SelectItem key={`cargo-${index}-${cargo}`} value={cargo}>
@@ -56,7 +56,7 @@ const CargoUnidade: React.FC<CargoUnidadeProps> = ({
                     ))}
                   </SelectContent>
                 </Select>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 max-h-20 overflow-auto">
                   {field.value.map((cargo, index) => (
                     <Badge key={index} variant="secondary" className="flex items-center space-x-1">
                       <span>{cargo}</span>
@@ -97,7 +97,7 @@ const CargoUnidade: React.FC<CargoUnidadeProps> = ({
                     ))}
                   </SelectContent>
                 </Select>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 max-h-20 overflow-auto">
                   {field.value.map((funcao, index) => (
                     <Badge key={index} variant="outline" className="flex items-center space-x-1">
                       <span>{funcao}</span>
@@ -138,7 +138,7 @@ const CargoUnidade: React.FC<CargoUnidadeProps> = ({
                     ))}
                   </SelectContent>
                 </Select>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 max-h-20 overflow-auto">
                   {field.value.map((unidade, index) => (
                     <Badge key={index} variant="secondary" className="flex items-center space-x-1">
                       <span>{unidade}</span>
