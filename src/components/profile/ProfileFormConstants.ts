@@ -25,7 +25,9 @@ export const safeTiposColaboracao = [
   'Projeto especial',
   'Mentoria',
   'Coaching',
-  'Grupo de trabalho'
+  'Grupo de trabalho',
+  'Comissão',
+  'Grupo de Atuação Especializada'
 ];
 
 export const safeDisponibilidadeEstimada = [
@@ -51,7 +53,9 @@ export const tipoColaboracaoMap: { [key: string]: string } = {
   'Projeto especial': 'projeto',
   'Mentoria': 'mentoria',
   'Coaching': 'coaching',
-  'Grupo de trabalho': 'grupo_trabalho'
+  'Grupo de trabalho': 'grupo_trabalho',
+  'Comissão': 'comissao',
+  'Grupo de Atuação Especializada': 'grupo_atuacao'
 };
 
 // Mapeamento reverso para exibição
@@ -62,7 +66,9 @@ export const tipoColaboracaoReverseMap: { [key: string]: string } = {
   'projeto': 'Projeto especial',
   'mentoria': 'Mentoria',
   'coaching': 'Coaching',
-  'grupo_trabalho': 'Grupo de trabalho'
+  'grupo_trabalho': 'Grupo de trabalho',
+  'comissao': 'Comissão',
+  'grupo_atuacao': 'Grupo de Atuação Especializada'
 };
 
 // Mapeamento que garante compatibilidade com os enums do banco de dados

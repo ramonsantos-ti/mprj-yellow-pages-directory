@@ -1,4 +1,3 @@
-
 // Helper function to filter and validate arrays
 const filterAndValidate = (array: string[], arrayName: string) => {
   console.log(`Processing ${arrayName}:`, array);
@@ -80,13 +79,14 @@ const rawNiveisFormacao = [
 
 const rawTiposColaboracao = [
   'Consultoria interna',
-  'Formação de equipes',
-  'Capacitações/tutoria',
-  'Grupos de trabalho',
+  'Parecer técnico',
+  'Capacitação/treinamento',
+  'Projeto especial',
   'Mentoria',
   'Coaching',
   'Grupo de trabalho',
-  'Grupo de atuação'
+  'Comissão',
+  'Grupo de Atuação Especializada'
 ];
 
 const rawDisponibilidadeEstimada = [

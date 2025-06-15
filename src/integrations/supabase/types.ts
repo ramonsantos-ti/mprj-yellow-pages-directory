@@ -317,6 +317,8 @@ export type Database = {
         | "mentoria"
         | "coaching"
         | "grupo_trabalho"
+        | "comissao"
+        | "grupo_atuacao"
       contact_preference: "email" | "telefone" | "teams" | "presencial"
     }
     CompositeTypes: {
@@ -442,6 +444,8 @@ export const Constants = {
         "mentoria",
         "coaching",
         "grupo_trabalho",
+        "comissao",
+        "grupo_atuacao",
       ],
       contact_preference: ["email", "telefone", "teams", "presencial"],
     },
