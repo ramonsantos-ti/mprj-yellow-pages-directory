@@ -39,7 +39,11 @@ const BasicInfo: React.FC<BasicInfoProps> = ({ form }) => {
               <FormItem>
                 <FormLabel>Matrícula *</FormLabel>
                 <FormControl>
-                  <Input {...field} disabled />
+                  <Input 
+                    {...field} 
+                    disabled 
+                    placeholder="Matrícula como informada no cadastro"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

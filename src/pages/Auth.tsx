@@ -96,11 +96,12 @@ const Auth: React.FC = () => {
     }
 
     try {
+      // Pass matricula exactly as entered by the user
       const result = await signup(
         signupData.email,
         signupData.password,
         signupData.name,
-        signupData.matricula
+        signupData.matricula.trim() // Only trim whitespace, no other modifications
       );
       
       if (result.error) {
@@ -240,11 +241,14 @@ const Auth: React.FC = () => {
                   <Input
                     id="signup-matricula"
                     type="text"
-                    placeholder="Sua matrícula no MPRJ"
+                    placeholder="Digite sua matrícula exatamente como consta no MPRJ"
                     value={signupData.matricula}
                     onChange={(e) => setSignupData({ ...signupData, matricula: e.target.value })}
                     required
                   />
+                  <p className="text-xs text-gray-500">
+                    Digite a matrícula exatamente como aparece em seus documentos oficiais
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="signup-email">Email Institucional</Label>

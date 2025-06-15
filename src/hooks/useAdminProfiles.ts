@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Profile } from '../types';
@@ -31,7 +30,7 @@ export const useAdminProfiles = () => {
         id: profile.id,
         userId: profile.user_id || '',
         name: profile.name,
-        matricula: profile.matricula,
+        matricula: profile.matricula, // Keep matricula exactly as stored
         cargo: profile.cargo || [],
         funcao: profile.funcao || [],
         unidade: profile.unidade || [],
@@ -103,6 +102,7 @@ export const useAdminProfiles = () => {
         .from('profiles')
         .update({
           name: updatedData.name,
+          matricula: updatedData.matricula, // Store matricula exactly as provided
           email: updatedData.email,
           cargo: updatedData.cargo,
           unidade: updatedData.unidade,
