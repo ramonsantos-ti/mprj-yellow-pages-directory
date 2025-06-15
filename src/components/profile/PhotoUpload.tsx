@@ -71,6 +71,9 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ fotoPreview, onFileUpload }) 
               className="hidden"
               disabled={loading}
             />
+            <p className="text-sm text-gray-500">
+              Formatos aceitos: JPG, PNG, GIF. Máximo 5MB.
+            </p>
             {errorMsg && (
               <div className="text-sm text-red-700 font-medium">{errorMsg}</div>
             )}
