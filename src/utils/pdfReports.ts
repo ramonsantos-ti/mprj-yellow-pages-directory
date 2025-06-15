@@ -77,7 +77,7 @@ const generateAreasConhecimentoReport = (doc: jsPDF, profiles: Profile[], startY
   const areaStats: { [key: string]: number } = {};
 
   profiles.forEach(profile => {
-    profile.areasConhecimento.forEach(area => {
+    profile.temasInteresse.forEach(area => {
       areaStats[area] = (areaStats[area] || 0) + 1;
     });
   });

@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { useAdminProfiles } from '../hooks/useAdminProfiles';
 import { useAuditLogs } from '../hooks/useAuditLogs';
@@ -61,7 +60,7 @@ const Admin: React.FC = () => {
   // Get unique values from profiles for filters
   const allCargos = [...new Set(profiles.flatMap(p => p.cargo || []))];
   const allUnidades = [...new Set(profiles.flatMap(p => p.unidade || []))];
-  const allAreas = [...new Set(profiles.flatMap(p => p.areasConhecimento || []))];
+  const allAreas = [...new Set(profiles.flatMap(p => p.temasInteresse || []))];
 
   const sendNotification = async () => {
     let recipients: string[] = [];
