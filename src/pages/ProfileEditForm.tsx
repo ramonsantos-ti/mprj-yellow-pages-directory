@@ -78,6 +78,7 @@ const ProfileEditForm: React.FC = () => {
   }, [userProfile, user]);
 
   const handleSave = async (data: any) => {
+    console.log('[DEBUG] handleSave foi chamado, dados do formulário:', data);
     const formacaoAcademica = data.formacaoAcademica || [];
     await saveProfile(data, fotoPreview, formacaoAcademica, projetos, disponibilidade);
   };
