@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -36,17 +35,11 @@ export const useProfileSave = () => {
         ? data.especializacoes
         : (data.especializacoes ? String(data.especializacoes) : '');
 
-      // --- INCLUINDO INFORMAÇÕES COMPLEMENTARES IN CASE IT EXISTS
+      // INFO: Agora ignoramos informacoesComplementares no campo especializacoes!
       const informacoesComplementares =
         typeof data.informacoesComplementares === 'string'
           ? data.informacoesComplementares
           : (data.informacoesComplementares ? String(data.informacoesComplementares) : '');
-
-      // Adiciona informacoesComplementares no campo especializacoes, se existir
-      const finalEspecializacoes =
-        informacoesComplementares && informacoesComplementares.trim() !== ''
-          ? `${safeEspecializacoes}${safeEspecializacoes && informacoesComplementares ? '\n\n' : ''}${informacoesComplementares}`
-          : safeEspecializacoes;
 
       const profileData = {
         user_id: user?.id,
@@ -59,7 +52,8 @@ export const useProfileSave = () => {
         funcao: data.funcao || [],
         unidade: data.unidade || [],
         areas_conhecimento: data.areasConhecimento || [],
-        especializacoes: finalEspecializacoes || "",
+        especializacoes: safeEspecializacoes || "",
+        informacoes_complementares: informacoesComplementares || "",
         temas_interesse: data.temasInteresse || [],
         idiomas: data.idiomas || [],
         link_curriculo: data.linkCurriculo || "",

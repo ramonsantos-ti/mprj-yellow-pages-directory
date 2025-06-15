@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { Profile } from '../../types';
@@ -35,20 +36,22 @@ export const useProfileFormHandler = ({
     form.setValue('matricula', profile.matricula || '');
     form.setValue('email', profile.email || '');
     form.setValue('telefone', profile.telefone || '');
-    form.setValue('biografia', profile.biografia ?? ""); // força string
+    form.setValue('biografia', profile.biografia ?? "");
     form.setValue('cargo', profile.cargo || []);
     form.setValue('funcao', profile.funcao || []);
     form.setValue('unidade', profile.unidade || []);
     form.setValue('areasConhecimento', profile.areasConhecimento || []);
-    form.setValue('especializacoes', profile.especializacoes ?? ""); // agora "Informações Complementares"
+    // Mantém especializacoes separado
+    form.setValue('especializacoes', profile.especializacoes ?? "");
     form.setValue('temasInteresse', profile.temasInteresse || []);
     form.setValue('idiomas', profile.idiomas || []);
     form.setValue('linkCurriculo', profile.linkCurriculo ?? "");
     form.setValue('certificacoes', profile.certificacoes || []);
-    form.setValue('publicacoes', profile.publicacoes ?? ""); // força string
+    form.setValue('publicacoes', profile.publicacoes ?? "");
     form.setValue('aceiteTermos', profile.aceiteTermos || false);
     form.setValue('formacaoAcademica', profile.formacaoAcademica || []);
-    form.setValue('informacoesComplementares', ""); // opcional, ignorar no preenchimento
+    // Corrigir: popular o campo informacoesComplementares SE existir
+    form.setValue('informacoesComplementares', profile.informacoesComplementares ?? "");
 
     setProjetos(profile.projetos || []);
 

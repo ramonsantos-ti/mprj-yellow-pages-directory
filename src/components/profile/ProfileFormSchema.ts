@@ -77,5 +77,5 @@ export const defaultFormValues = {
   biografia: '',
   publicacoes: '',
   especializacoes: '',
-  informacoesComplementares: '',
+  informacoesComplementares: "",
 };
