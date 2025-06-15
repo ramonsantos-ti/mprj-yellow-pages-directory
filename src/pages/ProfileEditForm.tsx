@@ -88,7 +88,8 @@ const ProfileEditForm: React.FC = () => {
 
           <CargoUnidade form={form} safeCargos={safeCargos} safeFuncoes={safeFuncoes} safeUnidades={safeUnidades} isValidSelectValue={isValidSelectValue} />
 
-          <InterestAreaSelector form={form} fieldName="areasConhecimento" />
+          {/* Removido InterestAreaSelector antigo de areasConhecimento */}
+          <InterestAreaSelector form={form} fieldName="temasInteresse" />
 
           <AcademicFormation form={form} />
 

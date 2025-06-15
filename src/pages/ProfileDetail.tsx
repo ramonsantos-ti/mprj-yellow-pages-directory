@@ -81,7 +81,6 @@ const ProfileDetail: React.FC = () => {
         telefone: profileData.telefone || '',
         email: profileData.email || '',
         biografia: profileData.biografia || '',
-        areasConhecimento: Array.isArray(profileData.areas_conhecimento) ? profileData.areas_conhecimento : [],
         especializacoes: profileData.especializacoes || '',
         temasInteresse: Array.isArray(profileData.temas_interesse) ? profileData.temas_interesse : [],
         idiomas: Array.isArray(profileData.idiomas) ? profileData.idiomas : [],
@@ -108,7 +107,7 @@ const ProfileDetail: React.FC = () => {
           curso: f.curso,
           ano: f.ano
         })) || [],
-        experienciasProfissionais: [], // Não será exibido
+        experienciasProfissionais: [],
         disponibilidade: availabilityData?.[0] ? {
           tipoColaboracao: Array.isArray(availabilityData[0].tipo_colaboracao) ? availabilityData[0].tipo_colaboracao : [],
           disponibilidadeEstimada: availabilityData[0].disponibilidade_estimada || ''

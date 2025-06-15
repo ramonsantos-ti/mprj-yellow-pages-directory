@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Profile } from '../types';
@@ -111,18 +110,18 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
           )}
         </div>
 
-        {/* Áreas de Interesse */}
+        {/* Temas de Interesse */}
         <div>
-          <h4 className="text-sm font-medium text-gray-900 mb-2">Áreas de Interesse</h4>
+          <h4 className="text-sm font-medium text-gray-900 mb-2">Temas de Interesse</h4>
           <div className="flex flex-wrap gap-1">
-            {profile.areasConhecimento.slice(0, 3).map((area, index) => (
+            {profile.temasInteresse.slice(0, 3).map((tema, index) => (
               <Badge key={index} className="text-xs bg-red-100 text-red-900 hover:bg-red-200">
-                {area}
+                {tema}
               </Badge>
             ))}
-            {profile.areasConhecimento.length > 3 && (
+            {profile.temasInteresse.length > 3 && (
               <Badge variant="outline" className="text-xs">
-                +{profile.areasConhecimento.length - 3} mais
+                +{profile.temasInteresse.length - 3} mais
               </Badge>
             )}
           </div>

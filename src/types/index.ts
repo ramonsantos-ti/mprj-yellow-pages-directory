@@ -1,3 +1,4 @@
+
 export interface User {
   id: string;
   username: string;
@@ -16,15 +17,14 @@ export interface Profile {
   name: string;
   matricula: string;
   cargo: string[];
-  funcao?: string[]; // New optional field for functions
+  funcao?: string[];
   unidade: string[];
   telefone?: string;
   email: string;
   biografia?: string;
-  areasConhecimento: string[];
   especializacoes?: string;
   projetos: Project[];
-  temasInteresse: string[];
+  temasInteresse: string[]; // ← unificado aqui
   formacaoAcademica: FormacaoAcademica[];
   experienciasProfissionais: ExperienciaProfissional[];
   idiomas: string[];
@@ -38,8 +38,8 @@ export interface Profile {
   certificacoes?: string[];
   publicacoes?: string;
   role?: 'admin' | 'user';
-  updatedByAdmin?: boolean; // New field to track admin modifications
-  informacoesComplementares?: string; // <-- ADDED to fix the error
+  updatedByAdmin?: boolean;
+  informacoesComplementares?: string;
 }
 
 export interface Project {
@@ -77,9 +77,9 @@ export interface ContatoPreferencia {
 
 export interface SearchFilters {
   cargo?: string;
-  funcao?: string; // New filter for functions
+  funcao?: string;
   unidade?: string;
-  areaConhecimento?: string;
+  areaConhecimento?: string; // Não removemos filtros antigos agora, mas pode ser revisado depois
   habilidadeTecnica?: string;
   formacao?: string;
   idioma?: string;

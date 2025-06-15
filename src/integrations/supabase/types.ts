@@ -177,7 +177,6 @@ export type Database = {
       profiles: {
         Row: {
           aceite_termos: boolean | null
-          areas_conhecimento: string[] | null
           biografia: string | null
           cargo: string[] | null
           certificacoes: string[] | null
@@ -204,7 +203,6 @@ export type Database = {
         }
         Insert: {
           aceite_termos?: boolean | null
-          areas_conhecimento?: string[] | null
           biografia?: string | null
           cargo?: string[] | null
           certificacoes?: string[] | null
@@ -231,7 +229,6 @@ export type Database = {
         }
         Update: {
           aceite_termos?: boolean | null
-          areas_conhecimento?: string[] | null
           biografia?: string | null
           cargo?: string[] | null
           certificacoes?: string[] | null

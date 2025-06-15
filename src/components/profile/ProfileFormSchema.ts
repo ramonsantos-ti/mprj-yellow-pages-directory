@@ -1,3 +1,4 @@
+
 import * as z from 'zod';
 
 const formacaoAcademicaSchema = z.object({
@@ -7,8 +8,6 @@ const formacaoAcademicaSchema = z.object({
   ano: z.number().min(1900, 'Ano deve ser válido').max(new Date().getFullYear() + 10, 'Ano não pode ser muito futuro')
 });
 
-// Atualização: agora o array pode ser undefined ou conter só entradas válidas completamente preenchidas.
-// Permite array vazio ou undefined!
 export const profileSchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório'),
   matricula: z.string().min(1, 'Matrícula é obrigatória'),
@@ -17,18 +16,15 @@ export const profileSchema = z.object({
   cargo: z.array(z.string()).min(1, 'Pelo menos um cargo é obrigatório'),
   funcao: z.array(z.string()),
   unidade: z.array(z.string()).min(1, 'Pelo menos uma unidade é obrigatória'),
-  areasConhecimento: z.array(z.string()),
-  temasInteresse: z.array(z.string()),
-  idiomas: z.array(z.string()), // seção própria
+  temasInteresse: z.array(z.string()), // <-- agora é obrigatório
+  idiomas: z.array(z.string()),
   linkCurriculo: z.string().optional(),
   certificacoes: z.array(z.string()),
   aceiteTermos: z.boolean().refine(val => val === true, 'Você deve aceitar os termos'),
-  // ↓↓↓ CAMPOS NOVOS/ALINHADOS ↓↓↓
   biografia: z.string().optional(),
   publicacoes: z.string().optional(),
   especializacoes: z.string().optional(),
   informacoesComplementares: z.string().optional(),
-  // Mantém validacão: array opcional, exige 100% dos campos se iniciado
   formacaoAcademica: z
     .array(formacaoAcademicaSchema)
     .optional()
@@ -66,14 +62,12 @@ export const defaultFormValues = {
   cargo: [],
   funcao: [],
   unidade: [],
-  areasConhecimento: [],
-  temasInteresse: [],
-  idiomas: [], // campo separado
+  temasInteresse: [], // <-- agora aqui!
+  idiomas: [],
   linkCurriculo: '',
   certificacoes: [],
   aceiteTermos: false,
   formacaoAcademica: [],
-  // ↓↓↓ ALINHADO COM O BANCO ↓↓↓
   biografia: '',
   publicacoes: '',
   especializacoes: '',

@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -35,7 +34,6 @@ export const useProfileData = () => {
       }
 
       if (profile) {
-        // Transform Supabase data to Profile interface
         const transformedProfile: Profile = {
           id: profile.id,
           userId: profile.user_id || '',
@@ -47,9 +45,8 @@ export const useProfileData = () => {
           telefone: profile.telefone || '',
           email: profile.email,
           biografia: profile.biografia || '',
-          areasConhecimento: profile.areas_conhecimento || [],
           especializacoes: profile.especializacoes || '',
-          temasInteresse: profile.temas_interesse || [],
+          temasInteresse: profile.temas_interesse || [], // <-- só esse campo
           idiomas: profile.idiomas || [],
           linkCurriculo: profile.link_curriculo || '',
           fotoUrl: profile.foto_url || '',
@@ -96,7 +93,7 @@ export const useProfileData = () => {
             formaContato: 'E-mail',
             horarioPreferencial: ''
           },
-          informacoesComplementares: profile.informacoes_complementares || '', // <-- map DB field to Profile camelCase
+          informacoesComplementares: profile.informacoes_complementares || '',
         };
 
         setUserProfile(transformedProfile);
