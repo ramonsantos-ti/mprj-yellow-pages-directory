@@ -1,8 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Camera, Upload } from 'lucide-react';
+import { validateSingleFace } from '../../utils/validateSingleFace';
 
 interface PhotoUploadProps {
   fotoPreview: string;
@@ -10,6 +11,31 @@ interface PhotoUploadProps {
 }
 
 const PhotoUpload: React.FC<PhotoUploadProps> = ({ fotoPreview, onFileUpload }) => {
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  // Novo handle que faz validação antes do upload de fato
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    setErrorMsg(null);
+    const file = event.target.files?.[0];
+    if (file) {
+      setLoading(true);
+      setErrorMsg(null);
+      try {
+        const isValid = await validateSingleFace(file);
+        if (!isValid) {
+          setErrorMsg('Por favor, selecione uma imagem com UM único rosto visível.');
+          return;
+        }
+        onFileUpload(event); // Executa o upload padrão (preview + callback do form)
+      } catch (e) {
+        setErrorMsg('Erro ao validar imagem. Tente novamente.');
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -17,7 +43,6 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ fotoPreview, onFileUpload }) 
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex items-center space-x-6">
-          {/* Increased photo size from w-32 h-32 to w-48 h-48 (50% increase) */}
           <div className="w-48 h-48 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center overflow-hidden">
             {fotoPreview ? (
               <img src={fotoPreview} alt="Preview" className="w-full h-full object-cover" />
@@ -34,20 +59,25 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ fotoPreview, onFileUpload }) 
               variant="logo-brown" 
               className="cursor-pointer font-bold" 
               onClick={() => document.getElementById('foto-upload')?.click()}
+              disabled={loading}
             >
               <Upload className="w-4 h-4 mr-2" />
-              Fazer Upload de Foto
+              {loading ? 'Validando...' : 'Fazer Upload de Foto'}
             </Button>
             <input
               id="foto-upload"
               type="file"
               accept="image/*"
-              onChange={onFileUpload}
+              onChange={handleFileChange}
               className="hidden"
+              disabled={loading}
             />
             <p className="text-sm text-gray-500">
               Formatos aceitos: JPG, PNG, GIF. Máximo 5MB.
             </p>
+            {errorMsg && (
+              <div className="text-sm text-red-700 font-medium">{errorMsg}</div>
+            )}
           </div>
         </div>
       </CardContent>
@@ -56,4 +86,3 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ fotoPreview, onFileUpload }) 
 };
 
 export default PhotoUpload;
-
