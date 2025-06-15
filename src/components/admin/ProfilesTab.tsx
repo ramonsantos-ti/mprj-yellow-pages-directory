@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Profile } from '../../types';
 import { Card, CardContent } from '../ui/card';
@@ -12,6 +11,7 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import AdminProfileEditModal from './AdminProfileEditModal';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from "react-router-dom";
 
 interface ProfilesTabProps {
   searchTerm: string;
@@ -35,6 +35,7 @@ const ProfilesTab: React.FC<ProfilesTabProps> = ({
   const [editingProfile, setEditingProfile] = useState<Profile | null>(null);
   const [deletingProfile, setDeletingProfile] = useState<Profile | null>(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
@@ -140,34 +141,15 @@ const ProfilesTab: React.FC<ProfilesTabProps> = ({
                 </div>
                 
                 <div className="flex items-center space-x-2">
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setEditingProfile(profile)}
-                        className="flex items-center space-x-1"
-                      >
-                        <Edit className="w-4 h-4" />
-                        <span>Editar</span>
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                      <DialogHeader>
-                        <DialogTitle>Editar Perfil - {profile.name}</DialogTitle>
-                      </DialogHeader>
-                      {editingProfile && (
-                        <AdminProfileEditModal
-                          profile={editingProfile}
-                          onSave={(updatedData) => {
-                            updateProfile(profile.id, updatedData);
-                            setEditingProfile(null);
-                          }}
-                          onCancel={() => setEditingProfile(null)}
-                        />
-                      )}
-                    </DialogContent>
-                  </Dialog>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center space-x-1"
+                    onClick={() => navigate(`/profile/${profile.id}?edit=1`)}
+                  >
+                    <Edit className="w-4 h-4" />
+                    <span>Editar</span>
+                  </Button>
 
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
