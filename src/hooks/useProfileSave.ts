@@ -23,23 +23,22 @@ export const useProfileSave = () => {
     try {
       setSaving(true);
 
-      // Logs detalhados: Mostre todos os valores no objeto antes de salvar
-      console.log('[DEBUG] DATA para salvar perfil:', data);
-      // Logs linha a linha para campos problemáticos
-      console.log('[DEBUG] Valor de biografia recebido (bruto):', data.biografia, 'typeof:', typeof data.biografia, 'null?', data.biografia === null, 'undefined?', data.biografia === undefined);
-      console.log('[DEBUG] Valor de publicacoes recebido (bruto):', data.publicacoes, 'typeof:', typeof data.publicacoes, 'null?', data.publicacoes === null, 'undefined?', data.publicacoes === undefined);
+      // Log para depuração profunda
+      console.log('[DEBUG] DATA', data);
 
-      // Forçar sempre string (inclusive se vier undefined/null)
-      const safeBiografia = typeof data.biografia === 'string'
-        ? data.biografia
-        : (data.biografia ? String(data.biografia) : '');
-      const safePublicacoes = typeof data.publicacoes === 'string'
-        ? data.publicacoes
-        : (data.publicacoes ? String(data.publicacoes) : '');
+      // Força string
+      const safeBiografia =
+        typeof data.biografia === 'string'
+          ? data.biografia
+          : (data.biografia ? String(data.biografia) : '');
+      const safePublicacoes =
+        typeof data.publicacoes === 'string'
+          ? data.publicacoes
+          : (data.publicacoes ? String(data.publicacoes) : '');
 
-      // Log teste após "saneamento"
-      console.log('[DEBUG] Valor de biografia SANEADO:', safeBiografia);
-      console.log('[DEBUG] Valor de publicacoes SANEADO:', safePublicacoes);
+      // Mostra o valor final dado para o banco antes de enviar
+      console.log('[DEBUG] VAI ENVIAR biografia:', safeBiografia);
+      console.log('[DEBUG] VAI ENVIAR publicacoes:', safePublicacoes);
 
       const profileData = {
         user_id: user?.id,
@@ -47,7 +46,7 @@ export const useProfileSave = () => {
         matricula: data.matricula,
         email: data.email,
         telefone: data.telefone || null,
-        biografia: safeBiografia,
+        biografia: safeBiografia ?? '',
         cargo: data.cargo || [],
         funcao: data.funcao || [],
         unidade: data.unidade || [],
@@ -58,13 +57,13 @@ export const useProfileSave = () => {
         link_curriculo: data.linkCurriculo || null,
         foto_url: fotoPreview || null,
         certificacoes: data.certificacoes || [],
-        publicacoes: safePublicacoes,
+        publicacoes: safePublicacoes ?? '',
         aceite_termos: data.aceiteTermos || false,
         updated_at: new Date().toISOString()
       };
 
-      // Log do objeto final
-      console.log('[DEBUG] profileData pronto para banco:', profileData);
+      // Log objeto enviado ao Supabase
+      console.log('[DEBUG] profileData para UPDATE/INSERT', profileData);
 
       let profileId = userProfile?.id;
       if (userProfile) {
@@ -72,8 +71,13 @@ export const useProfileSave = () => {
           .from('profiles')
           .update(profileData)
           .eq('id', userProfile.id)
-          .select(); // forçar retorno para log
+          .select(); // Forçar retorno para log
 
+        // LOG: Mostra exatamente o que veio do banco depois do update.
+        if (updateRet && Array.isArray(updateRet)) {
+          console.log('[DEBUG] CAMPOS RETORNADOS PELO UPDATE:');
+          console.log('biografia:', updateRet[0]?.biografia, '| publicacoes:', updateRet[0]?.publicacoes);
+        }
         console.log('[DEBUG] RESPOSTA UPDATE:', updateRet, error);
 
         if (error) throw error;
@@ -84,6 +88,10 @@ export const useProfileSave = () => {
           .select()
           .single();
 
+        if (newProfile) {
+          console.log('[DEBUG] CAMPOS RETORNADOS PELO INSERT:');
+          console.log('biografia:', newProfile?.biografia, '| publicacoes:', newProfile?.publicacoes);
+        }
         console.log('[DEBUG] RESPOSTA INSERT:', newProfile, error);
 
         if (error) throw error;
@@ -94,7 +102,6 @@ export const useProfileSave = () => {
       if (profileId) {
         await saveRelatedData(profileId, formacaoAcademica, projetos, data, disponibilidade);
       }
-
       onSuccess?.();
 
     } catch (err: any) {
