@@ -41,39 +41,38 @@ export function useProfileEditFormController() {
   });
 
   // Controle de carregamento do perfil
-  const hasLoadedProfileRef = useRef(false);
+  const hasPopulatedProfile = useRef(false);
 
   useEffect(() => {
-    console.log("[DEBUG] userProfile carregado do banco:", userProfile);
-    if (userProfile && !hasLoadedProfileRef.current) {
+    // Só popula se userProfile existir, não for null e nunca populado antes
+    if (userProfile && !hasPopulatedProfile.current) {
+      console.log("[DEBUG] Populando formulário com userProfile:", userProfile);
       populateFormWithProfile(userProfile);
-      hasLoadedProfileRef.current = true;
-      console.log("[DEBUG] populateFormWithProfile executado");
-    } else if (user && !userProfile && !hasLoadedProfileRef.current) {
-      form.setValue('name', user?.email || '');
-      form.setValue('email', user?.email || '');
+      hasPopulatedProfile.current = true;
+    } else if (!userProfile && user && !hasPopulatedProfile.current) {
+      // Novo usuário ou profile não existente, popular valores mínimos
+      form.setValue('name', user.email || '');
+      form.setValue('email', user.email || '');
       form.setValue('matricula', '');
-      hasLoadedProfileRef.current = true;
+      hasPopulatedProfile.current = true;
       console.log("[DEBUG] Form setado para dados mínimos");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userProfile, user]);
 
-  // Resetar controle se mudar o perfil
+  // Resetar controle se mudar o profile (novo login/etc)
   useEffect(() => {
-    hasLoadedProfileRef.current = false;
+    hasPopulatedProfile.current = false;
   }, [userProfile?.id]);
 
-  // Log debug após populate
   useEffect(() => {
     if (userProfile) {
       setTimeout(() => {
-        console.log("[DEBUG] Campos do formulário preenchidos após populate:", form.getValues());
+        console.log("[DEBUG] Valores do formulário após populate:", form.getValues());
       }, 100);
     }
   }, [userProfile, form]);
 
-  // Log de erros do form
   useEffect(() => {
     if (Object.keys(form.formState.errors).length > 0) {
       console.log("[DEBUG] Erros no formulário:", form.formState.errors);
