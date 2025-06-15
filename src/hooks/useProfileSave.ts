@@ -23,22 +23,24 @@ export const useProfileSave = () => {
     try {
       setSaving(true);
 
-      // Log para depuração profunda
-      console.log('[DEBUG] DATA', data);
+      // [DEBUG] Mostra recebimento dos campos específicos
+      console.log('[DEBUG] RECEBIDO PARA SALVAR >>>');
+      console.log('biografia:', data.biografia, '| typeof:', typeof data.biografia, '| null?:', data.biografia === null, '| undefined?:', data.biografia === undefined);
+      console.log('publicacoes:', data.publicacoes, '| typeof:', typeof data.publicacoes, '| null?:', data.publicacoes === null, '| undefined?:', data.publicacoes === undefined);
 
-      // Força string
       const safeBiografia =
         typeof data.biografia === 'string'
           ? data.biografia
           : (data.biografia ? String(data.biografia) : '');
+
       const safePublicacoes =
         typeof data.publicacoes === 'string'
           ? data.publicacoes
           : (data.publicacoes ? String(data.publicacoes) : '');
 
-      // Mostra o valor final dado para o banco antes de enviar
-      console.log('[DEBUG] VAI ENVIAR biografia:', safeBiografia);
-      console.log('[DEBUG] VAI ENVIAR publicacoes:', safePublicacoes);
+      // [DEBUG] Mostra antes de enviar ao banco
+      console.log('[DEBUG] ENVIAR PARA O BANCO >>>');
+      console.log('safeBiografia:', safeBiografia, '| safePublicacoes:', safePublicacoes);
 
       const profileData = {
         user_id: user?.id,
@@ -62,35 +64,90 @@ export const useProfileSave = () => {
         updated_at: new Date().toISOString()
       };
 
-      // Log objeto enviado ao Supabase
-      console.log('[DEBUG] profileData para UPDATE/INSERT', profileData);
+      // [DEBUG] profileData final enviado ao UPDATE/INSERT
+      console.log('[DEBUG] profileData FINAL >>>', profileData);
 
       let profileId = userProfile?.id;
       if (userProfile) {
+        // Aqui pedimos todos os campos explicitamente
         const { error, data: updateRet } = await supabase
           .from('profiles')
           .update(profileData)
           .eq('id', userProfile.id)
-          .select(); // Forçar retorno para log
+          .select(`
+            id,
+            user_id,
+            name,
+            matricula,
+            email,
+            telefone,
+            biografia,
+            cargo,
+            funcao,
+            unidade,
+            areas_conhecimento,
+            especializacoes,
+            temas_interesse,
+            idiomas,
+            link_curriculo,
+            foto_url,
+            certificacoes,
+            publicacoes,
+            aceite_termos,
+            updated_at
+          `);
 
-        // LOG: Mostra exatamente o que veio do banco depois do update.
-        if (updateRet && Array.isArray(updateRet)) {
-          console.log('[DEBUG] CAMPOS RETORNADOS PELO UPDATE:');
-          console.log('biografia:', updateRet[0]?.biografia, '| publicacoes:', updateRet[0]?.publicacoes);
+        // [DEBUG] Retorno do UPDATE incluindo biografia/publicações
+        if (Array.isArray(updateRet) && updateRet[0]) {
+          const ret = updateRet[0];
+          console.log('[DEBUG] CAMPOS UPDATE RETORNADOS:', {
+            biografia: ret.biografia,
+            publicacoes: ret.publicacoes,
+            keys: Object.keys(ret)
+          });
+        } else {
+          console.log('[DEBUG] UPDATE retornou:', updateRet);
         }
         console.log('[DEBUG] RESPOSTA UPDATE:', updateRet, error);
 
         if (error) throw error;
       } else {
+        // INSERT, também pedimos explicitamente os campos
         const { data: newProfile, error } = await supabase
           .from('profiles')
           .insert(profileData)
-          .select()
+          .select(`
+            id,
+            user_id,
+            name,
+            matricula,
+            email,
+            telefone,
+            biografia,
+            cargo,
+            funcao,
+            unidade,
+            areas_conhecimento,
+            especializacoes,
+            temas_interesse,
+            idiomas,
+            link_curriculo,
+            foto_url,
+            certificacoes,
+            publicacoes,
+            aceite_termos,
+            updated_at
+          `)
           .single();
 
         if (newProfile) {
-          console.log('[DEBUG] CAMPOS RETORNADOS PELO INSERT:');
-          console.log('biografia:', newProfile?.biografia, '| publicacoes:', newProfile?.publicacoes);
+          console.log('[DEBUG] CAMPOS INSERIDOS:', {
+            biografia: newProfile.biografia,
+            publicacoes: newProfile.publicacoes,
+            keys: Object.keys(newProfile)
+          });
+        } else {
+          console.log('[DEBUG] INSERT retornou:', newProfile);
         }
         console.log('[DEBUG] RESPOSTA INSERT:', newProfile, error);
 
