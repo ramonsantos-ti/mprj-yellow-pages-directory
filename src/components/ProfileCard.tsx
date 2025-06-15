@@ -32,7 +32,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
                 src={profile.fotoUrl} 
                 alt={profile.name} 
                 className="w-full h-full object-cover"
-                onLoad={() => console.log('Image loaded successfully for:', profile.name)}
+                onLoad={() => console.log('Image loaded successfully for:', profile.name, 'URL:', profile.fotoUrl)}
                 onError={(e) => {
                   console.error('Image failed to load for:', profile.name, 'URL:', profile.fotoUrl);
                   // Fallback to initials if image fails to load
