@@ -35,7 +35,7 @@ const BasicInfo: React.FC<BasicInfoProps> = ({ form }) => {
           )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <Label htmlFor="matricula">Matrícula *</Label>
             <Input
@@ -60,9 +60,7 @@ const BasicInfo: React.FC<BasicInfoProps> = ({ form }) => {
               <p className="text-red-500 text-sm mt-1">{errors.email.message as string}</p>
             )}
           </div>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <Label htmlFor="telefone">Telefone</Label>
             <Input
