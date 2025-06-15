@@ -6,14 +6,13 @@ import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Textarea } from '../ui/textarea';
 import { User } from 'lucide-react';
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '../ui/form';
 
 interface BasicInfoProps {
   form: UseFormReturn<any>;
 }
 
 const BasicInfo: React.FC<BasicInfoProps> = ({ form }) => {
-  const { register, formState: { errors } } = form;
-
   return (
     <Card>
       <CardHeader>
@@ -23,63 +22,90 @@ const BasicInfo: React.FC<BasicInfoProps> = ({ form }) => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div>
-          <Label htmlFor="name">Nome Completo *</Label>
-          <Input
-            id="name"
-            {...register('name', { required: 'Nome é obrigatório' })}
-            placeholder="Digite seu nome completo"
-          />
-          {errors.name && (
-            <p className="text-red-500 text-sm mt-1">{errors.name.message as string}</p>
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Nome Completo *</FormLabel>
+              <FormControl>
+                <Input
+                  {...field}
+                  placeholder="Digite seu nome completo"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
-        </div>
-
+        />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <Label htmlFor="matricula">Matrícula *</Label>
-            <Input
-              id="matricula"
-              {...register('matricula', { required: 'Matrícula é obrigatória' })}
-              placeholder="Digite sua matrícula"
-            />
-            {errors.matricula && (
-              <p className="text-red-500 text-sm mt-1">{errors.matricula.message as string}</p>
+          <FormField
+            control={form.control}
+            name="matricula"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Matrícula *</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    placeholder="Digite sua matrícula"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
             )}
-          </div>
-
-          <div>
-            <Label htmlFor="email">E-mail *</Label>
-            <Input
-              id="email"
-              type="email"
-              {...register('email', { required: 'E-mail é obrigatório' })}
-              placeholder="Digite seu e-mail"
-            />
-            {errors.email && (
-              <p className="text-red-500 text-sm mt-1">{errors.email.message as string}</p>
+          />
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>E-mail *</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="email"
+                    placeholder="Digite seu e-mail"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
             )}
-          </div>
-
-          <div>
-            <Label htmlFor="telefone">Telefone</Label>
-            <Input
-              id="telefone"
-              {...register('telefone')}
-              placeholder="Digite seu telefone"
-            />
-          </div>
-        </div>
-
-        <div>
-          <Label htmlFor="biografia">Biografia</Label>
-          <Textarea
-            id="biografia"
-            {...register('biografia')}
-            placeholder="Conte um pouco sobre você, sua experiência e interesses profissionais"
-            rows={4}
+          />
+          <FormField
+            control={form.control}
+            name="telefone"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Telefone</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    placeholder="Digite seu telefone"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
         </div>
+        <FormField
+          control={form.control}
+          name="biografia"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Biografia</FormLabel>
+              <FormControl>
+                <Textarea
+                  {...field}
+                  placeholder="Conte um pouco sobre você, sua experiência e interesses profissionais"
+                  rows={4}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       </CardContent>
     </Card>
   );

@@ -87,7 +87,11 @@ const ProfileEditForm: React.FC = () => {
   }, [form.formState.errors]);
 
   const handleSave = async (data: any) => {
-    console.log('[DEBUG] handleSave foi chamado, dados do formulário:', data);
+    // Log especial para análise de campos do formulário
+    console.log('[DEBUG][FORM BEFORE SUBMIT]:', {
+      biografia: data.biografia,
+      publicacoes: data.publicacoes
+    });
     const formacaoAcademica = data.formacaoAcademica || [];
     await saveProfile(data, fotoPreview, formacaoAcademica, projetos, disponibilidade);
   };
