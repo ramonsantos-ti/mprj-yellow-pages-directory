@@ -41,16 +41,23 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            {/* Logo */}
+            {/* Logo Principal - MPRJ */}
             <Link to="/" className="flex items-center space-x-3">
-              <img 
-                src="/lovable-uploads/2aae1185-7d52-453a-942a-1ef1876196b1.jpg" 
-                alt="MPRJ Logo" 
-                className="h-10 w-auto"
-              />
-              <span className="text-xl font-semibold text-gray-900 hidden sm:block">
-                Páginas Amarelas
-              </span>
+              <div className="flex items-center space-x-2">
+                <img 
+                  src="/lovable-uploads/2aae1185-7d52-453a-942a-1ef1876196b1.jpg" 
+                  alt="MPRJ Logo" 
+                  className="h-12 w-auto"
+                />
+                <div className="flex flex-col">
+                  <span className="text-lg font-bold text-red-900 hidden sm:block">
+                    MPRJ
+                  </span>
+                  <span className="text-sm font-medium text-gray-700 hidden sm:block">
+                    Páginas Amarelas
+                  </span>
+                </div>
+              </div>
             </Link>
 
             {/* Navigation */}
