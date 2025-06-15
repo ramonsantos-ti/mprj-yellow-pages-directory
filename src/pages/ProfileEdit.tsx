@@ -16,6 +16,7 @@ import ContactPreferences from '../components/profile/ContactPreferences';
 import PhotoUpload from '../components/profile/PhotoUpload';
 import CurriculumSection from '../components/profile/CurriculumSection';
 import StatusMessages from '../components/profile/StatusMessages';
+import InterestAreaSelector from '../components/InterestAreaSelector';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form } from '../components/ui/form';
@@ -122,6 +123,8 @@ const ProfileEdit: React.FC = () => {
             safeUnidades={safeUnidades}
             isValidSelectValue={isValidSelectValue}
           />
+
+          <InterestAreaSelector form={form} fieldName="areasConhecimento" />
 
           {/* Seção Formação Acadêmica e Projetos lado a lado */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
