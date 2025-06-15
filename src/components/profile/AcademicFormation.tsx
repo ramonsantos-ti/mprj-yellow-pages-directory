@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { UseFormRegister, FieldErrors, Control, useFieldArray } from 'react-hook-form';
+import { UseFormReturn, useFieldArray } from 'react-hook-form';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -9,12 +9,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { GraduationCap, Plus, Trash2 } from 'lucide-react';
 
 interface AcademicFormationProps {
-  register: UseFormRegister<any>;
-  errors: FieldErrors;
-  control: Control<any>;
+  form: UseFormReturn<any>;
 }
 
-const AcademicFormation: React.FC<AcademicFormationProps> = ({ register, errors, control }) => {
+const AcademicFormation: React.FC<AcademicFormationProps> = ({ form }) => {
+  const { register, control, formState: { errors } } = form;
+  
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'formacaoAcademica'

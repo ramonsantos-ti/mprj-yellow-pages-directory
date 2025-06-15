@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { UseFormRegister, FieldErrors } from 'react-hook-form';
+import { UseFormReturn } from 'react-hook-form';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
@@ -8,11 +8,12 @@ import { Textarea } from '../ui/textarea';
 import { FileText, Link as LinkIcon } from 'lucide-react';
 
 interface PublicationsSectionProps {
-  register: UseFormRegister<any>;
-  errors: FieldErrors;
+  form: UseFormReturn<any>;
 }
 
-const PublicationsSection: React.FC<PublicationsSectionProps> = ({ register, errors }) => {
+const PublicationsSection: React.FC<PublicationsSectionProps> = ({ form }) => {
+  const { register, formState: { errors } } = form;
+
   return (
     <div className="grid gap-6 md:grid-cols-2">
       <Card>

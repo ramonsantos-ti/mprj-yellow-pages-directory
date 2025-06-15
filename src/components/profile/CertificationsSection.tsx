@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { UseFormRegister, UseFormSetValue, UseFormWatch } from 'react-hook-form';
+import { UseFormReturn } from 'react-hook-form';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -9,16 +9,11 @@ import { Badge } from '../ui/badge';
 import { Award, Plus, X } from 'lucide-react';
 
 interface CertificationsSectionProps {
-  register: UseFormRegister<any>;
-  setValue: UseFormSetValue<any>;
-  watch: UseFormWatch<any>;
+  form: UseFormReturn<any>;
 }
 
-const CertificationsSection: React.FC<CertificationsSectionProps> = ({ 
-  register, 
-  setValue, 
-  watch 
-}) => {
+const CertificationsSection: React.FC<CertificationsSectionProps> = ({ form }) => {
+  const { register, setValue, watch } = form;
   const [newCertification, setNewCertification] = useState('');
   const certificacoes = watch('certificacoes') || [];
 

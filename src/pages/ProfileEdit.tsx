@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -451,19 +450,7 @@ const ProfileEdit: React.FC = () => {
 
           <AdditionalInfo form={form} />
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Formação Acadêmica</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <AcademicFormation
-                formacoes={formacaoAcademica}
-                setFormacoes={setFormacaoAcademica}
-                safeNiveisFormacao={['Graduação', 'Especialização', 'Mestrado', 'Doutorado', 'Pós-Doutorado']}
-                isValidSelectValue={isValidSelectValue}
-              />
-            </CardContent>
-          </Card>
+          <AcademicFormation form={form} />
 
           <Card>
             <CardHeader>
@@ -477,11 +464,7 @@ const ProfileEdit: React.FC = () => {
             </CardContent>
           </Card>
 
-          <CertificationsSection
-            form={form}
-            safeCertificacoes={safeCertificacoes}
-            isValidSelectValue={isValidSelectValue}
-          />
+          <CertificationsSection form={form} />
 
           <PublicationsSection form={form} />
 
