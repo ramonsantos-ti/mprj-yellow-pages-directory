@@ -4,6 +4,7 @@ import { UseFormReturn } from 'react-hook-form';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '../ui/form';
 import { Textarea } from '../ui/textarea';
+import { CircleHelp } from 'lucide-react';
 
 interface AdditionalInfoProps {
   form: UseFormReturn<any>;
@@ -13,7 +14,10 @@ const AdditionalInfo: React.FC<AdditionalInfoProps> = ({ form }) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Informações Complementares</CardTitle>
+        <CardTitle className="flex items-center space-x-2">
+          <CircleHelp className="w-5 h-5 text-black" />
+          <span>Informações Complementares</span>
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Campo livre de informações complementares */}

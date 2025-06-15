@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
@@ -6,7 +5,7 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '../ui/
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '../ui/select';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
-import { X } from 'lucide-react';
+import { X, Languages } from 'lucide-react';
 import { IDIOMAS } from '../../data/constants';
 
 interface LanguagesSectionProps {
@@ -31,7 +30,10 @@ const LanguagesSection: React.FC<LanguagesSectionProps> = ({ form }) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Idiomas</CardTitle>
+        <CardTitle className="flex items-center space-x-2">
+          <Languages className="w-5 h-5 text-black" />
+          <span>Idiomas</span>
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex gap-2">

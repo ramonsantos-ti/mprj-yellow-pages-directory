@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { FormField, FormItem, FormLabel, FormMessage } from './ui/form';
@@ -6,6 +5,7 @@ import { INTEREST_AREAS, MainInterestArea } from '../data/interestAreas';
 import { UseFormReturn } from 'react-hook-form';
 import SelectedAreasList from './interest-area/SelectedAreasList';
 import AreaInput from './interest-area/AreaInput';
+import { BookOpenText } from 'lucide-react';
 
 interface InterestAreaSelectorProps {
   form: UseFormReturn<any>;
@@ -32,7 +32,10 @@ const InterestAreaSelector: React.FC<InterestAreaSelectorProps> = ({ form, field
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Áreas de Interesse</CardTitle>
+        <CardTitle className="flex items-center space-x-2">
+          <BookOpenText className="w-5 h-5 text-black" />
+          <span>Áreas de Interesse</span>
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <FormField

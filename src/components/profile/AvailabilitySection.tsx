@@ -1,8 +1,8 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Checkbox } from '../ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { Hourglass } from 'lucide-react';
 
 interface AvailabilitySectionProps {
   tipoColaboracao: string[];
@@ -34,7 +34,10 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Disponibilidade para Colaboração</CardTitle>
+        <CardTitle className="flex items-center space-x-2">
+          <Hourglass className="w-5 h-5 text-black" />
+          <span>Disponibilidade para Colaboração</span>
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div>

@@ -1,9 +1,9 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Input } from '../ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { formaContatoMap } from './ProfileFormConstants';
+import { Mails } from 'lucide-react';
 
 interface ContactPreferencesProps {
   formaContato: string;
@@ -25,7 +25,10 @@ const ContactPreferences: React.FC<ContactPreferencesProps> = ({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Preferências de Contato</CardTitle>
+        <CardTitle className="flex items-center space-x-2">
+          <Mails className="w-5 h-5 text-black" />
+          <span>Preferências de Contato</span>
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
