@@ -24,7 +24,7 @@ const SelectTrigger = React.forwardRef<
   >
     {children}
     <SelectPrimitive.Icon asChild>
-      <ArrowDown size={28} color="#7B3F00" strokeWidth={3} className="font-bold" />
+      <ArrowDown size={22} color="#7B3F00" strokeWidth={3} className="font-bold" />
     </SelectPrimitive.Icon>
   </SelectPrimitive.Trigger>
 ))
@@ -42,7 +42,7 @@ const SelectScrollUpButton = React.forwardRef<
     )}
     {...props}
   >
-    <ArrowUp size={28} color="#7B3F00" strokeWidth={3} className="font-bold" />
+    <ArrowUp size={22} color="#7B3F00" strokeWidth={3} className="font-bold" />
   </SelectPrimitive.ScrollUpButton>
 ))
 SelectScrollUpButton.displayName = SelectPrimitive.ScrollUpButton.displayName
@@ -59,7 +59,7 @@ const SelectScrollDownButton = React.forwardRef<
     )}
     {...props}
   >
-    <ArrowDown size={28} color="#7B3F00" strokeWidth={3} className="font-bold" />
+    <ArrowDown size={22} color="#7B3F00" strokeWidth={3} className="font-bold" />
   </SelectPrimitive.ScrollDownButton>
 ))
 SelectScrollDownButton.displayName =
