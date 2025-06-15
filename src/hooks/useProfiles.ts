@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Profile } from '../types';
@@ -23,8 +24,12 @@ export const useProfiles = () => {
 
       if (error) throw error;
 
+      console.log('Raw profiles data from Supabase:', data);
+
       // Transform Supabase data to match our Profile type
       const transformedProfiles: Profile[] = data.map(profile => {
+        console.log('Processing profile:', profile.name, 'foto_url:', profile.foto_url);
+        
         return {
           id: profile.id,
           userId: profile.user_id || '',
@@ -85,6 +90,8 @@ export const useProfiles = () => {
           }
         };
       });
+
+      console.log('Transformed profiles:', transformedProfiles.map(p => ({ name: p.name, fotoUrl: p.fotoUrl })));
 
       setProfiles(transformedProfiles);
       setError(null);

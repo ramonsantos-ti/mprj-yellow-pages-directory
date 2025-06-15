@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Profile } from '../types';
@@ -18,6 +19,8 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   };
 
+  console.log('ProfileCard rendering:', profile.name, 'fotoUrl:', profile.fotoUrl);
+
   return (
     <Card className="h-full hover:shadow-lg transition-shadow duration-200">
       <CardHeader className="pb-4">
@@ -29,7 +32,9 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
                 src={profile.fotoUrl} 
                 alt={profile.name} 
                 className="w-full h-full object-cover"
+                onLoad={() => console.log('Image loaded successfully for:', profile.name)}
                 onError={(e) => {
+                  console.error('Image failed to load for:', profile.name, 'URL:', profile.fotoUrl);
                   // Fallback to initials if image fails to load
                   const target = e.target as HTMLImageElement;
                   target.style.display = 'none';
