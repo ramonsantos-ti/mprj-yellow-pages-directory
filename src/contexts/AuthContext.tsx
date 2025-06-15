@@ -114,11 +114,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     15 * 60 * 1000, // 15 minutos em ms
     () => {
       if (user) {
-        toast({
-          title: "Sessão expirada por inatividade",
-          description: "Você foi desconectado por ficar 15 minutos sem usar o sistema.",
-          variant: "destructive",
-        });
+        toast(
+          "Sessão expirada por inatividade",
+          {
+            description: "Você foi desconectado por ficar 15 minutos sem usar o sistema.",
+            className: "bg-destructive text-destructive-foreground"
+          }
+        );
         void logout();
       }
     }
