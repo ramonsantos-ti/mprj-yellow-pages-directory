@@ -127,7 +127,7 @@ const ProfileDetail: React.FC = () => {
     }
   };
 
-  // Utilitário para ocultar blocos vazios (string ou array)
+  // Utilitário para ocultar blocos vazios (mantido aqui caso precise em outros pontos)
   const isFieldFilled = (value: any) => {
     if (Array.isArray(value)) return value.length > 0 && value.some(v => v && String(v).trim() !== '');
     if (typeof value === 'string') return value.trim() !== '';
@@ -184,59 +184,30 @@ const ProfileDetail: React.FC = () => {
                   <MessageSquare className="w-4 h-4" />
                   <span>{formatText(profile.email)}</span>
                 </div>
-                {profile.telefone && (
-                  <div className="flex items-center space-x-2 text-gray-600">
-                    <MessageSquare className="w-4 h-4" />
-                    <span>{formatText(profile.telefone)}</span>
-                  </div>
-                )}
+                <div className="flex items-center space-x-2 text-gray-600">
+                  <MessageSquare className="w-4 h-4" />
+                  <span>{profile.telefone ? formatText(profile.telefone) : <span className="italic text-gray-400">Telefone não informado</span>}</span>
+                </div>
               </div>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Cargo, Função e Lotação */}
+      {/* Biografia */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Briefcase className="w-5 h-5 text-red-800" />
-            Cargo, Função e Lotação
+            <User className="w-5 h-5 text-red-800" />
+            Biografia
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-2">
-            <div>
-              <span className="font-medium">Cargo: </span>
-              {profile.cargo && profile.cargo.length > 0 ? (
-                profile.cargo.map((c, i) => (
-                  <Badge key={i} variant="outline" className="mr-1">{formatText(c)}</Badge>
-                ))
-              ) : (
-                <span className="text-gray-500 italic">Não informado</span>
-              )}
-            </div>
-            <div>
-              <span className="font-medium">Função: </span>
-              {profile.funcao && profile.funcao.length > 0 ? (
-                profile.funcao.map((f, i) => (
-                  <Badge key={i} variant="outline" className="mr-1 bg-blue-50">{formatText(f)}</Badge>
-                ))
-              ) : (
-                <span className="text-gray-500 italic">Não informado</span>
-              )}
-            </div>
-            <div>
-              <span className="font-medium">Lotação: </span>
-              {profile.unidade && profile.unidade.length > 0 ? (
-                profile.unidade.map((u, i) => (
-                  <Badge key={i} variant="outline" className="mr-1">{formatText(u)}</Badge>
-                ))
-              ) : (
-                <span className="text-gray-500 italic">Não informado</span>
-              )}
-            </div>
-          </div>
+          {typeof profile.biografia === "string" && profile.biografia.trim() !== "" ? (
+            <p className="text-gray-700 leading-relaxed">{formatText(profile.biografia)}</p>
+          ) : (
+            <span className="text-gray-500 italic">Biografia não informada</span>
+          )}
         </CardContent>
       </Card>
 
@@ -250,7 +221,7 @@ const ProfileDetail: React.FC = () => {
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-2">
-            {profile.temasInteresse && profile.temasInteresse.length > 0 ? (
+            {Array.isArray(profile.temasInteresse) && profile.temasInteresse.length > 0 ? (
               profile.temasInteresse.map((tema, i) => (
                 <Badge key={i} variant="outline">{formatText(tema)}</Badge>
               ))
@@ -361,7 +332,7 @@ const ProfileDetail: React.FC = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {profile.publicacoes && profile.publicacoes.trim() !== '' ? (
+          {typeof profile.publicacoes === "string" && profile.publicacoes.trim() !== "" ? (
             <p className="text-gray-700 leading-relaxed">{formatText(profile.publicacoes)}</p>
           ) : (
             <span className="text-gray-500 italic">Nenhuma publicação informada</span>
@@ -461,7 +432,7 @@ const ProfileDetail: React.FC = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {profile.especializacoes && profile.especializacoes.trim() !== '' ? (
+          {typeof profile.especializacoes === "string" && profile.especializacoes.trim() !== "" ? (
             <p className="text-gray-700">{formatText(profile.especializacoes)}</p>
           ) : (
             <span className="text-gray-500 italic">Nenhuma informação complementar informada</span>
