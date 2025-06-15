@@ -16,6 +16,12 @@ const LanguagesSection: React.FC<LanguagesSectionProps> = ({ form }) => {
   const [selectedIdioma, setSelectedIdioma] = React.useState<string>('');
   const idiomas = form.watch('idiomas') || [];
 
+  // Ordenar lista de idiomas alfabeticamente antes de exibir no select
+  const idiomasDisponiveis = IDIOMAS
+    .filter((idioma: string) => !idiomas.includes(idioma))
+    .slice()
+    .sort((a: string, b: string) => a.localeCompare(b, 'pt-BR'));
+
   const addIdioma = () => {
     if (selectedIdioma && !idiomas.includes(selectedIdioma)) {
       form.setValue('idiomas', [...idiomas, selectedIdioma]);
@@ -42,7 +48,7 @@ const LanguagesSection: React.FC<LanguagesSectionProps> = ({ form }) => {
               <SelectValue placeholder="Selecione um idioma" />
             </SelectTrigger>
             <SelectContent>
-              {IDIOMAS.filter((idioma: string) => !idiomas.includes(idioma)).map((idioma: string) => (
+              {idiomasDisponiveis.map((idioma: string) => (
                 <SelectItem key={idioma} value={idioma}>
                   {idioma}
                 </SelectItem>

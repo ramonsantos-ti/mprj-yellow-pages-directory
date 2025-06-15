@@ -188,6 +188,7 @@ export type Database = {
           funcao: string[] | null
           id: string
           idiomas: string[] | null
+          informacoes_complementares: string | null
           is_active: boolean | null
           link_curriculo: string | null
           matricula: string
@@ -214,6 +215,7 @@ export type Database = {
           funcao?: string[] | null
           id?: string
           idiomas?: string[] | null
+          informacoes_complementares?: string | null
           is_active?: boolean | null
           link_curriculo?: string | null
           matricula: string
@@ -240,6 +242,7 @@ export type Database = {
           funcao?: string[] | null
           id?: string
           idiomas?: string[] | null
+          informacoes_complementares?: string | null
           is_active?: boolean | null
           link_curriculo?: string | null
           matricula?: string
