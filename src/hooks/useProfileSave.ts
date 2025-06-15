@@ -1,21 +1,22 @@
+
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Profile } from '../types';
-import { 
-  tipoColaboracaoMap, 
-  formaContatoMap 
-} from '../components/profile/ProfileFormConstants';
+import { saveAcademicFormations } from './profileSave/saveAcademicFormations';
+import { saveProjects } from './profileSave/saveProjects';
+import { saveProfessionalExperiences } from './profileSave/saveProfessionalExperiences';
+import { saveAvailability } from './profileSave/saveAvailability';
 
 export const useProfileSave = () => {
   const { user } = useAuth();
   const [saving, setSaving] = useState(false);
 
   const saveProfile = async (
-    data: any, 
-    fotoPreview: string, 
-    formacaoAcademica: any[], 
-    projetos: any[], 
+    data: any,
+    fotoPreview: string,
+    formacaoAcademica: any[],
+    projetos: any[],
     disponibilidade: any,
     userProfile?: Profile | null,
     onSuccess?: () => void
@@ -23,24 +24,13 @@ export const useProfileSave = () => {
     try {
       setSaving(true);
 
-      // [DEBUG] Mostra recebimento dos campos específicos
-      console.log('[DEBUG] RECEBIDO PARA SALVAR >>>');
-      console.log('biografia:', data.biografia, '| typeof:', typeof data.biografia, '| null?:', data.biografia === null, '| undefined?:', data.biografia === undefined);
-      console.log('publicacoes:', data.publicacoes, '| typeof:', typeof data.publicacoes, '| null?:', data.publicacoes === null, '| undefined?:', data.publicacoes === undefined);
+      const safeBiografia = typeof data.biografia === 'string'
+        ? data.biografia
+        : (data.biografia ? String(data.biografia) : '');
 
-      const safeBiografia =
-        typeof data.biografia === 'string'
-          ? data.biografia
-          : (data.biografia ? String(data.biografia) : '');
-
-      const safePublicacoes =
-        typeof data.publicacoes === 'string'
-          ? data.publicacoes
-          : (data.publicacoes ? String(data.publicacoes) : '');
-
-      // [DEBUG] Mostra antes de enviar ao banco
-      console.log('[DEBUG] ENVIAR PARA O BANCO >>>');
-      console.log('safeBiografia:', safeBiografia, '| safePublicacoes:', safePublicacoes);
+      const safePublicacoes = typeof data.publicacoes === 'string'
+        ? data.publicacoes
+        : (data.publicacoes ? String(data.publicacoes) : '');
 
       const profileData = {
         user_id: user?.id,
@@ -64,12 +54,8 @@ export const useProfileSave = () => {
         updated_at: new Date().toISOString()
       };
 
-      // [DEBUG] profileData final enviado ao UPDATE/INSERT
-      console.log('[DEBUG] profileData FINAL >>>', profileData);
-
       let profileId = userProfile?.id;
       if (userProfile) {
-        // Aqui pedimos todos os campos explicitamente
         const { error, data: updateRet } = await supabase
           .from('profiles')
           .update(profileData)
@@ -97,22 +83,8 @@ export const useProfileSave = () => {
             updated_at
           `);
 
-        // [DEBUG] Retorno do UPDATE incluindo biografia/publicações
-        if (Array.isArray(updateRet) && updateRet[0]) {
-          const ret = updateRet[0];
-          console.log('[DEBUG] CAMPOS UPDATE RETORNADOS:', {
-            biografia: ret.biografia,
-            publicacoes: ret.publicacoes,
-            keys: Object.keys(ret)
-          });
-        } else {
-          console.log('[DEBUG] UPDATE retornou:', updateRet);
-        }
-        console.log('[DEBUG] RESPOSTA UPDATE:', updateRet, error);
-
         if (error) throw error;
       } else {
-        // INSERT, também pedimos explicitamente os campos
         const { data: newProfile, error } = await supabase
           .from('profiles')
           .insert(profileData)
@@ -140,24 +112,16 @@ export const useProfileSave = () => {
           `)
           .single();
 
-        if (newProfile) {
-          console.log('[DEBUG] CAMPOS INSERIDOS:', {
-            biografia: newProfile.biografia,
-            publicacoes: newProfile.publicacoes,
-            keys: Object.keys(newProfile)
-          });
-        } else {
-          console.log('[DEBUG] INSERT retornou:', newProfile);
-        }
-        console.log('[DEBUG] RESPOSTA INSERT:', newProfile, error);
-
         if (error) throw error;
         profileId = newProfile.id;
       }
 
-      // Save related data
+      // Salva dados relacionados usando funções separadas
       if (profileId) {
-        await saveRelatedData(profileId, formacaoAcademica, projetos, data, disponibilidade);
+        await saveAcademicFormations(profileId, formacaoAcademica);
+        await saveProjects(profileId, projetos);
+        await saveProfessionalExperiences(profileId, data.experienciasProfissionais);
+        await saveAvailability(profileId, disponibilidade);
       }
       onSuccess?.();
 
@@ -166,94 +130,6 @@ export const useProfileSave = () => {
       throw new Error('Erro ao salvar perfil: ' + err.message);
     } finally {
       setSaving(false);
-    }
-  };
-
-  const saveRelatedData = async (
-    profileId: string,
-    formacaoAcademica: any[],
-    projetos: any[],
-    data: any,
-    disponibilidade: any
-  ) => {
-    // Academic formations
-    await supabase.from('academic_formations').delete().eq('profile_id', profileId);
-    if (formacaoAcademica && formacaoAcademica.length > 0) {
-      const formations = formacaoAcademica.map(f => ({
-        profile_id: profileId,
-        nivel: f.nivel,
-        instituicao: f.instituicao,
-        curso: f.curso,
-        ano: parseInt(f.ano)
-      }));
-      const { error: formError } = await supabase.from('academic_formations').insert(formations);
-      if (formError) {
-        console.error('Error saving formations:', formError);
-      }
-    }
-
-    // Projects
-    await supabase.from('projects').delete().eq('profile_id', profileId);
-    if (projetos && projetos.length > 0) {
-      const projects = projetos.map(p => ({
-        profile_id: profileId,
-        nome: p.nome,
-        data_inicio: p.dataInicio instanceof Date ? p.dataInicio.toISOString().split('T')[0] : p.dataInicio,
-        data_fim: p.dataFim ? (p.dataFim instanceof Date ? p.dataFim.toISOString().split('T')[0] : p.dataFim) : null,
-        observacoes: p.observacoes || null
-      }));
-      const { error: projError } = await supabase.from('projects').insert(projects);
-      if (projError) {
-        console.error('Error saving projects:', projError);
-      }
-    }
-
-    // Professional experiences
-    await supabase.from('professional_experiences').delete().eq('profile_id', profileId);
-    if (data.experienciasProfissionais && data.experienciasProfissionais.length > 0) {
-      const experiences = data.experienciasProfissionais.map((exp: any) => ({
-        profile_id: profileId,
-        tempo_mprj: exp.tempoMPRJ || null,
-        experiencia_anterior: exp.experienciaAnterior || null,
-        projetos_internos: exp.projetosInternos || null,
-        publicacoes: exp.publicacoes || null
-      }));
-      const { error: expError } = await supabase.from('professional_experiences').insert(experiences);
-      if (expError) {
-        console.error('Error saving experiences:', expError);
-      }
-    }
-
-    // Availability
-    await saveAvailability(profileId, disponibilidade);
-  };
-
-  const saveAvailability = async (profileId: string, disponibilidade: any) => {
-    await supabase.from('availability').delete().eq('profile_id', profileId);
-    if (disponibilidade && (disponibilidade.tipoColaboracao?.length > 0 || disponibilidade.disponibilidadeEstimada || disponibilidade.formaContato)) {
-      console.log('Saving availability data:', disponibilidade);
-      
-      const tipoColaboracaoMapped = disponibilidade.tipoColaboracao?.map((tipo: string) => 
-        tipoColaboracaoMap[tipo] || tipo.toLowerCase().replace(/\s+/g, '_')
-      ) || [];
-
-      const formaContatoMapped = formaContatoMap[disponibilidade.formaContato] || 'email';
-
-      const availabilityData = {
-        profile_id: profileId,
-        tipo_colaboracao: tipoColaboracaoMapped,
-        disponibilidade_estimada: disponibilidade.disponibilidadeEstimada || null,
-        forma_contato: formaContatoMapped as 'email' | 'telefone' | 'teams' | 'presencial',
-        horario_preferencial: disponibilidade.horarioPreferencial || null
-      };
-
-      console.log('Mapped availability data for database:', availabilityData);
-
-      const { error: availError } = await supabase.from('availability').insert(availabilityData);
-      if (availError) {
-        console.error('Error saving availability:', availError);
-        throw new Error('Erro ao salvar disponibilidade: ' + availError.message);
-      }
     }
   };
 
