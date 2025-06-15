@@ -31,8 +31,8 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ fotoPreview, onFileUpload }) 
           <div className="space-y-2">
             <Button 
               type="button" 
-              variant="outline" 
-              className="cursor-pointer"
+              variant="logo-brown" 
+              className="cursor-pointer font-bold" 
               onClick={() => document.getElementById('foto-upload')?.click()}
             >
               <Upload className="w-4 h-4 mr-2" />
@@ -56,3 +56,4 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ fotoPreview, onFileUpload }) 
 };
 
 export default PhotoUpload;
+
