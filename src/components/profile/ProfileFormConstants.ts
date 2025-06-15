@@ -1,6 +1,18 @@
 export const safeCargos = [
-  'Promotor de Justiça', 'Procurador de Justiça', 'Analista Ministerial',
-  'Técnico Ministerial', 'Assessor', 'Estagiário'
+  'Procurador de Justiça',
+  'Promotor de Justiça',
+  'Promotor de Justiça Substituto',
+  'Analista',
+  'Técnico',
+  'Auxiliar',
+  'Cedido (superior)',
+  'Cedido (médio)',
+  'Estagiário (superior)',
+  'Estagiário (médio)',
+  'Terceirizado',
+  'Comissionado',
+  'Residente Jurídico',
+  'Residente Técnico'
 ];
 
 export const safeFuncoes = [
