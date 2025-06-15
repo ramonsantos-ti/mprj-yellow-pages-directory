@@ -1,155 +1,258 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { supabase } from '@/integrations/supabase/client';
+import { Profile } from '../types';
 import { Button } from '../components/ui/button';
-import { Form } from '../components/ui/form';
-import { Alert, AlertDescription } from '../components/ui/alert';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { FormField, FormItem, FormLabel, FormMessage } from '../components/ui/form';
-import { Checkbox } from '../components/ui/checkbox';
-import { 
-  CARGOS,
-  UNIDADES,
-  NIVEIS_FORMACAO,
-  TIPOS_COLABORACAO,
-  DISPONIBILIDADE_ESTIMADA,
-  FORMAS_CONTATO,
-  CERTIFICACOES,
-  IDIOMAS
-} from '../data/constants';
-import { mockProfiles } from '../data/mockData';
-import { Save, AlertCircle } from 'lucide-react';
-import { toast } from 'sonner';
-import { validateEmail } from '../utils/pdfReports';
-import InterestAreaSelector from '../components/InterestAreaSelector';
-import PhotoUpload from '../components/profile/PhotoUpload';
+import { Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
 import BasicInfo from '../components/profile/BasicInfo';
 import CargoUnidade from '../components/profile/CargoUnidade';
-import ProjectsManager from '../components/profile/ProjectsManager';
+import AdditionalInfo from '../components/profile/AdditionalInfo';
 import AcademicFormation from '../components/profile/AcademicFormation';
-import AvailabilitySection from '../components/profile/AvailabilitySection';
-import ContactPreferences from '../components/profile/ContactPreferences';
+import ProjectsManager from '../components/profile/ProjectsManager';
 import CertificationsSection from '../components/profile/CertificationsSection';
 import PublicationsSection from '../components/profile/PublicationsSection';
-import AdditionalInfo from '../components/profile/AdditionalInfo';
+import AvailabilitySection from '../components/profile/AvailabilitySection';
+import ContactPreferences from '../components/profile/ContactPreferences';
+import PhotoUpload from '../components/profile/PhotoUpload';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Form } from '../components/ui/form';
 
+// Define form schema
 const profileSchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório'),
   matricula: z.string().min(1, 'Matrícula é obrigatória'),
-  cargo: z.array(z.string()).min(1, 'Pelo menos um cargo é obrigatório'),
-  unidade: z.array(z.string()).min(1, 'Pelo menos uma unidade é obrigatória'),
-  email: z.string().email('Email inválido').refine(validateEmail, 'Email deve ser do domínio @mprj.mp.br'),
+  email: z.string().email('Email inválido'),
   telefone: z.string().optional(),
   biografia: z.string().optional(),
-  areasInteresse: z.array(z.string()).min(1, 'Pelo menos uma área de interesse é obrigatória'),
+  cargo: z.array(z.string()).min(1, 'Pelo menos um cargo é obrigatório'),
+  funcao: z.array(z.string()),
+  unidade: z.array(z.string()).min(1, 'Pelo menos uma unidade é obrigatória'),
+  areasConhecimento: z.array(z.string()),
   especializacoes: z.string().optional(),
-  temasInteresse: z.array(z.string()).min(1, 'Pelo menos um tema de interesse é obrigatório'),
+  temasInteresse: z.array(z.string()),
   idiomas: z.array(z.string()),
   linkCurriculo: z.string().optional(),
-  certificacoes: z.array(z.string()).optional(),
+  certificacoes: z.array(z.string()),
   publicacoes: z.string().optional(),
-  aceiteTermos: z.boolean().refine(val => val === true, 'Deve aceitar os termos')
+  aceiteTermos: z.boolean().refine(val => val === true, 'Você deve aceitar os termos')
 });
-
-type ProfileFormData = z.infer<typeof profileSchema>;
-
-// Enhanced validation function for Select values
-const isValidSelectValue = (value: any): value is string => {
-  const isValid = typeof value === 'string' && 
-                 value.trim().length > 0 && 
-                 /\S/.test(value.trim());
-  if (!isValid) {
-    console.error('Invalid select value detected:', value, typeof value);
-  }
-  return isValid;
-};
-
-// Helper function to safely filter arrays for Select components
-const safeFilterForSelect = (array: string[], arrayName: string) => {
-  const filtered = array.filter(item => {
-    const valid = isValidSelectValue(item);
-    if (!valid) {
-      console.warn(`Filtering out invalid ${arrayName} item:`, item);
-    }
-    return valid;
-  });
-  
-  console.log(`Safe filter for ${arrayName}: ${array.length} -> ${filtered.length}`);
-  return filtered;
-};
 
 const ProfileEdit: React.FC = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
-  const [projetos, setProjetos] = useState<Array<{nome: string, dataInicio: string, dataFim?: string, observacoes?: string}>>([]);
-  const [formacoes, setFormacoes] = useState<Array<{nivel: string, instituicao: string, curso: string, ano: number}>>([]);
-  const [tipoColaboracao, setTipoColaboracao] = useState<string[]>([]);
-  const [disponibilidadeEstimada, setDisponibilidadeEstimada] = useState('');
-  const [formaContato, setFormaContato] = useState('');
-  const [horarioPreferencial, setHorarioPreferencial] = useState('');
-  const [fotoFile, setFotoFile] = useState<File | null>(null);
-  const [fotoPreview, setFotoPreview] = useState<string>('');
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [userProfile, setUserProfile] = useState<Profile | null>(null);
 
-  // Buscar perfil existente do usuário
-  const userProfile = mockProfiles.find(p => p.userId === user?.id);
+  // Additional state for complex data structures
+  const [fotoPreview, setFotoPreview] = useState('');
+  const [formacaoAcademica, setFormacaoAcademica] = useState<any[]>([]);
+  const [projetos, setProjetos] = useState<any[]>([]);
+  const [disponibilidade, setDisponibilidade] = useState<any>({});
 
-  const form = useForm<ProfileFormData>({
+  // Available options
+  const safeCargos = [
+    'Promotor de Justiça', 'Procurador de Justiça', 'Analista Ministerial',
+    'Técnico Ministerial', 'Assessor', 'Estagiário'
+  ];
+  
+  const safeFuncoes = [
+    'Coordenador', 'Assessor Técnico', 'Chefe de Seção', 'Supervisor'
+  ];
+  
+  const safeUnidades = [
+    'Procuradoria-Geral de Justiça', 'Subprocuradoria-Geral de Justiça de Assuntos Administrativos',
+    'Corregedoria-Geral do Ministério Público', 'Centro de Apoio Operacional',
+    'Promotoria de Justiça', 'Procuradoria de Justiça'
+  ];
+
+  const safeCertificacoes = [
+    'PMP - Project Management Professional', 'ITIL Foundation',
+    'ISO 27001', 'Scrum Master', 'Product Owner'
+  ];
+
+  const safeTiposColaboracao = [
+    'Consultoria', 'Treinamento', 'Projetos', 'Palestras', 'Pesquisa'
+  ];
+
+  const safeDisponibilidadeEstimada = [
+    'Até 5 horas/semana', '5-10 horas/semana', '10-20 horas/semana', 'Mais de 20 horas/semana'
+  ];
+
+  const safeFormasContato = ['email', 'telefone', 'teams', 'presencial'];
+
+  const isValidSelectValue = (value: any): boolean => {
+    return typeof value === 'string' && value.trim().length > 0;
+  };
+
+  const form = useForm({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      name: user?.name || '',
-      matricula: user?.matricula || '',
-      cargo: userProfile?.cargo || [],
-      unidade: userProfile?.unidade || [],
-      email: userProfile?.email || '',
-      telefone: userProfile?.telefone || '',
-      biografia: userProfile?.biografia || '',
-      areasInteresse: userProfile?.areasConhecimento || [],
-      especializacoes: userProfile?.especializacoes || '',
-      temasInteresse: userProfile?.temasInteresse || [],
-      idiomas: userProfile?.idiomas || [],
-      linkCurriculo: userProfile?.linkCurriculo || '',
-      certificacoes: userProfile?.certificacoes || [],
-      publicacoes: userProfile?.publicacoes || '',
-      aceiteTermos: userProfile?.aceiteTermos || false
+      name: '',
+      matricula: '',
+      email: '',
+      telefone: '',
+      biografia: '',
+      cargo: [],
+      funcao: [],
+      unidade: [],
+      areasConhecimento: [],
+      especializacoes: '',
+      temasInteresse: [],
+      idiomas: [],
+      linkCurriculo: '',
+      certificacoes: [],
+      publicacoes: '',
+      aceiteTermos: false
     }
   });
 
   useEffect(() => {
-    if (userProfile) {
-      setProjetos(userProfile.projetos.map(p => ({
-        nome: p.nome,
-        dataInicio: p.dataInicio.toISOString().split('T')[0],
-        dataFim: p.dataFim?.toISOString().split('T')[0],
-        observacoes: p.observacoes
-      })));
-      setFormacoes(userProfile.formacaoAcademica);
-      setTipoColaboracao(userProfile.disponibilidade.tipoColaboracao);
-      setDisponibilidadeEstimada(userProfile.disponibilidade.disponibilidadeEstimada);
-      setFormaContato(userProfile.contato.formaContato);
-      setHorarioPreferencial(userProfile.contato.horarioPreferencial || '');
-      setFotoPreview(userProfile.fotoUrl || '');
+    if (user) {
+      loadUserProfile();
     }
-  }, [userProfile]);
+  }, [user]);
+
+  const loadUserProfile = async () => {
+    try {
+      setLoading(true);
+      
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select(`
+          *,
+          projects(*),
+          academic_formations(*),
+          professional_experiences(*),
+          availability(*)
+        `)
+        .eq('user_id', user?.id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        throw error;
+      }
+
+      if (profile) {
+        // Transform Supabase data to Profile interface
+        const transformedProfile: Profile = {
+          id: profile.id,
+          userId: profile.user_id || '',
+          name: profile.name,
+          matricula: profile.matricula,
+          cargo: profile.cargo || [],
+          funcao: profile.funcao || [],
+          unidade: profile.unidade || [],
+          telefone: profile.telefone || '',
+          email: profile.email,
+          biografia: profile.biografia || '',
+          areasConhecimento: profile.areas_conhecimento || [],
+          especializacoes: profile.especializacoes || '',
+          temasInteresse: profile.temas_interesse || [],
+          idiomas: profile.idiomas || [],
+          linkCurriculo: profile.link_curriculo || '',
+          fotoUrl: profile.foto_url || '',
+          certificacoes: profile.certificacoes || [],
+          publicacoes: profile.publicacoes || '',
+          role: profile.role as 'admin' | 'user',
+          isActive: profile.is_active ?? true,
+          aceiteTermos: profile.aceite_termos ?? false,
+          updatedByAdmin: profile.updated_by_admin ?? false,
+          lastUpdated: new Date(profile.updated_at || profile.created_at || new Date()),
+          projetos: profile.projects?.map((p: any) => ({
+            id: p.id,
+            nome: p.nome,
+            dataInicio: new Date(p.data_inicio),
+            dataFim: p.data_fim ? new Date(p.data_fim) : undefined,
+            observacoes: p.observacoes || ''
+          })) || [],
+          formacaoAcademica: profile.academic_formations?.map((f: any) => ({
+            id: f.id,
+            nivel: f.nivel,
+            instituicao: f.instituicao,
+            curso: f.curso,
+            ano: f.ano
+          })) || [],
+          experienciasProfissionais: profile.professional_experiences?.map((e: any) => ({
+            tempoMPRJ: e.tempo_mprj || '',
+            experienciaAnterior: e.experiencia_anterior || '',
+            projetosInternos: e.projetos_internos || '',
+            publicacoes: e.publicacoes || ''
+          })) || [],
+          disponibilidade: profile.availability?.[0] ? {
+            tipoColaboracao: profile.availability[0].tipo_colaboracao || [],
+            disponibilidadeEstimada: profile.availability[0].disponibilidade_estimada || ''
+          } : {
+            tipoColaboracao: [],
+            disponibilidadeEstimada: ''
+          },
+          contato: profile.availability?.[0] ? {
+            formaContato: profile.availability[0].forma_contato || 'email',
+            horarioPreferencial: profile.availability[0].horario_preferencial || ''
+          } : {
+            formaContato: 'email',
+            horarioPreferencial: ''
+          }
+        };
+
+        setUserProfile(transformedProfile);
+        populateFormWithProfile(transformedProfile);
+      } else {
+        // New profile - set defaults
+        form.setValue('name', user?.email || '');
+        form.setValue('email', user?.email || '');
+        form.setValue('matricula', '');
+      }
+    } catch (err: any) {
+      console.error('Error loading profile:', err);
+      setError('Erro ao carregar perfil: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const populateFormWithProfile = (profile: Profile) => {
+    setFotoPreview(profile.fotoUrl || '');
+    
+    // Set form values
+    form.setValue('name', profile.name || '');
+    form.setValue('matricula', profile.matricula || '');
+    form.setValue('email', profile.email || '');
+    form.setValue('telefone', profile.telefone || '');
+    form.setValue('biografia', profile.biografia || '');
+    form.setValue('cargo', profile.cargo || []);
+    form.setValue('funcao', profile.funcao || []);
+    form.setValue('unidade', profile.unidade || []);
+    form.setValue('areasConhecimento', profile.areasConhecimento || []);
+    form.setValue('especializacoes', profile.especializacoes || '');
+    form.setValue('temasInteresse', profile.temasInteresse || []);
+    form.setValue('idiomas', profile.idiomas || []);
+    form.setValue('linkCurriculo', profile.linkCurriculo || '');
+    form.setValue('certificacoes', profile.certificacoes || []);
+    form.setValue('publicacoes', profile.publicacoes || '');
+    form.setValue('aceiteTermos', profile.aceiteTermos || false);
+
+    // Set related data
+    setFormacaoAcademica(profile.formacaoAcademica || []);
+    setProjetos(profile.projetos || []);
+    
+    if (profile.disponibilidade && profile.contato) {
+      setDisponibilidade({
+        tipoColaboracao: profile.disponibilidade.tipoColaboracao || [],
+        disponibilidadeEstimada: profile.disponibilidade.disponibilidadeEstimada || '',
+        formaContato: profile.contato.formaContato || 'email',
+        horarioPreferencial: profile.contato.horarioPreferencial || ''
+      });
+    }
+  };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
-        toast.error('Arquivo muito grande. Máximo 5MB.');
-        return;
-      }
-      
-      if (!file.type.startsWith('image/')) {
-        toast.error('Apenas imagens são permitidas.');
-        return;
-      }
-
-      setFotoFile(file);
       const reader = new FileReader();
       reader.onload = (e) => {
         setFotoPreview(e.target?.result as string);
@@ -158,55 +261,178 @@ const ProfileEdit: React.FC = () => {
     }
   };
 
-  const onSubmit = async (data: ProfileFormData) => {
-    setIsLoading(true);
+  const handleSave = async (data: any) => {
     try {
-      // Simular salvamento
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      setSaving(true);
+      setError(null);
+      setSuccessMessage(null);
+
+      const profileData = {
+        user_id: user?.id,
+        name: data.name,
+        matricula: data.matricula,
+        email: data.email,
+        telefone: data.telefone,
+        biografia: data.biografia,
+        cargo: data.cargo,
+        funcao: data.funcao,
+        unidade: data.unidade,
+        areas_conhecimento: data.areasConhecimento,
+        especializacoes: data.especializacoes,
+        temas_interesse: data.temasInteresse,
+        idiomas: data.idiomas,
+        link_curriculo: data.linkCurriculo,
+        foto_url: fotoPreview,
+        certificacoes: data.certificacoes,
+        publicacoes: data.publicacoes,
+        aceite_termos: data.aceiteTermos,
+        updated_at: new Date().toISOString()
+      };
+
+      let profileId = userProfile?.id;
+
+      if (userProfile) {
+        // Update existing profile
+        const { error } = await supabase
+          .from('profiles')
+          .update(profileData)
+          .eq('id', userProfile.id);
+
+        if (error) throw error;
+      } else {
+        // Create new profile
+        const { data: newProfile, error } = await supabase
+          .from('profiles')
+          .insert(profileData)
+          .select()
+          .single();
+
+        if (error) throw error;
+        profileId = newProfile.id;
+      }
+
+      // Save academic formations
+      if (profileId) {
+        // Delete existing formations
+        await supabase
+          .from('academic_formations')
+          .delete()
+          .eq('profile_id', profileId);
+
+        // Insert new formations
+        if (formacaoAcademica.length > 0) {
+          const formations = formacaoAcademica.map(f => ({
+            profile_id: profileId,
+            nivel: f.nivel,
+            instituicao: f.instituicao,
+            curso: f.curso,
+            ano: f.ano
+          }));
+
+          await supabase
+            .from('academic_formations')
+            .insert(formations);
+        }
+
+        // Save projects
+        await supabase
+          .from('projects')
+          .delete()
+          .eq('profile_id', profileId);
+
+        if (projetos.length > 0) {
+          const projects = projetos.map(p => ({
+            profile_id: profileId,
+            nome: p.nome,
+            data_inicio: p.dataInicio instanceof Date ? p.dataInicio.toISOString().split('T')[0] : p.dataInicio,
+            data_fim: p.dataFim ? (p.dataFim instanceof Date ? p.dataFim.toISOString().split('T')[0] : p.dataFim) : null,
+            observacoes: p.observacoes
+          }));
+
+          await supabase
+            .from('projects')
+            .insert(projects);
+        }
+
+        // Save availability
+        await supabase
+          .from('availability')
+          .delete()
+          .eq('profile_id', profileId);
+
+        if (disponibilidade.tipoColaboracao?.length > 0) {
+          await supabase
+            .from('availability')
+            .insert({
+              profile_id: profileId,
+              tipo_colaboracao: disponibilidade.tipoColaboracao,
+              disponibilidade_estimada: disponibilidade.disponibilidadeEstimada,
+              forma_contato: disponibilidade.formaContato,
+              horario_preferencial: disponibilidade.horarioPreferencial
+            });
+        }
+      }
+
+      setSuccessMessage('Perfil salvo com sucesso!');
+      setTimeout(() => setSuccessMessage(null), 3000);
       
-      toast.success('Perfil atualizado com sucesso!');
-      navigate('/');
-    } catch (error) {
-      toast.error('Erro ao salvar perfil');
+      // Reload profile data
+      await loadUserProfile();
+      
+    } catch (err: any) {
+      console.error('Error saving profile:', err);
+      setError('Erro ao salvar perfil: ' + err.message);
     } finally {
-      setIsLoading(false);
+      setSaving(false);
     }
   };
 
-  if (!user) {
+  if (loading) {
     return (
-      <Alert>
-        <AlertCircle className="h-4 w-4" />
-        <AlertDescription>
-          Você precisa estar logado para acessar esta página.
-        </AlertDescription>
-      </Alert>
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 mx-auto mb-4 animate-spin text-red-600" />
+          <p className="text-gray-600">Carregando perfil...</p>
+        </div>
+      </div>
     );
   }
 
-  // Safe filtered arrays for Select components
-  const safeCargos = safeFilterForSelect(CARGOS, 'CARGOS');
-  const safeUnidades = safeFilterForSelect(UNIDADES, 'UNIDADES');
-  const safeNiveisFormacao = safeFilterForSelect(NIVEIS_FORMACAO, 'NIVEIS_FORMACAO');
-  const safeTiposColaboracao = safeFilterForSelect(TIPOS_COLABORACAO, 'TIPOS_COLABORACAO');
-  const safeDisponibilidadeEstimada = safeFilterForSelect(DISPONIBILIDADE_ESTIMADA, 'DISPONIBILIDADE_ESTIMADA');
-  const safeFormasContato = safeFilterForSelect(FORMAS_CONTATO, 'FORMAS_CONTATO');
-  const safeCertificacoes = safeFilterForSelect(CERTIFICACOES, 'CERTIFICACOES');
-
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-red-900">
-          {userProfile ? 'Editar Perfil' : 'Completar Cadastro'}
+      <div className="text-center space-y-4">
+        <h1 className="text-3xl font-bold text-gray-900">
+          {userProfile ? 'Editar Perfil' : 'Criar Perfil'}
         </h1>
-        <Button onClick={() => navigate('/')} variant="outline">
-          Cancelar
-        </Button>
+        <p className="text-lg text-gray-600">
+          Complete suas informações para aparecer nas buscas públicas
+        </p>
       </div>
 
+      {error && (
+        <Card className="border-red-200 bg-red-50">
+          <CardContent className="pt-6">
+            <div className="flex items-center space-x-2 text-red-800">
+              <AlertCircle className="w-5 h-5" />
+              <span>{error}</span>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {successMessage && (
+        <Card className="border-green-200 bg-green-50">
+          <CardContent className="pt-6">
+            <div className="flex items-center space-x-2 text-green-800">
+              <CheckCircle2 className="w-5 h-5" />
+              <span>{successMessage}</span>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          
+        <form onSubmit={form.handleSubmit(handleSave)} className="grid gap-6">
           <PhotoUpload 
             fotoPreview={fotoPreview}
             onFileUpload={handleFileUpload}
@@ -214,107 +440,73 @@ const ProfileEdit: React.FC = () => {
 
           <BasicInfo form={form} />
 
-          <CargoUnidade 
+          <CargoUnidade
             form={form}
             safeCargos={safeCargos}
+            safeFuncoes={safeFuncoes}
             safeUnidades={safeUnidades}
-            isValidSelectValue={isValidSelectValue}
-          />
-
-          <InterestAreaSelector form={form} fieldName="areasInteresse" />
-
-          <ProjectsManager 
-            projetos={projetos}
-            setProjetos={setProjetos}
-          />
-
-          <AcademicFormation 
-            formacoes={formacoes}
-            setFormacoes={setFormacoes}
-            safeNiveisFormacao={safeNiveisFormacao}
-            isValidSelectValue={isValidSelectValue}
-          />
-
-          <CertificationsSection 
-            form={form}
-            safeCertificacoes={safeCertificacoes}
-            isValidSelectValue={isValidSelectValue}
-          />
-
-          <PublicationsSection form={form} />
-
-          {/* Idiomas Section */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Idiomas</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <FormField
-                control={form.control}
-                name="idiomas"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Idiomas</FormLabel>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                      {IDIOMAS.map(idioma => (
-                        <div key={idioma} className="flex items-center space-x-2">
-                          <Checkbox
-                            checked={field.value.includes(idioma)}
-                            onCheckedChange={() => {
-                              if (field.value.includes(idioma)) {
-                                field.onChange(field.value.filter(i => i !== idioma));
-                              } else {
-                                field.onChange([...field.value, idioma]);
-                              }
-                            }}
-                          />
-                          <span className="text-sm">{idioma}</span>
-                        </div>
-                      ))}
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </CardContent>
-          </Card>
-
-          <AvailabilitySection 
-            tipoColaboracao={tipoColaboracao}
-            setTipoColaboracao={setTipoColaboracao}
-            disponibilidadeEstimada={disponibilidadeEstimada}
-            setDisponibilidadeEstimada={setDisponibilidadeEstimada}
-            safeTiposColaboracao={safeTiposColaboracao}
-            safeDisponibilidadeEstimada={safeDisponibilidadeEstimada}
-            isValidSelectValue={isValidSelectValue}
-          />
-
-          <ContactPreferences 
-            formaContato={formaContato}
-            setFormaContato={setFormaContato}
-            horarioPreferencial={horarioPreferencial}
-            setHorarioPreferencial={setHorarioPreferencial}
-            safeFormasContato={safeFormasContato}
             isValidSelectValue={isValidSelectValue}
           />
 
           <AdditionalInfo form={form} />
 
-          <div className="flex justify-end space-x-4">
-            <Button type="button" variant="outline" onClick={() => navigate('/')}>
-              Cancelar
-            </Button>
-            <Button type="submit" disabled={isLoading} className="bg-amber-900 hover:bg-amber-800">
-              {isLoading ? (
-                'Salvando...'
-              ) : (
-                <>
-                  <Save className="w-4 h-4 mr-2" />
-                  Salvar Perfil
-                </>
-              )}
-            </Button>
-          </div>
+          <AcademicFormation form={form} />
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Projetos</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ProjectsManager
+                projetos={projetos}
+                setProjetos={setProjetos}
+              />
+            </CardContent>
+          </Card>
+
+          <CertificationsSection form={form} />
+
+          <PublicationsSection form={form} />
+
+          <AvailabilitySection
+            tipoColaboracao={disponibilidade.tipoColaboracao || []}
+            setTipoColaboracao={(value) => setDisponibilidade({...disponibilidade, tipoColaboracao: value})}
+            disponibilidadeEstimada={disponibilidade.disponibilidadeEstimada || ''}
+            setDisponibilidadeEstimada={(value) => setDisponibilidade({...disponibilidade, disponibilidadeEstimada: value})}
+            safeTiposColaboracao={safeTiposColaboracao}
+            safeDisponibilidadeEstimada={safeDisponibilidadeEstimada}
+            isValidSelectValue={isValidSelectValue}
+          />
+
+          <ContactPreferences
+            formaContato={disponibilidade.formaContato || 'email'}
+            setFormaContato={(value) => setDisponibilidade({...disponibilidade, formaContato: value})}
+            horarioPreferencial={disponibilidade.horarioPreferencial || ''}
+            setHorarioPreferencial={(value) => setDisponibilidade({...disponibilidade, horarioPreferencial: value})}
+            safeFormasContato={safeFormasContato}
+            isValidSelectValue={isValidSelectValue}
+          />
+
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex space-x-4">
+                <Button
+                  type="submit"
+                  disabled={saving}
+                  className="flex-1"
+                >
+                  {saving ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Salvando...
+                    </>
+                  ) : (
+                    'Salvar Perfil'
+                  )}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </form>
       </Form>
     </div>

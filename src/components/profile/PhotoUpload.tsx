@@ -29,14 +29,15 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ fotoPreview, onFileUpload }) 
             )}
           </div>
           <div className="space-y-2">
-            <label htmlFor="foto-upload">
-              <Button type="button" variant="outline" className="cursor-pointer" asChild>
-                <span>
-                  <Upload className="w-4 h-4 mr-2" />
-                  Fazer Upload de Foto
-                </span>
-              </Button>
-            </label>
+            <Button 
+              type="button" 
+              variant="outline" 
+              className="cursor-pointer"
+              onClick={() => document.getElementById('foto-upload')?.click()}
+            >
+              <Upload className="w-4 h-4 mr-2" />
+              Fazer Upload de Foto
+            </Button>
             <input
               id="foto-upload"
               type="file"

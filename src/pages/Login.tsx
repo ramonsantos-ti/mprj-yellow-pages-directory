@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -17,6 +16,9 @@ const Login: React.FC = () => {
   
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  // Check if user is admin (usuario01 or any user with admin role)
+  const isAdminLogin = username === 'usuario01';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,9 +44,13 @@ const Login: React.FC = () => {
       <div className="max-w-md w-full space-y-8">
         {/* Header */}
         <div className="text-center">
-          <div className="w-16 h-16 bg-amber-900 rounded-lg flex items-center justify-center mx-auto mb-4">
-            <span className="text-white font-bold text-2xl">MP</span>
-          </div>
+          <Link to="/" className="inline-block mb-4">
+            <img 
+              src="/lovable-uploads/9bdb3a99-0580-4f1a-90fd-bca0f42a713d.png" 
+              alt="MPRJ Logo" 
+              className="h-16 w-auto mx-auto hover:opacity-80 transition-opacity"
+            />
+          </Link>
           <h2 className="text-3xl font-bold text-gray-900">
             Acesso ao Sistema
           </h2>
@@ -96,7 +102,7 @@ const Login: React.FC = () => {
 
               <Button
                 type="submit"
-                className="w-full bg-amber-900 hover:bg-amber-800"
+                className="w-full"
                 disabled={isLoading}
               >
                 {isLoading ? 'Entrando...' : 'Entrar'}
@@ -135,9 +141,9 @@ const Login: React.FC = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="text-xs text-amber-800 space-y-1">
-            <p><strong>Administrador:</strong> usuário0002 / usu@rio0002</p>
-            <p><strong>Usuário comum:</strong> usuário0001 / usu@rio0001</p>
-            <p><em>Outros usuários: usuário0003 a usuário0010 com senhas correspondentes</em></p>
+            <p><strong>Administrador:</strong> usuario01 / usuario01</p>
+            <p><strong>Usuário comum:</strong> usuario02 / usuario02</p>
+            <p><em>Outros usuários: usuario03 a usuario14 com senhas correspondentes</em></p>
           </CardContent>
         </Card>
       </div>

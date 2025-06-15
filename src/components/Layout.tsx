@@ -1,95 +1,131 @@
+
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from './ui/button';
+import { Separator } from './ui/separator';
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuSeparator, 
+  DropdownMenuTrigger 
+} from './ui/dropdown-menu';
+import { Avatar, AvatarFallback } from './ui/avatar';
 import { LogOut, User, Settings, Home } from 'lucide-react';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
+
 interface LayoutProps {
   children: React.ReactNode;
 }
-const Layout: React.FC<LayoutProps> = ({
-  children
-}) => {
-  const {
-    user,
-    logout
-  } = useAuth();
-  const location = useLocation();
-  return <div className="min-h-screen bg-gray-50">
+
+const Layout: React.FC<LayoutProps> = ({ children }) => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/auth');
+  };
+
+  const getUserInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(word => word.charAt(0))
+      .slice(0, 2)
+      .join('')
+      .toUpperCase();
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b-4 border-red-900">
+      <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
-            {/* Logo */}
-            <Link to="/" className="flex items-center space-x-3 mx-0">
-              <img src="/lovable-uploads/9bdb3a99-0580-4f1a-90fd-bca0f42a713d.png" alt="MPRJ Logo" className="h-16 w-auto" />
-              <div>
-                <h1 className="text-xl font-bold text-red-900"></h1>
-                <p className="text-sm text-gray-600"></p>
-              </div>
+            {/* Logo Principal */}
+            <Link to="/" className="flex items-center">
+              <img 
+                src="/lovable-uploads/67816a9d-4783-48d7-a5ea-020683c86e12.png" 
+                alt="MPRJ Logo Principal" 
+                className="h-18 w-auto"
+              />
             </Link>
 
             {/* Navigation */}
-            <nav className="hidden md:flex space-x-8">
-              <Link to="/" className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium ${location.pathname === '/' ? 'text-red-900 bg-red-50' : 'text-gray-700 hover:text-red-900 hover:bg-red-50'}`}>
-                <Home className="w-4 h-4" />
-                <span>Início</span>
-              </Link>
-            </nav>
-
-            {/* User Menu */}
             <div className="flex items-center space-x-4">
-              {user ? <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="flex items-center space-x-2 border-red-900 text-red-900 hover:bg-red-50">
-                      <User className="w-4 h-4" />
-                      <span className="hidden md:inline">{user.name}</span>
+              {user ? (
+                <>
+                  <Link to="/">
+                    <Button variant="ghost" size="sm" className="flex items-center space-x-2">
+                      <Home className="w-4 h-4" />
+                      <span className="hidden sm:inline">Início</span>
                     </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56">
-                    <DropdownMenuItem asChild>
-                      <Link to="/profile" className="flex items-center space-x-2">
-                        <User className="w-4 h-4" />
-                        <span>Meu Perfil</span>
-                      </Link>
-                    </DropdownMenuItem>
-                    {user.role === 'admin' && <DropdownMenuItem asChild>
-                        <Link to="/admin" className="flex items-center space-x-2">
-                          <Settings className="w-4 h-4" />
-                          <span>Administração</span>
+                  </Link>
+                  
+                  {user.role === 'admin' && (
+                    <Link to="/admin">
+                      <Button variant="ghost" size="sm" className="flex items-center space-x-2">
+                        <Settings className="w-4 h-4" />
+                        <span className="hidden sm:inline">Admin</span>
+                      </Button>
+                    </Link>
+                  )}
+
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                        <Avatar className="h-8 w-8">
+                          <AvatarFallback className="bg-red-900 text-white text-sm">
+                            {getUserInitials(user.name)}
+                          </AvatarFallback>
+                        </Avatar>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-56" align="end" forceMount>
+                      <div className="flex flex-col space-y-1 p-2">
+                        <p className="text-sm font-medium leading-none">{user.name}</p>
+                        <p className="text-xs leading-none text-muted-foreground">
+                          {user.email}
+                        </p>
+                        <p className="text-xs leading-none text-muted-foreground">
+                          {user.matricula}
+                        </p>
+                      </div>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link to="/profile" className="flex items-center">
+                          <User className="mr-2 h-4 w-4" />
+                          <span>Meu Perfil</span>
                         </Link>
-                      </DropdownMenuItem>}
-                    <DropdownMenuItem onClick={logout} className="flex items-center space-x-2">
-                      <LogOut className="w-4 h-4" />
-                      <span>Sair</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu> : <Link to="/login">
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>Sair</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </>
+              ) : (
+                <Link to="/auth">
                   <Button className="bg-red-900 hover:bg-red-800">
-                    Login
+                    Entrar
                   </Button>
-                </Link>}
+                </Link>
+              )}
             </div>
           </div>
         </div>
+        {/* Brown separator line */}
+        <Separator className="bg-amber-800 h-1" />
       </header>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Main content */}
+      <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         {children}
       </main>
-
-      {/* Footer */}
-      <footer className="bg-red-900 text-white mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center">
-            <p>&copy; 2024 Ministério Público do Estado do Rio de Janeiro</p>
-            <p className="text-sm text-red-200 mt-2">
-              Sistema de Páginas Amarelas - Conectando especialistas
-            </p>
-          </div>
-        </div>
-      </footer>
-    </div>;
+    </div>
+  );
 };
+
 export default Layout;

@@ -1,9 +1,11 @@
 
 import React, { useState, useMemo } from 'react';
-import { mockProfiles } from '../data/mockData';
-import { Profile } from '../types';
-import { AuditLog, StandardMessage } from '../types/admin';
+import { useAdminProfiles } from '../hooks/useAdminProfiles';
+import { useAuditLogs } from '../hooks/useAuditLogs';
+import { StandardMessage } from '../types/admin';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { Card, CardContent } from '../components/ui/card';
+import { Loader2, AlertCircle } from 'lucide-react';
 import { generateProfileReport } from '../utils/pdfReports';
 import ProfilesTab from '../components/admin/ProfilesTab';
 import AuditTab from '../components/admin/AuditTab';
@@ -13,8 +15,18 @@ import AnalyticsTab from '../components/admin/AnalyticsTab';
 
 const Admin: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [profiles, setProfiles] = useState<Profile[]>(mockProfiles);
-  const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
+  const { 
+    profiles, 
+    loading: profilesLoading, 
+    error: profilesError,
+    updateProfile,
+    toggleProfileStatus,
+    promoteToAdmin,
+    deleteProfile 
+  } = useAdminProfiles();
+  
+  const { auditLogs, loading: auditLoading, addAuditLog } = useAuditLogs();
+  
   const [standardMessages, setStandardMessages] = useState<StandardMessage[]>([
     {
       id: '1',
@@ -51,42 +63,7 @@ const Admin: React.FC = () => {
   const allUnidades = [...new Set(profiles.flatMap(p => p.unidade || []))];
   const allAreas = [...new Set(profiles.flatMap(p => p.areasConhecimento || []))];
 
-  const addAuditLog = (action: string, user: string, details: string) => {
-    const newLog: AuditLog = {
-      id: Date.now().toString(),
-      action,
-      user,
-      details,
-      timestamp: new Date()
-    };
-    setAuditLogs(prev => [newLog, ...prev]);
-  };
-
-  const toggleProfileStatus = (profileId: string) => {
-    setProfiles(prev => prev.map(profile => 
-      profile.id === profileId ? { ...profile, isActive: !profile.isActive } : profile
-    ));
-    
-    const profile = profiles.find(p => p.id === profileId);
-    addAuditLog('status_change', 'Admin', `Perfil ${profile?.name} ${profile?.isActive ? 'desativado' : 'ativado'}`);
-  };
-
-  const promoteToAdmin = (profileId: string) => {
-    setProfiles(prev => prev.map(profile => 
-      profile.id === profileId ? { ...profile, role: 'admin' } : profile
-    ));
-    
-    const profile = profiles.find(p => p.id === profileId);
-    addAuditLog('role_change', 'Admin', `Perfil ${profile?.name} promovido a administrador`);
-  };
-
-  const deleteProfile = (profileId: string) => {
-    const profile = profiles.find(p => p.id === profileId);
-    setProfiles(prev => prev.filter(profile => profile.id !== profileId));
-    addAuditLog('delete', 'Admin', `Perfil ${profile?.name} excluído`);
-  };
-
-  const sendNotification = () => {
+  const sendNotification = async () => {
     let recipients: string[] = [];
     
     if (recipientType === 'group') {
@@ -110,7 +87,15 @@ const Admin: React.FC = () => {
     }
     
     // Register in audit log
-    addAuditLog('notification_sent', 'Admin', `Notificação "${messageSubject}" enviada para ${recipients.length} destinatários`);
+    await addAuditLog(
+      'Notificação enviada',
+      'Administrador',
+      `Notificação "${messageSubject}" enviada`,
+      'Notificação',
+      undefined,
+      `${recipients.length} destinatários`,
+      `Assunto: ${messageSubject}`
+    );
     
     // Clear form
     setMessageSubject('');
@@ -120,9 +105,52 @@ const Admin: React.FC = () => {
     alert(`Notificação enviada para ${recipients.length} destinatários!`);
   };
 
-  const generateReport = (reportType: string) => {
+  const generateReport = async (reportType: string) => {
     generateProfileReport(profiles, reportType);
+    
+    await addAuditLog(
+      'Relatório gerado',
+      'Administrador',
+      `Relatório de tipo "${reportType}" foi gerado`,
+      'Relatório',
+      undefined,
+      undefined,
+      `Tipo: ${reportType}, ${profiles.length} perfis incluídos`
+    );
   };
+
+  if (profilesLoading || auditLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 mx-auto mb-4 animate-spin text-red-600" />
+          <p className="text-gray-600">Carregando dados administrativos...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (profilesError) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Card className="w-full max-w-md">
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <AlertCircle className="w-8 h-8 mx-auto mb-4 text-red-600" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Erro ao carregar dados</h3>
+              <p className="text-gray-600 mb-4">{profilesError}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              >
+                Tentar novamente
+              </button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -152,6 +180,7 @@ const Admin: React.FC = () => {
             toggleProfileStatus={toggleProfileStatus}
             promoteToAdmin={promoteToAdmin}
             deleteProfile={deleteProfile}
+            updateProfile={updateProfile}
           />
         </TabsContent>
 
