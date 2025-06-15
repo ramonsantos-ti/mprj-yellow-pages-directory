@@ -1,0 +1,41 @@
+
+-- Inserir um usuário admin padrão
+INSERT INTO public.profiles (
+  name, 
+  matricula, 
+  email, 
+  cargo, 
+  funcao, 
+  unidade, 
+  telefone, 
+  biografia,
+  areas_conhecimento, 
+  especializacoes, 
+  temas_interesse, 
+  idiomas,
+  foto_url, 
+  certificacoes, 
+  publicacoes, 
+  aceite_termos, 
+  is_active, 
+  role
+) VALUES (
+  'Administrador do Sistema',
+  'ADMIN001',
+  'admin@mprj.mp.br',
+  ARRAY['Administrador'],
+  ARRAY['Administrador do Sistema'],
+  ARRAY['Tecnologia da Informação'],
+  '(21) 2334-0000',
+  'Usuário administrador do sistema de perfis do MPRJ.',
+  ARRAY['Administração de Sistema', 'Gestão de Usuários'],
+  'Especialista em Administração de Sistemas',
+  ARRAY['Gestão de Perfis', 'Administração', 'Controle de Acesso'],
+  ARRAY['Português'],
+  '/placeholder.svg',
+  ARRAY['Administração de Sistemas'],
+  'Responsável pela gestão do sistema de perfis',
+  true,
+  true,
+  'admin'
+) ON CONFLICT (matricula) DO NOTHING;
