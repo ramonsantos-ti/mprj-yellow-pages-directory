@@ -13,6 +13,12 @@ interface ProfileHeaderProps {
 }
 
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profile, getInitials }) => {
+  console.log('🎨 Renderizando ProfileHeader para:', profile.name);
+  console.log('📱 Telefone:', profile.telefone);
+  console.log('🏢 Cargo:', profile.cargo);
+  console.log('⚙️ Função:', profile.funcao);
+  console.log('🏛️ Unidade:', profile.unidade);
+
   return (
     <>
       <div className="flex items-center justify-between">
@@ -34,6 +40,10 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profile, getInitials }) =
                   src={profile.fotoUrl} 
                   alt={profile.name} 
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    console.log('❌ Erro ao carregar imagem:', profile.fotoUrl);
+                    e.currentTarget.style.display = 'none';
+                  }}
                 />
               ) : (
                 <div className="w-full h-full bg-red-100 flex items-center justify-center">

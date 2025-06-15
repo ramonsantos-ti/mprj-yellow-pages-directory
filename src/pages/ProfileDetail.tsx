@@ -33,87 +33,130 @@ const ProfileDetail: React.FC = () => {
       setError(null);
       console.log('🔍 Carregando perfil com ID:', id);
       
-      const { data, error } = await supabase
+      // Buscar dados básicos do perfil primeiro
+      const { data: profileData, error: profileError } = await supabase
         .from('profiles')
-        .select(`
-          *,
-          projects(*),
-          academic_formations(*),
-          professional_experiences(*),
-          availability(*)
-        `)
+        .select('*')
         .eq('id', id)
         .single();
 
-      if (error) {
-        console.error('❌ Erro ao buscar perfil:', error);
+      if (profileError) {
+        console.error('❌ Erro ao buscar perfil:', profileError);
         setError('Perfil não encontrado');
         return;
       }
 
-      if (!data) {
+      if (!profileData) {
         console.log('❌ Nenhum perfil encontrado');
         setError('Perfil não encontrado');
         return;
       }
 
-      console.log('✅ Dados do perfil encontrados:', data);
+      console.log('✅ Dados básicos do perfil:', profileData);
 
-      // Transform Supabase data to match our Profile type
+      // Buscar projetos relacionados
+      const { data: projectsData, error: projectsError } = await supabase
+        .from('projects')
+        .select('*')
+        .eq('profile_id', id);
+
+      if (projectsError) {
+        console.error('❌ Erro ao buscar projetos:', projectsError);
+      }
+
+      // Buscar formações acadêmicas
+      const { data: formationsData, error: formationsError } = await supabase
+        .from('academic_formations')
+        .select('*')
+        .eq('profile_id', id);
+
+      if (formationsError) {
+        console.error('❌ Erro ao buscar formações:', formationsError);
+      }
+
+      // Buscar experiências profissionais
+      const { data: experiencesData, error: experiencesError } = await supabase
+        .from('professional_experiences')
+        .select('*')
+        .eq('profile_id', id);
+
+      if (experiencesError) {
+        console.error('❌ Erro ao buscar experiências:', experiencesError);
+      }
+
+      // Buscar disponibilidade
+      const { data: availabilityData, error: availabilityError } = await supabase
+        .from('availability')
+        .select('*')
+        .eq('profile_id', id);
+
+      if (availabilityError) {
+        console.error('❌ Erro ao buscar disponibilidade:', availabilityError);
+      }
+
+      console.log('📊 Dados coletados:', {
+        profile: profileData,
+        projects: projectsData,
+        formations: formationsData,
+        experiences: experiencesData,
+        availability: availabilityData
+      });
+
+      // Transformar dados para o formato esperado
       const transformedProfile: Profile = {
-        id: data.id,
-        userId: data.user_id || '',
-        name: data.name || 'Nome não informado',
-        matricula: data.matricula || 'Matrícula não informada',
-        cargo: Array.isArray(data.cargo) ? data.cargo : [],
-        funcao: Array.isArray(data.funcao) ? data.funcao : [],
-        unidade: Array.isArray(data.unidade) ? data.unidade : [],
-        telefone: data.telefone || '',
-        email: data.email || '',
-        biografia: data.biografia || '',
-        areasConhecimento: Array.isArray(data.areas_conhecimento) ? data.areas_conhecimento : [],
-        especializacoes: data.especializacoes || '',
-        temasInteresse: Array.isArray(data.temas_interesse) ? data.temas_interesse : [],
-        idiomas: Array.isArray(data.idiomas) ? data.idiomas : [],
-        linkCurriculo: data.link_curriculo || '',
-        fotoUrl: data.foto_url || '',
-        certificacoes: Array.isArray(data.certificacoes) ? data.certificacoes : [],
-        publicacoes: data.publicacoes || '',
-        role: data.role as 'admin' | 'user' || 'user',
-        isActive: data.is_active ?? true,
-        aceiteTermos: data.aceite_termos ?? false,
-        updatedByAdmin: data.updated_by_admin ?? false,
-        lastUpdated: new Date(data.updated_at || data.created_at || new Date()),
-        projetos: data.projects?.map((p: any) => ({
+        id: profileData.id,
+        userId: profileData.user_id || '',
+        name: profileData.name || 'Nome não informado',
+        matricula: profileData.matricula || 'Matrícula não informada',
+        cargo: Array.isArray(profileData.cargo) ? profileData.cargo : [],
+        funcao: Array.isArray(profileData.funcao) ? profileData.funcao : [],
+        unidade: Array.isArray(profileData.unidade) ? profileData.unidade : [],
+        telefone: profileData.telefone || '',
+        email: profileData.email || '',
+        biografia: profileData.biografia || '',
+        areasConhecimento: Array.isArray(profileData.areas_conhecimento) ? profileData.areas_conhecimento : [],
+        especializacoes: profileData.especializacoes || '',
+        temasInteresse: Array.isArray(profileData.temas_interesse) ? profileData.temas_interesse : [],
+        idiomas: Array.isArray(profileData.idiomas) ? profileData.idiomas : [],
+        linkCurriculo: profileData.link_curriculo || '',
+        fotoUrl: profileData.foto_url || '',
+        certificacoes: Array.isArray(profileData.certificacoes) ? profileData.certificacoes : [],
+        publicacoes: profileData.publicacoes || '',
+        role: (profileData.role as 'admin' | 'user') || 'user',
+        isActive: profileData.is_active ?? true,
+        aceiteTermos: profileData.aceite_termos ?? false,
+        updatedByAdmin: profileData.updated_by_admin ?? false,
+        lastUpdated: new Date(profileData.updated_at || profileData.created_at || new Date()),
+        projetos: projectsData?.map((p: any) => ({
           id: p.id,
           nome: p.nome,
           dataInicio: new Date(p.data_inicio),
           dataFim: p.data_fim ? new Date(p.data_fim) : undefined,
           observacoes: p.observacoes || ''
         })) || [],
-        formacaoAcademica: data.academic_formations?.map((f: any) => ({
+        formacaoAcademica: formationsData?.map((f: any) => ({
           id: f.id,
           nivel: f.nivel,
           instituicao: f.instituicao,
           curso: f.curso,
           ano: f.ano
         })) || [],
-        experienciasProfissionais: data.professional_experiences?.map((e: any) => ({
+        experienciasProfissionais: experiencesData?.map((e: any) => ({
           tempoMPRJ: e.tempo_mprj || '',
           experienciaAnterior: e.experiencia_anterior || '',
           projetosInternos: e.projetos_internos || '',
           publicacoes: e.publicacoes || ''
         })) || [],
-        disponibilidade: data.availability?.[0] ? {
-          tipoColaboracao: Array.isArray(data.availability[0].tipo_colaboracao) ? data.availability[0].tipo_colaboracao : [],
-          disponibilidadeEstimada: data.availability[0].disponibilidade_estimada || ''
+        disponibilidade: availabilityData?.[0] ? {
+          tipoColaboracao: Array.isArray(availabilityData[0].tipo_colaboracao) ? availabilityData[0].tipo_colaboracao : [],
+          disponibilidadeEstimada: availabilityData[0].disponibilidade_estimada || ''
         } : {
           tipoColaboracao: [],
           disponibilidadeEstimada: ''
         },
-        contato: data.availability?.[0] ? {
-          formaContato: data.availability[0].forma_contato || 'email',
-          horarioPreferencial: data.availability[0].horario_preferencial || ''
+        contato: availabilityData?.[0] ? {
+          formaContato: availabilityData[0].forma_contato || 'email',
+          horarioPreferencial: availabilityData[0].horario_preferencial || ''
         } : {
           formaContato: 'email',
           horarioPreferencial: ''
@@ -142,38 +185,56 @@ const ProfileDetail: React.FC = () => {
     return <ErrorState error={error || 'Erro desconhecido'} />;
   }
 
+  console.log('🎨 Renderizando perfil:', profile.name);
+
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6 p-4">
       <ProfileHeader profile={profile} getInitials={getInitials} />
       
-      <ProfileBiography biografia={profile.biografia} />
+      {profile.biografia && (
+        <ProfileBiography biografia={profile.biografia} />
+      )}
       
-      <KnowledgeAreas 
-        areasConhecimento={profile.areasConhecimento} 
-        temasInteresse={profile.temasInteresse} 
-      />
+      {((profile.areasConhecimento && profile.areasConhecimento.length > 0) || 
+        (profile.temasInteresse && profile.temasInteresse.length > 0)) && (
+        <KnowledgeAreas 
+          areasConhecimento={profile.areasConhecimento} 
+          temasInteresse={profile.temasInteresse} 
+        />
+      )}
       
-      <AcademicFormationCard formacaoAcademica={profile.formacaoAcademica} />
+      {profile.formacaoAcademica && profile.formacaoAcademica.length > 0 && (
+        <AcademicFormationCard formacaoAcademica={profile.formacaoAcademica} />
+      )}
       
-      <ProfessionalExperienceCard experienciasProfissionais={profile.experienciasProfissionais} />
+      {profile.experienciasProfissionais && profile.experienciasProfissionais.length > 0 && (
+        <ProfessionalExperienceCard experienciasProfissionais={profile.experienciasProfissionais} />
+      )}
       
-      <ProjectsCard projetos={profile.projetos} />
+      {profile.projetos && profile.projetos.length > 0 && (
+        <ProjectsCard projetos={profile.projetos} />
+      )}
       
-      <LanguagesAndCertifications 
-        idiomas={profile.idiomas} 
-        certificacoes={profile.certificacoes} 
-      />
+      {((profile.idiomas && profile.idiomas.length > 0) || 
+        (profile.certificacoes && profile.certificacoes.length > 0)) && (
+        <LanguagesAndCertifications 
+          idiomas={profile.idiomas} 
+          certificacoes={profile.certificacoes} 
+        />
+      )}
       
       <AvailabilityCard 
         disponibilidade={profile.disponibilidade} 
         contato={profile.contato} 
       />
       
-      <PublicationsAndCurriculum 
-        publicacoes={profile.publicacoes}
-        linkCurriculo={profile.linkCurriculo}
-        especializacoes={profile.especializacoes}
-      />
+      {(profile.publicacoes || profile.linkCurriculo || profile.especializacoes) && (
+        <PublicationsAndCurriculum 
+          publicacoes={profile.publicacoes}
+          linkCurriculo={profile.linkCurriculo}
+          especializacoes={profile.especializacoes}
+        />
+      )}
     </div>
   );
 };
