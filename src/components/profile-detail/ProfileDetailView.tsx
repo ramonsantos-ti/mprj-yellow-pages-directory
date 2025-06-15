@@ -1,6 +1,5 @@
 
 import React from "react";
-import { useParams } from "react-router-dom";
 import { useProfileData } from "@/hooks/useProfileData";
 import LoadingState from "./LoadingState";
 import ErrorState from "./ErrorState";
@@ -23,26 +22,26 @@ const ProfileDetailView: React.FC<ProfileDetailViewProps> = ({ profileId }) => {
   const { userProfile, loading, error } = useProfileData(profileId);
 
   if (loading) return <LoadingState />;
-  if (error) return <ErrorState message={error} />;
-  if (!userProfile) return <ErrorState message="Perfil não encontrado." />;
+  if (error) return <ErrorState error={error} />;
+  if (!userProfile) return <ErrorState error="Perfil não encontrado." />;
 
   return (
     <div className="space-y-6">
       <ProfileHeader profile={userProfile} />
       <ProfileBasicInfo profile={userProfile} />
-      <AcademicFormationCard formacoes={userProfile.formacaoAcademica} />
-      <ProfessionalExperienceCard experiencias={userProfile.experiencias} />
-      <ProjectsCard projetos={userProfile.projetos} />
+      <AcademicFormationCard formacaoAcademica={userProfile.formacaoAcademica || []} />
+      <ProfessionalExperienceCard experienciasProfissionais={userProfile.experienciasProfissionais || []} />
+      <ProjectsCard projetos={userProfile.projetos || []} />
       <AvailabilityCard
         disponibilidade={userProfile.disponibilidade}
         contato={userProfile.contato}
       />
-      <ProfileAdditionalInfo adicionais={userProfile.infoAdicional} />
-      <LanguagesAndCertifications profile={userProfile} />
-      <ProfileInterestAreas areas={userProfile.temasInteresse} />
+      <ProfileAdditionalInfo informacoesComplementares={userProfile.informacoesComplementares || ""} />
+      <LanguagesAndCertifications idiomas={userProfile.idiomas || []} certificacoes={userProfile.certificacoes || []} />
+      <ProfileInterestAreas temasInteresse={userProfile.temasInteresse || []} />
       <PublicationsAndCurriculum
-        publicacoes={userProfile.publicacoes}
-        curriculumUrl={userProfile.curriculumUrl}
+        publicacoes={userProfile.publicacoes || ""}
+        linkCurriculo={userProfile.linkCurriculo || ""}
       />
     </div>
   );
