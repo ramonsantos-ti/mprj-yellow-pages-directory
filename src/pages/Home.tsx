@@ -1,7 +1,7 @@
+
 import React, { useState, useMemo } from 'react';
 import { useProfiles } from '../hooks/useProfiles';
 import ProfileCard from '../components/ProfileCard';
-import { Badge } from '../components/ui/badge';
 import { Card, CardContent } from '../components/ui/card';
 import { Input } from '../components/ui/input';
 import { Search, Users, Loader2, AlertCircle } from 'lucide-react';
@@ -9,9 +9,6 @@ import { Search, Users, Loader2, AlertCircle } from 'lucide-react';
 const Home: React.FC = () => {
   const { profiles, loading, error } = useProfiles();
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedAreas, setSelectedAreas] = useState<string[]>([]);
-  const [selectedCargos, setSelectedCargos] = useState<string[]>([]);
-  const [selectedUnidades, setSelectedUnidades] = useState<string[]>([]);
 
   const filteredProfiles = useMemo(() => {
     return profiles.filter(profile => {
@@ -24,23 +21,9 @@ const Home: React.FC = () => {
         ) ||
         (profile.especializacoes && profile.especializacoes.toLowerCase().includes(searchTerm.toLowerCase()));
 
-      const matchesAreas = selectedAreas.length === 0 || 
-        selectedAreas.some(area => profile.areasConhecimento.includes(area));
-
-      const matchesCargos = selectedCargos.length === 0 || 
-        selectedCargos.some(cargo => profile.cargo.includes(cargo));
-
-      const matchesUnidades = selectedUnidades.length === 0 || 
-        selectedUnidades.some(unidade => profile.unidade.includes(unidade));
-
-      return matchesSearch && matchesAreas && matchesCargos && matchesUnidades;
+      return matchesSearch;
     });
-  }, [profiles, searchTerm, selectedAreas, selectedCargos, selectedUnidades]);
-
-  // Get unique values for filters
-  const allAreas = [...new Set(profiles.flatMap(p => p.areasConhecimento))];
-  const allCargos = [...new Set(profiles.flatMap(p => p.cargo))];
-  const allUnidades = [...new Set(profiles.flatMap(p => p.unidade))];
+  }, [profiles, searchTerm]);
 
   if (loading) {
     return (
@@ -101,7 +84,7 @@ const Home: React.FC = () => {
         </div>
       </div>
 
-      {/* Search and Filters */}
+      {/* Search Only */}
       <Card>
         <CardContent className="pt-6">
           <div className="space-y-4">
@@ -114,81 +97,6 @@ const Home: React.FC = () => {
                 className="pl-10"
               />
             </div>
-            
-            {/* Filter badges */}
-            <div className="space-y-3">
-              {allAreas.length > 0 && (
-                <div>
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">Áreas de Conhecimento:</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {allAreas.slice(0, 10).map((area) => (
-                      <Badge
-                        key={area}
-                        variant={selectedAreas.includes(area) ? "default" : "outline"}
-                        className={`cursor-pointer ${selectedAreas.includes(area) ? 'bg-red-600' : ''}`}
-                        onClick={() => {
-                          setSelectedAreas(prev => 
-                            prev.includes(area) 
-                              ? prev.filter(a => a !== area)
-                              : [...prev, area]
-                          );
-                        }}
-                      >
-                        {area}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
-              
-              {allCargos.length > 0 && (
-                <div>
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">Cargos:</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {allCargos.slice(0, 10).map((cargo) => (
-                      <Badge
-                        key={cargo}
-                        variant={selectedCargos.includes(cargo) ? "default" : "outline"}
-                        className={`cursor-pointer ${selectedCargos.includes(cargo) ? 'bg-red-600' : ''}`}
-                        onClick={() => {
-                          setSelectedCargos(prev => 
-                            prev.includes(cargo) 
-                              ? prev.filter(c => c !== cargo)
-                              : [...prev, cargo]
-                          );
-                        }}
-                      >
-                        {cargo}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
-              
-              {allUnidades.length > 0 && (
-                <div>
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">Unidades:</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {allUnidades.slice(0, 10).map((unidade) => (
-                      <Badge
-                        key={unidade}
-                        variant={selectedUnidades.includes(unidade) ? "default" : "outline"}
-                        className={`cursor-pointer ${selectedUnidades.includes(unidade) ? 'bg-red-600' : ''}`}
-                        onClick={() => {
-                          setSelectedUnidades(prev => 
-                            prev.includes(unidade) 
-                              ? prev.filter(u => u !== unidade)
-                              : [...prev, unidade]
-                          );
-                        }}
-                      >
-                        {unidade}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
           </div>
         </CardContent>
       </Card>
@@ -200,19 +108,14 @@ const Home: React.FC = () => {
             Nenhum especialista encontrado
           </h3>
           <p className="text-gray-600 mb-4">
-            Tente ajustar os filtros de busca ou termos utilizados
+            Tente ajustar os termos de busca utilizados
           </p>
-          {(searchTerm || selectedAreas.length > 0 || selectedCargos.length > 0 || selectedUnidades.length > 0) && (
+          {searchTerm && (
             <button
-              onClick={() => {
-                setSearchTerm('');
-                setSelectedAreas([]);
-                setSelectedCargos([]);
-                setSelectedUnidades([]);
-              }}
+              onClick={() => setSearchTerm('')}
               className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
             >
-              Limpar filtros
+              Limpar busca
             </button>
           )}
         </div>

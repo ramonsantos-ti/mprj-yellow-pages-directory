@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import { Profile } from '../types';
 import { Card, CardContent, CardHeader } from './ui/card';
 import { Badge } from './ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Mail, Phone, Calendar, MapPin } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -24,13 +23,28 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
     <Card className="h-full hover:shadow-lg transition-shadow duration-200">
       <CardHeader className="pb-4">
         <div className="flex items-start space-x-4">
-          {/* Increased photo size from w-20 h-28 to w-30 h-42 (50% increase) */}
+          {/* Photo container with increased size */}
           <div className="w-30 h-42 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border">
             {profile.fotoUrl ? (
               <img 
                 src={profile.fotoUrl} 
                 alt={profile.name} 
                 className="w-full h-full object-cover"
+                onError={(e) => {
+                  // Fallback to initials if image fails to load
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                  const parent = target.parentElement;
+                  if (parent) {
+                    parent.innerHTML = `
+                      <div class="w-full h-full bg-red-100 flex items-center justify-center">
+                        <span class="text-red-900 font-semibold text-xl">
+                          ${getInitials(profile.name)}
+                        </span>
+                      </div>
+                    `;
+                  }
+                }}
               />
             ) : (
               <div className="w-full h-full bg-red-100 flex items-center justify-center">
