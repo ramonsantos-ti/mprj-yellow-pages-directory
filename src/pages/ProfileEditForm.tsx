@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '../components/ui/button';
@@ -148,16 +147,17 @@ const ProfileEditForm: React.FC = () => {
             isValidSelectValue={isValidSelectValue}
           />
 
-          <ContactPreferences
-            formaContato={disponibilidade.formaContato || 'email'}
-            setFormaContato={(value) => setDisponibilidade({...disponibilidade, formaContato: value})}
-            horarioPreferencial={disponibilidade.horarioPreferencial || ''}
-            setHorarioPreferencial={(value) => setDisponibilidade({...disponibilidade, horarioPreferencial: value})}
-            safeFormasContato={safeFormasContato}
-            isValidSelectValue={isValidSelectValue}
-          />
-
-          <LanguagesSection form={form} />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <ContactPreferences
+              formaContato={disponibilidade.formaContato || 'email'}
+              setFormaContato={(value) => setDisponibilidade({...disponibilidade, formaContato: value})}
+              horarioPreferencial={disponibilidade.horarioPreferencial || ''}
+              setHorarioPreferencial={(value) => setDisponibilidade({...disponibilidade, horarioPreferencial: value})}
+              safeFormasContato={safeFormasContato}
+              isValidSelectValue={isValidSelectValue}
+            />
+            <LanguagesSection form={form} />
+          </div>
 
           <AdditionalInfo form={form} />
 
