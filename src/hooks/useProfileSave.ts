@@ -23,14 +23,23 @@ export const useProfileSave = () => {
     try {
       setSaving(true);
 
-      // LOG PARA DEPURAÇÃO
+      // Logs detalhados: Mostre todos os valores no objeto antes de salvar
       console.log('[DEBUG] DATA para salvar perfil:', data);
-      console.log('[DEBUG] Valor de biografia recebido:', data.biografia);
-      console.log('[DEBUG] Valor de publicacoes recebido:', data.publicacoes);
+      // Logs linha a linha para campos problemáticos
+      console.log('[DEBUG] Valor de biografia recebido (bruto):', data.biografia, 'typeof:', typeof data.biografia, 'null?', data.biografia === null, 'undefined?', data.biografia === undefined);
+      console.log('[DEBUG] Valor de publicacoes recebido (bruto):', data.publicacoes, 'typeof:', typeof data.publicacoes, 'null?', data.publicacoes === null, 'undefined?', data.publicacoes === undefined);
 
-      // Garante que ambos são string (ou string vazia)
-      const safeBiografia = typeof data.biografia === 'string' ? data.biografia : (data.biografia ? String(data.biografia) : '');
-      const safePublicacoes = typeof data.publicacoes === 'string' ? data.publicacoes : (data.publicacoes ? String(data.publicacoes) : '');
+      // Forçar sempre string (inclusive se vier undefined/null)
+      const safeBiografia = typeof data.biografia === 'string'
+        ? data.biografia
+        : (data.biografia ? String(data.biografia) : '');
+      const safePublicacoes = typeof data.publicacoes === 'string'
+        ? data.publicacoes
+        : (data.publicacoes ? String(data.publicacoes) : '');
+
+      // Log teste após "saneamento"
+      console.log('[DEBUG] Valor de biografia SANEADO:', safeBiografia);
+      console.log('[DEBUG] Valor de publicacoes SANEADO:', safePublicacoes);
 
       const profileData = {
         user_id: user?.id,
@@ -38,7 +47,7 @@ export const useProfileSave = () => {
         matricula: data.matricula,
         email: data.email,
         telefone: data.telefone || null,
-        biografia: safeBiografia, // Corrigido
+        biografia: safeBiografia,
         cargo: data.cargo || [],
         funcao: data.funcao || [],
         unidade: data.unidade || [],
@@ -49,21 +58,23 @@ export const useProfileSave = () => {
         link_curriculo: data.linkCurriculo || null,
         foto_url: fotoPreview || null,
         certificacoes: data.certificacoes || [],
-        publicacoes: safePublicacoes, // Corrigido
+        publicacoes: safePublicacoes,
         aceite_termos: data.aceiteTermos || false,
         updated_at: new Date().toISOString()
       };
 
-      // LOG para checar valor enviado ao banco
+      // Log do objeto final
       console.log('[DEBUG] profileData pronto para banco:', profileData);
 
       let profileId = userProfile?.id;
-
       if (userProfile) {
-        const { error } = await supabase
+        const { error, data: updateRet } = await supabase
           .from('profiles')
           .update(profileData)
-          .eq('id', userProfile.id);
+          .eq('id', userProfile.id)
+          .select(); // forçar retorno para log
+
+        console.log('[DEBUG] RESPOSTA UPDATE:', updateRet, error);
 
         if (error) throw error;
       } else {
@@ -72,6 +83,8 @@ export const useProfileSave = () => {
           .insert(profileData)
           .select()
           .single();
+
+        console.log('[DEBUG] RESPOSTA INSERT:', newProfile, error);
 
         if (error) throw error;
         profileId = newProfile.id;
@@ -83,7 +96,7 @@ export const useProfileSave = () => {
       }
 
       onSuccess?.();
-      
+
     } catch (err: any) {
       console.error('Error saving profile:', err);
       throw new Error('Erro ao salvar perfil: ' + err.message);
