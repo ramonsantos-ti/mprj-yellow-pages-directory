@@ -23,9 +23,14 @@ export const useProfileSave = () => {
     try {
       setSaving(true);
 
-      // LOG PARA DEPURAÇÃO (certificar que biografia está chegando do form)
+      // LOG PARA DEPURAÇÃO
       console.log('[DEBUG] DATA para salvar perfil:', data);
       console.log('[DEBUG] Valor de biografia recebido:', data.biografia);
+      console.log('[DEBUG] Valor de publicacoes recebido:', data.publicacoes);
+
+      // Garante que ambos são string (ou string vazia)
+      const safeBiografia = typeof data.biografia === 'string' ? data.biografia : (data.biografia ? String(data.biografia) : '');
+      const safePublicacoes = typeof data.publicacoes === 'string' ? data.publicacoes : (data.publicacoes ? String(data.publicacoes) : '');
 
       const profileData = {
         user_id: user?.id,
@@ -33,7 +38,7 @@ export const useProfileSave = () => {
         matricula: data.matricula,
         email: data.email,
         telefone: data.telefone || null,
-        biografia: typeof data.biografia === 'string' ? data.biografia : (data.biografia || ''), // ajuste garantido tipo string
+        biografia: safeBiografia, // Corrigido
         cargo: data.cargo || [],
         funcao: data.funcao || [],
         unidade: data.unidade || [],
@@ -44,7 +49,7 @@ export const useProfileSave = () => {
         link_curriculo: data.linkCurriculo || null,
         foto_url: fotoPreview || null,
         certificacoes: data.certificacoes || [],
-        publicacoes: data.publicacoes || null,
+        publicacoes: safePublicacoes, // Corrigido
         aceite_termos: data.aceiteTermos || false,
         updated_at: new Date().toISOString()
       };
