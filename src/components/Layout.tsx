@@ -1,8 +1,8 @@
-
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from './ui/button';
+import { Separator } from './ui/separator';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -42,17 +42,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo Principal */}
-            <Link to="/" className="flex items-center space-x-3">
-              <div className="flex items-center space-x-2">
-                <img 
-                  src="/lovable-uploads/67816a9d-4783-48d7-a5ea-020683c86e12.png" 
-                  alt="MPRJ Logo Principal" 
-                  className="h-12 w-auto"
-                />
-                <span className="text-xl font-semibold text-gray-900 hidden sm:inline">
-                  Páginas Amarelas
-                </span>
-              </div>
+            <Link to="/" className="flex items-center">
+              <img 
+                src="/lovable-uploads/67816a9d-4783-48d7-a5ea-020683c86e12.png" 
+                alt="MPRJ Logo Principal" 
+                className="h-18 w-auto"
+              />
             </Link>
 
             {/* Navigation */}
@@ -120,6 +115,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             </div>
           </div>
         </div>
+        {/* Brown separator line */}
+        <Separator className="bg-amber-800 h-1" />
       </header>
 
       {/* Main content */}
