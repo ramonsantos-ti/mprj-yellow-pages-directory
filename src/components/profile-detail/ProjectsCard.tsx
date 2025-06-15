@@ -1,14 +1,12 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { construction } from 'lucide-react';
+import { Construction } from 'lucide-react';
 import { Profile } from '../../types';
 
 interface ProjectsCardProps {
   projetos: Profile['projetos'];
 }
-
-const LucideConstruction = construction;
 
 const ProjectsCard: React.FC<ProjectsCardProps> = ({ projetos }) => {
   const hasProjects = projetos && projetos.length > 0;
@@ -17,7 +15,7 @@ const ProjectsCard: React.FC<ProjectsCardProps> = ({ projetos }) => {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center space-x-2">
-          <LucideConstruction className="w-5 h-5" />
+          <Construction className="w-5 h-5" />
           <span>Projetos</span>
         </CardTitle>
       </CardHeader>
