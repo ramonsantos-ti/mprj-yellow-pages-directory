@@ -11,7 +11,7 @@ interface ProjectsCardProps {
 }
 
 const ProjectsCard: React.FC<ProjectsCardProps> = ({ projetos }) => {
-  if (!projetos?.length) return null;
+  const hasProjects = projetos && projetos.length > 0;
 
   return (
     <Card>
@@ -22,23 +22,27 @@ const ProjectsCard: React.FC<ProjectsCardProps> = ({ projetos }) => {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
-          {projetos.map((projeto, index) => (
-            <div key={projeto.id || index} className="border-l-4 border-blue-200 pl-4">
-              <h4 className="font-semibold text-gray-900">{projeto.nome}</h4>
-              <p className="text-sm text-gray-600 mb-2">
-                <Calendar className="w-4 h-4 inline mr-1" />
-                {format(new Date(projeto.dataInicio), 'dd/MM/yyyy', { locale: ptBR })}
-                {projeto.dataFim && (
-                  <> - {format(new Date(projeto.dataFim), 'dd/MM/yyyy', { locale: ptBR })}</>
+        {hasProjects ? (
+          <div className="space-y-4">
+            {projetos.map((projeto, index) => (
+              <div key={projeto.id || index} className="border-l-4 border-blue-200 pl-4">
+                <h4 className="font-semibold text-gray-900">{projeto.nome}</h4>
+                <p className="text-sm text-gray-600 mb-2">
+                  <Calendar className="w-4 h-4 inline mr-1" />
+                  {format(new Date(projeto.dataInicio), 'dd/MM/yyyy', { locale: ptBR })}
+                  {projeto.dataFim && (
+                    <> - {format(new Date(projeto.dataFim), 'dd/MM/yyyy', { locale: ptBR })}</>
+                  )}
+                </p>
+                {projeto.observacoes && (
+                  <p className="text-gray-700 text-sm">{projeto.observacoes}</p>
                 )}
-              </p>
-              {projeto.observacoes && (
-                <p className="text-gray-700 text-sm">{projeto.observacoes}</p>
-              )}
-            </div>
-          ))}
-        </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-500 italic">Nenhum projeto informado</p>
+        )}
       </CardContent>
     </Card>
   );

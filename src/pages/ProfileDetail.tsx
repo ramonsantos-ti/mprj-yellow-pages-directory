@@ -148,18 +148,6 @@ const ProfileDetail: React.FC = () => {
       };
 
       console.log('🔄 Perfil transformado final:', transformedProfile);
-      console.log('📊 Resumo dos dados:');
-      console.log('- Nome:', transformedProfile.name);
-      console.log('- Email:', transformedProfile.email);
-      console.log('- Cargo:', transformedProfile.cargo);
-      console.log('- Telefone:', transformedProfile.telefone || 'Não informado');
-      console.log('- Biografia:', transformedProfile.biografia || 'Não informado');
-      console.log('- Áreas:', transformedProfile.areasConhecimento?.length || 0);
-      console.log('- Temas:', transformedProfile.temasInteresse?.length || 0);
-      console.log('- Formações:', transformedProfile.formacaoAcademica?.length || 0);
-      console.log('- Idiomas:', transformedProfile.idiomas?.length || 0);
-      console.log('- Certificações:', transformedProfile.certificacoes?.length || 0);
-      
       setProfile(transformedProfile);
     } catch (err: any) {
       console.error('❌ Erro geral ao carregar perfil:', err);
@@ -173,55 +161,49 @@ const ProfileDetail: React.FC = () => {
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   };
 
-  console.log('🎨 Renderizando ProfileDetail - loading:', loading, 'error:', error, 'profile existe:', !!profile);
-
   if (loading) {
-    console.log('⏳ Renderizando LoadingState');
     return <LoadingState />;
   }
 
   if (error || !profile) {
-    console.log('❌ Renderizando ErrorState com erro:', error);
     return <ErrorState error={error || 'Erro desconhecido'} />;
   }
-
-  console.log('✅ Renderizando perfil completo para:', profile.name);
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 p-4">
       <ProfileHeader profile={profile} getInitials={getInitials} />
       
-      {/* Biografia */}
+      {/* Biografia - sempre exibir */}
       <ProfileBiography biografia={profile.biografia} />
       
-      {/* Áreas de Conhecimento e Temas de Interesse */}
+      {/* Áreas de Conhecimento e Temas de Interesse - sempre exibir */}
       <KnowledgeAreas 
         areasConhecimento={profile.areasConhecimento} 
         temasInteresse={profile.temasInteresse} 
       />
       
-      {/* Formação Acadêmica */}
+      {/* Formação Acadêmica - sempre exibir */}
       <AcademicFormationCard formacaoAcademica={profile.formacaoAcademica} />
       
-      {/* Experiência Profissional */}
+      {/* Experiência Profissional - sempre exibir */}
       <ProfessionalExperienceCard experienciasProfissionais={profile.experienciasProfissionais} />
       
-      {/* Projetos */}
+      {/* Projetos - sempre exibir */}
       <ProjectsCard projetos={profile.projetos} />
       
-      {/* Idiomas e Certificações */}
+      {/* Idiomas e Certificações - sempre exibir */}
       <LanguagesAndCertifications 
         idiomas={profile.idiomas} 
         certificacoes={profile.certificacoes} 
       />
       
-      {/* Disponibilidade */}
+      {/* Disponibilidade - sempre exibir */}
       <AvailabilityCard 
         disponibilidade={profile.disponibilidade} 
         contato={profile.contato} 
       />
       
-      {/* Publicações e Currículo */}
+      {/* Publicações e Currículo - sempre exibir */}
       <PublicationsAndCurriculum 
         publicacoes={profile.publicacoes}
         linkCurriculo={profile.linkCurriculo}
