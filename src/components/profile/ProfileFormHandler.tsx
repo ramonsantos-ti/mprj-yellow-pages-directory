@@ -31,13 +31,14 @@ export const useProfileFormHandler = ({
 
   const populateFormWithProfile = (profile: Profile) => {
     setFotoPreview(profile.fotoUrl || '');
-    
+
     // Set form values
     form.setValue('name', profile.name || '');
     form.setValue('matricula', profile.matricula || '');
     form.setValue('email', profile.email || '');
     form.setValue('telefone', profile.telefone || '');
-    form.setValue('biografia', profile.biografia || '');
+    // >>> Garantir que salva o campo corretamente, mesmo se vier undefined/null
+    form.setValue('biografia', typeof profile.biografia === 'string' ? profile.biografia : '');
     form.setValue('cargo', profile.cargo || []);
     form.setValue('funcao', profile.funcao || []);
     form.setValue('unidade', profile.unidade || []);
@@ -49,13 +50,13 @@ export const useProfileFormHandler = ({
     form.setValue('certificacoes', profile.certificacoes || []);
     form.setValue('publicacoes', profile.publicacoes || '');
     form.setValue('aceiteTermos', profile.aceiteTermos || false);
-    
+
     // Set formação acadêmica directly in the form
     form.setValue('formacaoAcademica', profile.formacaoAcademica || []);
 
     // Set related data
     setProjetos(profile.projetos || []);
-    
+
     if (profile.disponibilidade && profile.contato) {
       setDisponibilidade({
         tipoColaboracao: profile.disponibilidade.tipoColaboracao || [],
@@ -82,3 +83,4 @@ export const useProfileFormHandler = ({
     handleFileUpload
   };
 };
+
