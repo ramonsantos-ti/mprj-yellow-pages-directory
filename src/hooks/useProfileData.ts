@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -7,7 +8,7 @@ import {
   formaContatoReverseMap 
 } from '../components/profile/ProfileFormConstants';
 
-export const useProfileData = () => {
+export const useProfileData = (profileId?: string) => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -17,6 +18,14 @@ export const useProfileData = () => {
     try {
       setLoading(true);
       
+      // Se não tem profileId, usa o usuário logado
+      const targetUserId = profileId || user?.id;
+      
+      if (!targetUserId) {
+        setError('Usuário não encontrado');
+        return null;
+      }
+
       const { data: profile, error } = await supabase
         .from('profiles')
         .select(`
@@ -26,7 +35,7 @@ export const useProfileData = () => {
           professional_experiences(*),
           availability(*)
         `)
-        .eq('user_id', user?.id)
+        .eq(profileId ? 'id' : 'user_id', targetUserId)
         .single();
 
       if (error && error.code !== 'PGRST116') {

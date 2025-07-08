@@ -9,10 +9,18 @@ import { Profile } from '../../types';
 
 interface ProfileHeaderProps {
   profile: Profile;
-  getInitials: (name: string) => string;
 }
 
-const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profile, getInitials }) => {
+const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profile }) => {
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(word => word.charAt(0))
+      .slice(0, 2)
+      .join('')
+      .toUpperCase();
+  };
+
   console.log('🎨 Renderizando ProfileHeader para:', profile.name);
   console.log('📱 Telefone:', profile.telefone);
   console.log('🏢 Cargo:', profile.cargo);

@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useProfileData } from "@/hooks/useProfileData";
 import LoadingState from "./LoadingState";
 import ErrorState from "./ErrorState";
@@ -19,7 +19,11 @@ interface ProfileDetailViewProps {
 }
 
 const ProfileDetailView: React.FC<ProfileDetailViewProps> = ({ profileId }) => {
-  const { userProfile, loading, error } = useProfileData(profileId);
+  const { userProfile, loading, error, loadUserProfile } = useProfileData(profileId);
+
+  useEffect(() => {
+    loadUserProfile();
+  }, [profileId]);
 
   if (loading) return <LoadingState />;
   if (error) return <ErrorState error={error} />;
@@ -48,4 +52,3 @@ const ProfileDetailView: React.FC<ProfileDetailViewProps> = ({ profileId }) => {
 };
 
 export default ProfileDetailView;
-
