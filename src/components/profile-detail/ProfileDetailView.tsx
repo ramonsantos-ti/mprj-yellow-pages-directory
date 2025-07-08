@@ -4,7 +4,6 @@ import { useProfileData } from "@/hooks/useProfileData";
 import LoadingState from "./LoadingState";
 import ErrorState from "./ErrorState";
 import ProfileHeader from "./ProfileHeader";
-import ProfileBasicInfo from "./ProfileBasicInfo";
 import AcademicFormationCard from "./AcademicFormationCard";
 import ProfessionalExperienceCard from "./ProfessionalExperienceCard";
 import ProjectsCard from "./ProjectsCard";
@@ -32,7 +31,6 @@ const ProfileDetailView: React.FC<ProfileDetailViewProps> = ({ profileId }) => {
   return (
     <div className="space-y-6">
       <ProfileHeader profile={userProfile} />
-      <ProfileBasicInfo profile={userProfile} />
       <AcademicFormationCard formacaoAcademica={userProfile.formacaoAcademica || []} />
       <ProfessionalExperienceCard experienciasProfissionais={userProfile.experienciasProfissionais || []} />
       <ProjectsCard projetos={userProfile.projetos || []} />
