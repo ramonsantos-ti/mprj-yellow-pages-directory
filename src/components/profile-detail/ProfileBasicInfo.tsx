@@ -22,7 +22,7 @@ const ProfileBasicInfo: React.FC<ProfileBasicInfoProps> = ({ profile }) => {
 
   return (
     <Card>
-      <CardContent className="pt-6">
+      <CardContent>
         <div className="flex flex-col md:flex-row items-start md:space-x-6 space-y-4 md:space-y-0">
           {/* Foto */}
           <div className="w-32 h-40 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border">
