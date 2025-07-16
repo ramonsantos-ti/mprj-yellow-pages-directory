@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -29,7 +30,7 @@ export default {
 				'48': '12rem'    // 192px - for 50% increase from h-32 (128px)
 			},
 			colors: {
-				'custom-bg': '#E9BEBD',
+				'custom-bg': '#CDB9B3',
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
