@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Profile } from '../types';
@@ -19,7 +20,8 @@ export const useProfiles = () => {
           professional_experiences(*),
           availability(*)
         `)
-        .eq('is_active', true);
+        .eq('is_active', true)
+        .order('updated_at', { ascending: false });
 
       if (error) throw error;
 
