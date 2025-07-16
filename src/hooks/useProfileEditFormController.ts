@@ -7,7 +7,7 @@ import { profileSchema, defaultFormValues } from '../components/profile/ProfileF
 import { useProfileEdit } from '../hooks/useProfileEdit';
 import { useProfileFormHandler } from '../components/profile/ProfileFormHandler';
 
-export function useProfileEditFormController() {
+export function useProfileEditFormController(profileId?: string, isAdminEdit?: boolean) {
   const { user } = useAuth();
   const {
     loading,
@@ -16,7 +16,7 @@ export function useProfileEditFormController() {
     successMessage,
     userProfile,
     saveProfile
-  } = useProfileEdit();
+  } = useProfileEdit(profileId); // Passando profileId para o hook
 
   const [fotoPreview, setFotoPreview] = useState('');
   const [projetos, setProjetos] = useState<any[]>([]);
@@ -46,9 +46,11 @@ export function useProfileEditFormController() {
   useEffect(() => {
     if (userProfile && !hasPopulatedProfile.current) {
       console.log("[DEBUG] Populando formulário com userProfile:", userProfile);
+      console.log("[DEBUG] Profile ID sendo editado:", profileId || "próprio usuário");
+      console.log("[DEBUG] É edição admin?", isAdminEdit);
       populateFormWithProfile(userProfile);
       hasPopulatedProfile.current = true;
-    } else if (!userProfile && user && !hasPopulatedProfile.current) {
+    } else if (!userProfile && user && !profileId && !hasPopulatedProfile.current) {
       // Novo usuário ou profile não existente, popular valores mínimos
       form.setValue('name', user.email || '');
       form.setValue('email', user.email || '');
@@ -57,12 +59,12 @@ export function useProfileEditFormController() {
       console.log("[DEBUG] Form setado para dados mínimos");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userProfile, user]);
+  }, [userProfile, user, profileId]);
 
   // Resetar controle se mudar o profile (novo login/etc)
   useEffect(() => {
     hasPopulatedProfile.current = false;
-  }, [userProfile?.id]);
+  }, [userProfile?.id, profileId]);
 
   useEffect(() => {
     if (userProfile) {
@@ -86,7 +88,10 @@ export function useProfileEditFormController() {
     console.log('[DEBUG][FORM BEFORE SUBMIT]:', {
       biografia,
       publicacoes,
-      formData: data
+      formData: data,
+      profileIdBeingEdited: profileId,
+      isAdminEdit,
+      targetProfileId: userProfile?.id
     });
 
     // Atualizar os campos de biografia e publicacoes antes do submit
@@ -95,7 +100,8 @@ export function useProfileEditFormController() {
       fotoPreview,
       data.formacaoAcademica || [],
       projetos,
-      disponibilidade
+      disponibilidade,
+      profileId // Passando o profileId específico para o saveProfile
     );
   };
 

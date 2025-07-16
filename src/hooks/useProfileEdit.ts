@@ -5,7 +5,7 @@ import { useProfileData } from './useProfileData';
 import { useProfileSave } from './useProfileSave';
 import { useProfileState } from './useProfileState';
 
-export const useProfileEdit = () => {
+export const useProfileEdit = (profileId?: string) => {
   const { user } = useAuth();
   const { 
     loading, 
@@ -13,15 +13,28 @@ export const useProfileEdit = () => {
     userProfile, 
     loadUserProfile, 
     setError 
-  } = useProfileData();
+  } = useProfileData(profileId);
   
   const { saving, saveProfile: saveProfileData } = useProfileSave();
   const { successMessage, setSuccessMessage, showSuccessMessage } = useProfileState();
 
-  const saveProfile = async (data: any, fotoPreview: string, formacaoAcademica: any[], projetos: any[], disponibilidade: any) => {
+  const saveProfile = async (
+    data: any, 
+    fotoPreview: string, 
+    formacaoAcademica: any[], 
+    projetos: any[], 
+    disponibilidade: any,
+    targetProfileId?: string
+  ) => {
     try {
       setError(null);
       setSuccessMessage(null);
+
+      console.log('[DEBUG][useProfileEdit] Salvando perfil:', {
+        targetProfileId,
+        userProfileId: userProfile?.id,
+        isEditingOtherProfile: !!targetProfileId
+      });
 
       await saveProfileData(
         data, 
@@ -43,10 +56,11 @@ export const useProfileEdit = () => {
   };
 
   useEffect(() => {
-    if (user) {
+    if (profileId || user) {
+      console.log('[DEBUG][useProfileEdit] Carregando perfil:', { profileId, userId: user?.id });
       loadUserProfile();
     }
-  }, [user]);
+  }, [profileId, user]);
 
   return {
     loading,

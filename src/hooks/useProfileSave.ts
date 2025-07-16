@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -31,14 +32,13 @@ export const useProfileSave = () => {
         ? data.publicacoes
         : (data.publicacoes ? String(data.publicacoes) : "");
 
-      // INFO: Agora ignoramos informacoesComplementares no campo especializacoes!
       const informacoesComplementares =
         typeof data.informacoesComplementares === 'string'
           ? data.informacoesComplementares
           : (data.informacoesComplementares ? String(data.informacoesComplementares) : "");
 
       const profileData = {
-        user_id: user?.id,
+        user_id: userProfile?.userId || user?.id, // Mantém o user_id original do perfil
         name: data.name,
         matricula: data.matricula,
         email: data.email,
@@ -55,8 +55,17 @@ export const useProfileSave = () => {
         certificacoes: data.certificacoes || [],
         publicacoes: safePublicacoes || "",
         aceite_termos: data.aceiteTermos || false,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
+        updated_by_admin: userProfile && userProfile.userId !== user?.id // Marca como editado por admin se for diferente
       };
+
+      console.log('[DEBUG][useProfileSave] Dados a serem salvos:', {
+        profileId: userProfile?.id,
+        originalUserId: userProfile?.userId,
+        currentUserId: user?.id,
+        updatedByAdmin: profileData.updated_by_admin,
+        profileData
+      });
 
       let profileId = userProfile?.id;
       if (userProfile) {
@@ -82,10 +91,16 @@ export const useProfileSave = () => {
             certificacoes,
             publicacoes,
             aceite_termos,
-            updated_at
+            updated_at,
+            updated_by_admin
           `);
 
-        if (error) throw error;
+        if (error) {
+          console.error('[DEBUG][useProfileSave] Erro ao atualizar perfil:', error);
+          throw error;
+        }
+
+        console.log('[DEBUG][useProfileSave] Perfil atualizado com sucesso para ID:', userProfile.id);
       } else {
         const { data: newProfile, error } = await supabase
           .from('profiles')
@@ -108,12 +123,17 @@ export const useProfileSave = () => {
             certificacoes,
             publicacoes,
             aceite_termos,
-            updated_at
+            updated_at,
+            updated_by_admin
           `)
           .single();
 
-        if (error) throw error;
+        if (error) {
+          console.error('[DEBUG][useProfileSave] Erro ao criar perfil:', error);
+          throw error;
+        }
         profileId = newProfile.id;
+        console.log('[DEBUG][useProfileSave] Novo perfil criado com ID:', profileId);
       }
 
       // Salva dados relacionados usando funções separadas
@@ -122,6 +142,7 @@ export const useProfileSave = () => {
         await saveProjects(profileId, projetos);
         await saveProfessionalExperiences(profileId, data.experienciasProfissionais);
         await saveAvailability(profileId, disponibilidade);
+        console.log('[DEBUG][useProfileSave] Dados relacionados salvos para perfil ID:', profileId);
       }
       onSuccess?.();
 

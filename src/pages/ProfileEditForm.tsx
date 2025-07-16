@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
@@ -42,7 +43,7 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ profileId, isAdminEdi
     setProjetos,
     disponibilidade,
     setDisponibilidade
-  } = useProfileEditFormController();
+  } = useProfileEditFormController(profileId, isAdminEdit);
 
   function renderFormErrors() {
     const errors = form.formState.errors;
@@ -66,6 +67,7 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ profileId, isAdminEdi
         </ul>
       </div>;
   }
+
   if (loading) {
     return <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
@@ -74,14 +76,29 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ profileId, isAdminEdi
         </div>
       </div>;
   }
+
+  // Debug info para o teste
+  console.log('[DEBUG][ProfileEditForm] Props recebidas:', {
+    profileId,
+    isAdminEdit,
+    userProfileId: userProfile?.id,
+    userProfileName: userProfile?.name
+  });
+
   return <div className="max-w-6xl mx-auto space-y-6">
       <div className="text-center space-y-4">
         <h1 className="text-3xl font-bold text-gray-900">
-          {userProfile ? 'Editar Perfil' : 'Criar Perfil'}
+          {isAdminEdit && userProfile ? `Editando Perfil: ${userProfile.name}` : userProfile ? 'Editar Perfil' : 'Criar Perfil'}
         </h1>
         <p className="text-lg text-gray-600">
-          Complete suas informações para aparecer nas buscas públicas
+          {isAdminEdit ? 'Editando perfil como administrador' : 'Complete suas informações para aparecer nas buscas públicas'}
         </p>
+        {isAdminEdit && (
+          <div className="bg-orange-100 border border-orange-300 text-orange-800 p-3 rounded-lg">
+            <strong>Modo Administrador:</strong> Você está editando o perfil de outro usuário. 
+            {userProfile && ` (ID: ${userProfile.id})`}
+          </div>
+        )}
       </div>
 
       <StatusMessages error={error} successMessage={successMessage} />
@@ -94,7 +111,6 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ profileId, isAdminEdi
 
           <CargoUnidade form={form} safeCargos={safeCargos} safeFuncoes={safeFuncoes} safeUnidades={safeUnidades} isValidSelectValue={isValidSelectValue} />
 
-          {/* Removido InterestAreaSelector antigo de areasConhecimento */}
           <InterestAreaSelector form={form} fieldName="temasInteresse" />
 
           <AcademicFormation form={form} />
@@ -124,8 +140,6 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ profileId, isAdminEdi
           })} safeFormasContato={safeFormasContato} isValidSelectValue={isValidSelectValue} />
             <LanguagesSection form={form} />
           </div>
-
-          {/* Removido campo "especializacoes" e componentes relativos */}
 
           <AdditionalInfo form={form} />
 
