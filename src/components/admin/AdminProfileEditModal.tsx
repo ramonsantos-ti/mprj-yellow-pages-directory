@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -59,10 +58,10 @@ const AdminProfileEditModal: React.FC<AdminProfileEditModalProps> = ({
       biografia: profile.biografia || '',
       linkCurriculo: profile.linkCurriculo || '',
       publicacoes: profile.publicacoes || '',
-      // Valores iniciais para experiência profissional
-      tempoMPRJ: profile.experienciasProfissionais?.[0]?.tempo_mprj || '',
-      experienciaAnterior: profile.experienciasProfissionais?.[0]?.experiencia_anterior || '',
-      projetosInternos: profile.experienciasProfissionais?.[0]?.projetos_internos || '',
+      // Valores iniciais para experiência profissional - usando camelCase
+      tempoMPRJ: profile.experienciasProfissionais?.[0]?.tempoMPRJ || '',
+      experienciaAnterior: profile.experienciasProfissionais?.[0]?.experienciaAnterior || '',
+      projetosInternos: profile.experienciasProfissionais?.[0]?.projetosInternos || '',
     }
   });
 
@@ -75,11 +74,11 @@ const AdminProfileEditModal: React.FC<AdminProfileEditModalProps> = ({
       idiomas: selectedIdiomas,
       temasInteresse: selectedTemas,
       certificacoes: selectedCertificacoes,
-      // Incluir experiência profissional
+      // Incluir experiência profissional - usando camelCase
       experienciasProfissionais: [{
-        tempo_mprj: data.tempoMPRJ || '',
-        experiencia_anterior: data.experienciaAnterior || '',
-        projetos_internos: data.projetosInternos || '',
+        tempoMPRJ: data.tempoMPRJ || '',
+        experienciaAnterior: data.experienciaAnterior || '',
+        projetosInternos: data.projetosInternos || '',
         publicacoes: data.publicacoes || ''
       }],
       lastUpdated: new Date(),
