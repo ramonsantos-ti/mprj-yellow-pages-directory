@@ -143,31 +143,34 @@ export type Database = {
       }
       professional_experiences: {
         Row: {
+          atividades: string | null
+          cargo_funcao: string | null
           created_at: string | null
-          experiencia_anterior: string | null
+          data_fim: string | null
+          data_inicio: string | null
+          empresa_instituicao: string | null
           id: string
           profile_id: string | null
-          projetos_internos: string | null
-          publicacoes: string | null
-          tempo_mprj: string | null
         }
         Insert: {
+          atividades?: string | null
+          cargo_funcao?: string | null
           created_at?: string | null
-          experiencia_anterior?: string | null
+          data_fim?: string | null
+          data_inicio?: string | null
+          empresa_instituicao?: string | null
           id?: string
           profile_id?: string | null
-          projetos_internos?: string | null
-          publicacoes?: string | null
-          tempo_mprj?: string | null
         }
         Update: {
+          atividades?: string | null
+          cargo_funcao?: string | null
           created_at?: string | null
-          experiencia_anterior?: string | null
+          data_fim?: string | null
+          data_inicio?: string | null
+          empresa_instituicao?: string | null
           id?: string
           profile_id?: string | null
-          projetos_internos?: string | null
-          publicacoes?: string | null
-          tempo_mprj?: string | null
         }
         Relationships: [
           {

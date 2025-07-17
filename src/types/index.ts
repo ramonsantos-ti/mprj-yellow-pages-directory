@@ -22,7 +22,6 @@ export interface Profile {
   telefone?: string;
   email: string;
   biografia?: string;
-  // especializacoes?: string; // REMOVIDO
   projetos: Project[];
   temasInteresse: string[];
   formacaoAcademica: FormacaoAcademica[];
@@ -59,10 +58,12 @@ export interface FormacaoAcademica {
 }
 
 export interface ExperienciaProfissional {
-  tempoMPRJ: string;
-  experienciaAnterior?: string;
-  projetosInternos?: string;
-  publicacoes?: string;
+  id?: string;
+  empresaInstituicao?: string;
+  cargoFuncao?: string;
+  dataInicio?: string;
+  dataFim?: string;
+  atividades?: string;
 }
 
 export interface Disponibilidade {
@@ -79,7 +80,7 @@ export interface SearchFilters {
   cargo?: string;
   funcao?: string;
   unidade?: string;
-  areaConhecimento?: string; // Não removemos filtros antigos agora, mas pode ser revisado depois
+  areaConhecimento?: string;
   habilidadeTecnica?: string;
   formacao?: string;
   idioma?: string;

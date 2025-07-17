@@ -6,10 +6,11 @@ export async function saveProfessionalExperiences(profileId: string, experiencia
   if (experienciasProfissionais && experienciasProfissionais.length > 0) {
     const experiences = experienciasProfissionais.map((exp: any) => ({
       profile_id: profileId,
-      tempo_mprj: exp.tempoMPRJ || null,
-      experiencia_anterior: exp.experienciaAnterior || null,
-      projetos_internos: exp.projetosInternos || null,
-      publicacoes: exp.publicacoes || null
+      empresa_instituicao: exp.empresaInstituicao || null,
+      cargo_funcao: exp.cargoFuncao || null,
+      data_inicio: exp.dataInicio || null,
+      data_fim: exp.dataFim || null,
+      atividades: exp.atividades || null
     }));
     const { error } = await supabase.from('professional_experiences').insert(experiences);
     if (error) {

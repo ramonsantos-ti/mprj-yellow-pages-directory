@@ -10,12 +10,14 @@ export const formacaoAcademicaSchema = z.object({
   ano: z.number().min(1900, 'Ano deve ser maior que 1900').max(new Date().getFullYear(), 'Ano não pode ser no futuro'),
 });
 
-// Schema para experiência profissional
+// Schema para experiência profissional - atualizado com novos campos
 export const experienciaProfissionalSchema = z.object({
-  tempoMPRJ: z.string().optional(),
-  experienciaAnterior: z.string().optional(),
-  projetosInternos: z.string().optional(),
-  publicacoes: z.string().optional(),
+  id: z.string().optional(),
+  empresaInstituicao: z.string().optional(),
+  cargoFuncao: z.string().optional(),
+  dataInicio: z.string().optional(),
+  dataFim: z.string().optional(),
+  atividades: z.string().optional(),
 });
 
 // Schema principal do perfil
@@ -57,14 +59,7 @@ export const defaultFormValues = {
   informacoesComplementares: '',
   aceiteTermos: false,
   formacaoAcademica: [],
-  experienciasProfissionais: [
-    {
-      tempoMPRJ: '',
-      experienciaAnterior: '',
-      projetosInternos: '',
-      publicacoes: ''
-    }
-  ],
+  experienciasProfissionais: [],
 };
 
 export type ProfileFormData = z.infer<typeof profileSchema>;

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -21,10 +22,6 @@ const adminProfileSchema = z.object({
   biografia: z.string().optional(),
   linkCurriculo: z.string().optional(),
   publicacoes: z.string().optional(),
-  // Campos de experiência profissional
-  tempoMPRJ: z.string().optional(),
-  experienciaAnterior: z.string().optional(),
-  projetosInternos: z.string().optional(),
 });
 
 type AdminProfileFormData = z.infer<typeof adminProfileSchema>;
@@ -46,6 +43,7 @@ const AdminProfileEditModal: React.FC<AdminProfileEditModalProps> = ({
   const [selectedIdiomas, setSelectedIdiomas] = useState<string[]>(profile.idiomas || []);
   const [selectedTemas, setSelectedTemas] = useState<string[]>(profile.temasInteresse || []);
   const [selectedCertificacoes, setSelectedCertificacoes] = useState<string[]>(profile.certificacoes || []);
+  const [experienciasProfissionais, setExperienciasProfissionais] = useState(profile.experienciasProfissionais || []);
   const [newTema, setNewTema] = useState('');
   const [newCertificacao, setNewCertificacao] = useState('');
 
@@ -58,10 +56,6 @@ const AdminProfileEditModal: React.FC<AdminProfileEditModalProps> = ({
       biografia: profile.biografia || '',
       linkCurriculo: profile.linkCurriculo || '',
       publicacoes: profile.publicacoes || '',
-      // Valores iniciais para experiência profissional - usando camelCase
-      tempoMPRJ: profile.experienciasProfissionais?.[0]?.tempoMPRJ || '',
-      experienciaAnterior: profile.experienciasProfissionais?.[0]?.experienciaAnterior || '',
-      projetosInternos: profile.experienciasProfissionais?.[0]?.projetosInternos || '',
     }
   });
 
@@ -74,13 +68,7 @@ const AdminProfileEditModal: React.FC<AdminProfileEditModalProps> = ({
       idiomas: selectedIdiomas,
       temasInteresse: selectedTemas,
       certificacoes: selectedCertificacoes,
-      // Incluir experiência profissional - usando camelCase
-      experienciasProfissionais: [{
-        tempoMPRJ: data.tempoMPRJ || '',
-        experienciaAnterior: data.experienciaAnterior || '',
-        projetosInternos: data.projetosInternos || '',
-        publicacoes: data.publicacoes || ''
-      }],
+      experienciasProfissionais: experienciasProfissionais,
       lastUpdated: new Date(),
       updatedByAdmin: true,
     };
@@ -118,6 +106,26 @@ const AdminProfileEditModal: React.FC<AdminProfileEditModalProps> = ({
     setSelectedItems: React.Dispatch<React.SetStateAction<string[]>>
   ) => {
     setSelectedItems(selectedItems.filter(i => i !== item));
+  };
+
+  const addExperience = () => {
+    setExperienciasProfissionais([...experienciasProfissionais, {
+      empresaInstituicao: '',
+      cargoFuncao: '',
+      dataInicio: '',
+      dataFim: '',
+      atividades: ''
+    }]);
+  };
+
+  const removeExperience = (index: number) => {
+    setExperienciasProfissionais(experienciasProfissionais.filter((_, i) => i !== index));
+  };
+
+  const updateExperience = (index: number, field: string, value: string) => {
+    const updated = [...experienciasProfissionais];
+    updated[index] = { ...updated[index], [field]: value };
+    setExperienciasProfissionais(updated);
   };
 
   return (
@@ -289,48 +297,77 @@ const AdminProfileEditModal: React.FC<AdminProfileEditModalProps> = ({
         {/* Experiência Profissional */}
         <Card>
           <CardHeader>
-            <CardTitle>Experiência Profissional</CardTitle>
+            <CardTitle className="flex items-center justify-between">
+              <span>Experiência Profissional</span>
+              <Button
+                type="button"
+                onClick={addExperience}
+                size="sm"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Adicionar
+              </Button>
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <FormField
-              control={form.control}
-              name="tempoMPRJ"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Tempo no MPRJ</FormLabel>
-                  <FormControl>
-                    <Textarea {...field} rows={2} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="experienciaAnterior"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Experiência Anterior</FormLabel>
-                  <FormControl>
-                    <Textarea {...field} rows={3} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="projetosInternos"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Projetos Internos</FormLabel>
-                  <FormControl>
-                    <Textarea {...field} rows={3} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {experienciasProfissionais.map((exp, index) => (
+              <div key={index} className="border border-gray-200 rounded-lg p-4">
+                <div className="flex justify-between items-center mb-4">
+                  <h4 className="font-medium">Experiência {index + 1}</h4>
+                  <Button
+                    type="button"
+                    onClick={() => removeExperience(index)}
+                    variant="outline"
+                    size="sm"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <FormLabel>Empresa/Instituição</FormLabel>
+                    <Input
+                      value={exp.empresaInstituicao || ''}
+                      onChange={(e) => updateExperience(index, 'empresaInstituicao', e.target.value)}
+                      placeholder="Nome da empresa/instituição"
+                    />
+                  </div>
+                  <div>
+                    <FormLabel>Cargo/Função</FormLabel>
+                    <Input
+                      value={exp.cargoFuncao || ''}
+                      onChange={(e) => updateExperience(index, 'cargoFuncao', e.target.value)}
+                      placeholder="Cargo ou função exercida"
+                    />
+                  </div>
+                  <div>
+                    <FormLabel>Data de Início</FormLabel>
+                    <Input
+                      type="date"
+                      value={exp.dataInicio || ''}
+                      onChange={(e) => updateExperience(index, 'dataInicio', e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <FormLabel>Data de Término</FormLabel>
+                    <Input
+                      type="date"
+                      value={exp.dataFim || ''}
+                      onChange={(e) => updateExperience(index, 'dataFim', e.target.value)}
+                    />
+                  </div>
+                  <div className="col-span-2">
+                    <FormLabel>Atividades</FormLabel>
+                    <Textarea
+                      value={exp.atividades || ''}
+                      onChange={(e) => updateExperience(index, 'atividades', e.target.value)}
+                      placeholder="Descreva as principais atividades desenvolvidas"
+                      rows={3}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
           </CardContent>
         </Card>
 
