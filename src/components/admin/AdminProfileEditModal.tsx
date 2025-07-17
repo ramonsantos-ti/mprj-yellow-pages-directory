@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -21,6 +22,10 @@ const adminProfileSchema = z.object({
   biografia: z.string().optional(),
   linkCurriculo: z.string().optional(),
   publicacoes: z.string().optional(),
+  // Campos de experiência profissional
+  tempoMPRJ: z.string().optional(),
+  experienciaAnterior: z.string().optional(),
+  projetosInternos: z.string().optional(),
 });
 
 type AdminProfileFormData = z.infer<typeof adminProfileSchema>;
@@ -54,6 +59,10 @@ const AdminProfileEditModal: React.FC<AdminProfileEditModalProps> = ({
       biografia: profile.biografia || '',
       linkCurriculo: profile.linkCurriculo || '',
       publicacoes: profile.publicacoes || '',
+      // Valores iniciais para experiência profissional
+      tempoMPRJ: profile.experienciasProfissionais?.[0]?.tempo_mprj || '',
+      experienciaAnterior: profile.experienciasProfissionais?.[0]?.experiencia_anterior || '',
+      projetosInternos: profile.experienciasProfissionais?.[0]?.projetos_internos || '',
     }
   });
 
@@ -66,6 +75,13 @@ const AdminProfileEditModal: React.FC<AdminProfileEditModalProps> = ({
       idiomas: selectedIdiomas,
       temasInteresse: selectedTemas,
       certificacoes: selectedCertificacoes,
+      // Incluir experiência profissional
+      experienciasProfissionais: [{
+        tempo_mprj: data.tempoMPRJ || '',
+        experiencia_anterior: data.experienciaAnterior || '',
+        projetos_internos: data.projetosInternos || '',
+        publicacoes: data.publicacoes || ''
+      }],
       lastUpdated: new Date(),
       updatedByAdmin: true,
     };
@@ -268,6 +284,54 @@ const AdminProfileEditModal: React.FC<AdminProfileEditModalProps> = ({
                 </Badge>
               ))}
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Experiência Profissional */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Experiência Profissional</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <FormField
+              control={form.control}
+              name="tempoMPRJ"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Tempo no MPRJ</FormLabel>
+                  <FormControl>
+                    <Textarea {...field} rows={2} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="experienciaAnterior"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Experiência Anterior</FormLabel>
+                  <FormControl>
+                    <Textarea {...field} rows={3} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="projetosInternos"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Projetos Internos</FormLabel>
+                  <FormControl>
+                    <Textarea {...field} rows={3} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </CardContent>
         </Card>
 
