@@ -67,7 +67,8 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profile }) => {
               <h1 className="text-3xl font-bold text-gray-900 mb-2">{profile.name}</h1>
               <p className="text-lg text-gray-600 mb-4">Matrícula: {profile.matricula}</p>
               
-              <div className="space-y-3">
+              {/* Contato - E-mail e Telefone lado a lado */}
+              <div className="flex flex-wrap gap-6 mb-4">
                 <div className="flex items-center space-x-2 text-gray-600">
                   <Mail className="w-4 h-4" />
                   <span>{profile.email}</span>
@@ -81,8 +82,8 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profile }) => {
                 )}
               </div>
 
-              {/* Cargo, Função e Unidade */}
-              <div className="mt-4 space-y-2">
+              {/* Cargo, Função e Unidade lado a lado */}
+              <div className="grid gap-4 md:grid-cols-3">
                 {profile.cargo && profile.cargo.length > 0 && (
                   <div>
                     <h3 className="text-sm font-medium text-gray-900 mb-1">Cargo:</h3>

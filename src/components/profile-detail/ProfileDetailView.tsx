@@ -31,16 +31,29 @@ const ProfileDetailView: React.FC<ProfileDetailViewProps> = ({ profileId }) => {
   return (
     <div className="space-y-6">
       <ProfileHeader profile={userProfile} />
-      <AcademicFormationCard formacaoAcademica={userProfile.formacaoAcademica || []} />
-      <ProfessionalExperienceCard experienciasProfissionais={userProfile.experienciasProfissionais || []} />
-      <ProjectsCard projetos={userProfile.projetos || []} />
-      <AvailabilityCard
-        disponibilidade={userProfile.disponibilidade}
-        contato={userProfile.contato}
-      />
-      <ProfileAdditionalInfo informacoesComplementares={userProfile.informacoesComplementares || ""} />
+      
+      {/* Formação Acadêmica e Experiência Profissional lado a lado */}
+      <div className="grid gap-6 md:grid-cols-2">
+        <AcademicFormationCard formacaoAcademica={userProfile.formacaoAcademica || []} />
+        <ProfessionalExperienceCard experienciasProfissionais={userProfile.experienciasProfissionais || []} />
+      </div>
+
+      {/* Disponibilidade e Contato e Projetos lado a lado */}
+      <div className="grid gap-6 md:grid-cols-2">
+        <AvailabilityCard
+          disponibilidade={userProfile.disponibilidade}
+          contato={userProfile.contato}
+        />
+        <ProjectsCard projetos={userProfile.projetos || []} />
+      </div>
+
+      {/* Áreas de Interesse e Informações Complementares lado a lado */}
+      <div className="grid gap-6 md:grid-cols-2">
+        <ProfileInterestAreas temasInteresse={userProfile.temasInteresse || []} />
+        <ProfileAdditionalInfo informacoesComplementares={userProfile.informacoesComplementares || ""} />
+      </div>
+
       <LanguagesAndCertifications idiomas={userProfile.idiomas || []} certificacoes={userProfile.certificacoes || []} />
-      <ProfileInterestAreas temasInteresse={userProfile.temasInteresse || []} />
       <PublicationsAndCurriculum
         publicacoes={userProfile.publicacoes || ""}
         linkCurriculo={userProfile.linkCurriculo || ""}
