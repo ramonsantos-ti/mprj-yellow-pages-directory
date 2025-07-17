@@ -14,6 +14,7 @@ import AvailabilitySection from '../components/profile/AvailabilitySection';
 import ContactPreferences from '../components/profile/ContactPreferences';
 import PhotoUpload from '../components/profile/PhotoUpload';
 import CurriculumSection from '../components/profile/CurriculumSection';
+import ProfessionalExperienceSection from '../components/profile/ProfessionalExperienceSection';
 import StatusMessages from '../components/profile/StatusMessages';
 import InterestAreaSelector from '../components/InterestAreaSelector';
 import LanguagesSection from '../components/profile/LanguagesSection';
@@ -113,7 +114,10 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ profileId, isAdminEdi
 
           <InterestAreaSelector form={form} fieldName="temasInteresse" />
 
-          <AcademicFormation form={form} />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <AcademicFormation form={form} />
+            <ProfessionalExperienceSection form={form} />
+          </div>
 
           <ProjectsManager projetos={projetos} setProjetos={setProjetos} />
 
@@ -121,6 +125,8 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ profileId, isAdminEdi
             <CertificationsSection form={form} />
             <PublicationsSection form={form} />
           </div>
+
+          <CurriculumSection form={form} />
 
           <AvailabilitySection tipoColaboracao={disponibilidade.tipoColaboracao || []} setTipoColaboracao={value => setDisponibilidade({
           ...disponibilidade,

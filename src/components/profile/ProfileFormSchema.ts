@@ -1,57 +1,45 @@
-import * as z from 'zod';
 
-const formacaoAcademicaSchema = z.object({
+import { z } from 'zod';
+
+// Schema para formação acadêmica
+export const formacaoAcademicaSchema = z.object({
+  id: z.string().optional(),
   nivel: z.string().min(1, 'Nível é obrigatório'),
   instituicao: z.string().min(1, 'Instituição é obrigatória'),
   curso: z.string().min(1, 'Curso é obrigatório'),
-  ano: z.number().min(1900, 'Ano deve ser válido').max(new Date().getFullYear() + 10, 'Ano não pode ser muito futuro')
+  ano: z.number().min(1900, 'Ano deve ser maior que 1900').max(new Date().getFullYear(), 'Ano não pode ser no futuro'),
 });
 
+// Schema para experiência profissional
+export const experienciaProfissionalSchema = z.object({
+  tempoMPRJ: z.string().optional(),
+  experienciaAnterior: z.string().optional(),
+  projetosInternos: z.string().optional(),
+  publicacoes: z.string().optional(),
+});
+
+// Schema principal do perfil
 export const profileSchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório'),
   matricula: z.string().min(1, 'Matrícula é obrigatória'),
   email: z.string().email('Email inválido'),
   telefone: z.string().optional(),
-  cargo: z.array(z.string()).min(1, 'Pelo menos um cargo é obrigatório'),
-  funcao: z.array(z.string()),
-  unidade: z.array(z.string()).min(1, 'Pelo menos uma unidade é obrigatória'),
-  temasInteresse: z.array(z.string()), // <-- agora é obrigatório
-  idiomas: z.array(z.string()),
-  linkCurriculo: z.string().optional(),
-  certificacoes: z.array(z.string()),
-  aceiteTermos: z.boolean().refine(val => val === true, 'Você deve aceitar os termos'),
+  cargo: z.array(z.string()).optional(),
+  funcao: z.array(z.string()).optional(),
+  unidade: z.array(z.string()).optional(),
+  temasInteresse: z.array(z.string()).optional(),
+  idiomas: z.array(z.string()).optional(),
   biografia: z.string().optional(),
+  linkCurriculo: z.string().optional(),
+  certificacoes: z.array(z.string()).optional(),
   publicacoes: z.string().optional(),
   informacoesComplementares: z.string().optional(),
-  formacaoAcademica: z
-    .array(formacaoAcademicaSchema)
-    .optional()
-    .refine(
-      (arr) => {
-        if (!arr) return true;
-        if (arr.length === 0) return true;
-        return arr.every(
-          (item) =>
-            item.nivel &&
-            item.instituicao &&
-            item.curso &&
-            item.ano &&
-            typeof item.nivel === 'string' &&
-            typeof item.instituicao === 'string' &&
-            typeof item.curso === 'string' &&
-            typeof item.ano === 'number' &&
-            item.nivel.trim() !== '' &&
-            item.instituicao.trim() !== '' &&
-            item.curso.trim() !== ''
-        );
-      },
-      {
-        message:
-          'Se você começou a preencher uma formação acadêmica, complete todos os campos ou exclua a entrada para salvar o perfil.'
-      }
-    ),
+  aceiteTermos: z.boolean().refine(val => val === true, 'Você deve aceitar os termos'),
+  formacaoAcademica: z.array(formacaoAcademicaSchema).optional(),
+  experienciasProfissionais: z.array(experienciaProfissionalSchema).optional(),
 });
 
+// Valores padrão para o formulário
 export const defaultFormValues = {
   name: '',
   matricula: '',
@@ -62,11 +50,21 @@ export const defaultFormValues = {
   unidade: [],
   temasInteresse: [],
   idiomas: [],
+  biografia: '',
   linkCurriculo: '',
   certificacoes: [],
+  publicacoes: '',
+  informacoesComplementares: '',
   aceiteTermos: false,
   formacaoAcademica: [],
-  biografia: '',
-  publicacoes: '',
-  informacoesComplementares: "",
+  experienciasProfissionais: [
+    {
+      tempoMPRJ: '',
+      experienciaAnterior: '',
+      projetosInternos: '',
+      publicacoes: ''
+    }
+  ],
 };
+
+export type ProfileFormData = z.infer<typeof profileSchema>;
