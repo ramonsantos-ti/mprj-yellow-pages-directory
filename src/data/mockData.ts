@@ -196,8 +196,11 @@ export const mockProfiles: Profile[] = [
     ],
     experienciasProfissionais: [
       {
-        tempoMPRJ: '20 anos',
-        experienciaAnterior: 'Advogada constitucionalista por 5 anos, Professora universitária por 8 anos'
+        empresaInstituicao: 'Escritório de Advocacia Silva & Associados',
+        cargoFuncao: 'Advogada Constitucionalista',
+        dataInicio: '2000-01-15',
+        dataFim: '2005-12-31',
+        atividades: 'Consultoria em direito constitucional e administrativo'
       }
     ],
     idiomas: ['Português', 'Inglês', 'Francês', 'Espanhol'],
@@ -244,8 +247,11 @@ export const mockProfiles: Profile[] = [
     ],
     experienciasProfissionais: [
       {
-        tempoMPRJ: '18 anos',
-        experienciaAnterior: 'Auditor público por 7 anos'
+        empresaInstituicao: 'Tribunal de Contas do Estado',
+        cargoFuncao: 'Auditor Público',
+        dataInicio: '1998-03-01',
+        dataFim: '2005-02-28',
+        atividades: 'Auditoria de contas públicas e controle interno'
       }
     ],
     idiomas: ['Português', 'Inglês', 'Italiano'],
@@ -303,8 +309,11 @@ export const mockProfiles: Profile[] = [
     ],
     experienciasProfissionais: [
       {
-        tempoMPRJ: '10 anos',
-        experienciaAnterior: 'Defensora Pública por 3 anos'
+        empresaInstituicao: 'Defensoria Pública do Estado',
+        cargoFuncao: 'Defensora Pública',
+        dataInicio: '2010-01-15',
+        dataFim: '2013-12-31',
+        atividades: 'Defesa de direitos das mulheres vítimas de violência'
       }
     ],
     idiomas: ['Português', 'Inglês', 'Francês'],
@@ -362,8 +371,11 @@ export const mockProfiles: Profile[] = [
     ],
     experienciasProfissionais: [
       {
-        tempoMPRJ: '8 anos',
-        experienciaAnterior: 'Arquiteto de Software em multinacional de tecnologia por 6 anos'
+        empresaInstituicao: 'TechGlobal Solutions',
+        cargoFuncao: 'Arquiteto de Software',
+        dataInicio: '2010-03-01',
+        dataFim: '2016-02-29',
+        atividades: 'Arquitetura de sistemas distribuídos e soluções em nuvem'
       }
     ],
     idiomas: ['Português', 'Inglês', 'Japonês', 'Mandarim'],
@@ -421,8 +433,11 @@ export const mockProfiles: Profile[] = [
     ],
     experienciasProfissionais: [
       {
-        tempoMPRJ: '9 anos',
-        experienciaAnterior: 'Consultor ambiental por 2 anos'
+        empresaInstituicao: 'Consultoria Ambiental Verde',
+        cargoFuncao: 'Consultor Ambiental',
+        dataInicio: '2013-01-15',
+        dataFim: '2015-01-14',
+        atividades: 'Estudos de impacto ambiental e licenciamento'
       }
     ],
     idiomas: ['Português', 'Inglês', 'Espanhol'],
@@ -480,8 +495,11 @@ export const mockProfiles: Profile[] = [
     ],
     experienciasProfissionais: [
       {
-        tempoMPRJ: '6 anos',
-        experienciaAnterior: 'Jornalista em veículos de comunicação por 4 anos'
+        empresaInstituicao: 'Jornal O Globo',
+        cargoFuncao: 'Jornalista',
+        dataInicio: '2014-01-15',
+        dataFim: '2018-01-14',
+        atividades: 'Cobertura de política e governo, redação de matérias'
       }
     ],
     idiomas: ['Português', 'Inglês', 'Francês'],
@@ -539,8 +557,11 @@ export const mockProfiles: Profile[] = [
     ],
     experienciasProfissionais: [
       {
-        tempoMPRJ: '7 anos',
-        experienciaAnterior: 'Diplomata no Itamaraty por 5 anos'
+        empresaInstituicao: 'Ministério das Relações Exteriores',
+        cargoFuncao: 'Diplomata',
+        dataInicio: '2012-01-15',
+        dataFim: '2017-01-14',
+        atividades: 'Negociações internacionais e assessoria diplomática'
       }
     ],
     idiomas: ['Português', 'Inglês', 'Espanhol', 'Francês', 'Alemão'],
@@ -593,8 +614,11 @@ export const mockProfiles: Profile[] = [
     ],
     experienciasProfissionais: [
       {
-        tempoMPRJ: '5 anos',
-        experienciaAnterior: 'Analista de projetos em consultoria por 3 anos'
+        empresaInstituicao: 'McKinsey & Company',
+        cargoFuncao: 'Analista de Projetos',
+        dataInicio: '2016-01-15',
+        dataFim: '2019-01-14',
+        atividades: 'Gestão de projetos estratégicos e consultoria empresarial'
       }
     ],
     idiomas: ['Português', 'Espanhol', 'Inglês'],
@@ -647,8 +671,11 @@ export const mockProfiles: Profile[] = [
     ],
     experienciasProfissionais: [
       {
-        tempoMPRJ: '2 anos',
-        experienciaAnterior: 'Médica em hospital público por 1 ano'
+        empresaInstituicao: 'Hospital Municipal São João',
+        cargoFuncao: 'Médica',
+        dataInicio: '2021-01-15',
+        dataFim: '2022-01-14',
+        atividades: 'Atendimento médico e procedimentos cirúrgicos'
       }
     ],
     idiomas: ['Português', 'Árabe', 'Inglês', 'Francês'],
@@ -706,8 +733,11 @@ export const mockProfiles: Profile[] = [
     ],
     experienciasProfissionais: [
       {
-        tempoMPRJ: '4 anos',
-        experienciaAnterior: 'Analista sênior em banco de investimento por 8 anos, Professor universitário por 3 anos'
+        empresaInstituicao: 'Banco BTG Pactual',
+        cargoFuncao: 'Analista Sênior',
+        dataInicio: '2004-01-15',
+        dataFim: '2012-01-14',
+        atividades: 'Análise financeira e estruturação de investimentos'
       }
     ],
     idiomas: ['Português', 'Hindi', 'Inglês', 'Gujarati', 'Espanhol'],
@@ -765,8 +795,11 @@ export const mockProfiles: Profile[] = [
     ],
     experienciasProfissionais: [
       {
-        tempoMPRJ: '14 anos',
-        experienciaAnterior: 'Delegado de Polícia Civil por 2 anos'
+        empresaInstituicao: 'Polícia Civil do Rio de Janeiro',
+        cargoFuncao: 'Delegado de Polícia',
+        dataInicio: '2008-01-15',
+        dataFim: '2010-01-14',
+        atividades: 'Investigação criminal e coordenação de operações'
       }
     ],
     idiomas: ['Português', 'Inglês', 'Espanhol'],
@@ -824,8 +857,11 @@ export const mockProfiles: Profile[] = [
     ],
     experienciasProfissionais: [
       {
-        tempoMPRJ: '7 anos',
-        experienciaAnterior: 'Consultora em RH por 3 anos, Psicóloga organizacional por 2 anos'
+        empresaInstituicao: 'Consultoria RH Plus',
+        cargoFuncao: 'Consultora em Recursos Humanos',
+        dataInicio: '2015-01-15',
+        dataFim: '2018-01-14',
+        atividades: 'Recrutamento, seleção e desenvolvimento organizacional'
       }
     ],
     idiomas: ['Português', 'Espanhol', 'Inglês', 'Francês'],
@@ -883,8 +919,11 @@ export const mockProfiles: Profile[] = [
     ],
     experienciasProfissionais: [
       {
-        tempoMPRJ: '25 anos',
-        experienciaAnterior: 'Consultor em gestão pública por 3 anos'
+        empresaInstituicao: 'Consultoria Gestão Pública',
+        cargoFuncao: 'Consultor Sênior',
+        dataInicio: '1999-01-15',
+        dataFim: '2002-01-14',
+        atividades: 'Modernização de processos e sistemas públicos'
       }
     ],
     idiomas: ['Português', 'Inglês', 'Espanhol', 'Francês'],
@@ -942,8 +981,11 @@ export const mockProfiles: Profile[] = [
     ],
     experienciasProfissionais: [
       {
-        tempoMPRJ: '11 anos',
-        experienciaAnterior: 'Advogada popular por 2 anos, Assistente social por 3 anos'
+        empresaInstituicao: 'Centro de Direitos Humanos',
+        cargoFuncao: 'Advogada Popular',
+        dataInicio: '2011-01-15',
+        dataFim: '2013-01-14',
+        atividades: 'Defesa de direitos sociais e assessoria jurídica popular'
       }
     ],
     idiomas: ['Português', 'Inglês', 'Espanhol'],

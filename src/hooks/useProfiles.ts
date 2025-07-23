@@ -68,10 +68,12 @@ export const useProfiles = () => {
             ano: f.ano
           })) || [],
           experienciasProfissionais: profile.professional_experiences?.map((e: any) => ({
-            tempoMPRJ: e.tempo_mprj || '',
-            experienciaAnterior: e.experiencia_anterior || '',
-            projetosInternos: e.projetos_internos || '',
-            publicacoes: e.publicacoes || ''
+            id: e.id,
+            empresaInstituicao: e.empresa_instituicao || '',
+            cargoFuncao: e.cargo_funcao || '',
+            dataInicio: e.data_inicio || '',
+            dataFim: e.data_fim || '',
+            atividades: e.atividades || ''
           })) || [],
           disponibilidade: profile.availability?.[0] ? {
             tipoColaboracao: profile.availability[0].tipo_colaboracao || [],

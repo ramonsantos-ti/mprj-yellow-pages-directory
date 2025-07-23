@@ -24,28 +24,30 @@ const ProfessionalExperienceCard: React.FC<ProfessionalExperienceCardProps> = ({
           <div className="space-y-4">
             {experienciasProfissionais.map((exp, index) => (
               <div key={index} className="border-l-4 border-green-200 pl-4">
-                {exp.tempoMPRJ && (
+                {exp.empresaInstituicao && (
                   <div className="mb-2">
-                    <h4 className="font-semibold text-gray-900">Tempo no MPRJ</h4>
-                    <p className="text-gray-700">{exp.tempoMPRJ}</p>
+                    <h4 className="font-semibold text-gray-900">Empresa/Instituição</h4>
+                    <p className="text-gray-700">{exp.empresaInstituicao}</p>
                   </div>
                 )}
-                {exp.experienciaAnterior && (
+                {exp.cargoFuncao && (
                   <div className="mb-2">
-                    <h4 className="font-semibold text-gray-900">Experiência Anterior</h4>
-                    <p className="text-gray-700">{exp.experienciaAnterior}</p>
+                    <h4 className="font-semibold text-gray-900">Cargo/Função</h4>
+                    <p className="text-gray-700">{exp.cargoFuncao}</p>
                   </div>
                 )}
-                {exp.projetosInternos && (
+                {(exp.dataInicio || exp.dataFim) && (
                   <div className="mb-2">
-                    <h4 className="font-semibold text-gray-900">Projetos Internos</h4>
-                    <p className="text-gray-700">{exp.projetosInternos}</p>
+                    <h4 className="font-semibold text-gray-900">Período</h4>
+                    <p className="text-gray-700">
+                      {exp.dataInicio} {exp.dataFim ? `- ${exp.dataFim}` : '- Atual'}
+                    </p>
                   </div>
                 )}
-                {exp.publicacoes && (
+                {exp.atividades && (
                   <div className="mb-2">
-                    <h4 className="font-semibold text-gray-900">Publicações Relacionadas</h4>
-                    <p className="text-gray-700">{exp.publicacoes}</p>
+                    <h4 className="font-semibold text-gray-900">Atividades</h4>
+                    <p className="text-gray-700">{exp.atividades}</p>
                   </div>
                 )}
               </div>
