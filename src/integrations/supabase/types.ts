@@ -52,42 +52,170 @@ export type Database = {
           },
         ]
       }
+      audit_alerts: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          alert_type: string
+          audit_log_id: string | null
+          created_at: string | null
+          id: string
+          is_read: boolean | null
+          message: string
+          severity: string
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          alert_type: string
+          audit_log_id?: string | null
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message: string
+          severity: string
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          alert_type?: string
+          audit_log_id?: string | null
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message?: string
+          severity?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_alerts_audit_log_id_fkey"
+            columns: ["audit_log_id"]
+            isOneToOne: false
+            referencedRelation: "audit_logs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      audit_categories: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          notify_admins: boolean | null
+          severity_level: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          notify_admins?: boolean | null
+          severity_level: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          notify_admins?: boolean | null
+          severity_level?: string
+        }
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action: string
+          affected_fields: string[] | null
+          changes_summary: Json | null
           created_at: string | null
           details: string
           entity_id: string | null
           entity_type: string
+          error_message: string | null
           id: string
+          ip_address: unknown | null
+          module: string | null
           new_value: string | null
+          operation_type: string | null
           previous_value: string | null
+          session_id: string | null
+          severity_level: string | null
+          success: boolean | null
+          user_agent: string | null
           user_matricula: string | null
           user_name: string
         }
         Insert: {
           action: string
+          affected_fields?: string[] | null
+          changes_summary?: Json | null
           created_at?: string | null
           details: string
           entity_id?: string | null
           entity_type: string
+          error_message?: string | null
           id?: string
+          ip_address?: unknown | null
+          module?: string | null
           new_value?: string | null
+          operation_type?: string | null
           previous_value?: string | null
+          session_id?: string | null
+          severity_level?: string | null
+          success?: boolean | null
+          user_agent?: string | null
           user_matricula?: string | null
           user_name: string
         }
         Update: {
           action?: string
+          affected_fields?: string[] | null
+          changes_summary?: Json | null
           created_at?: string | null
           details?: string
           entity_id?: string | null
           entity_type?: string
+          error_message?: string | null
           id?: string
+          ip_address?: unknown | null
+          module?: string | null
           new_value?: string | null
+          operation_type?: string | null
           previous_value?: string | null
+          session_id?: string | null
+          severity_level?: string | null
+          success?: boolean | null
+          user_agent?: string | null
           user_matricula?: string | null
           user_name?: string
+        }
+        Relationships: []
+      }
+      audit_settings: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          setting_key: string
+          setting_value: Json
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          setting_key: string
+          setting_value: Json
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          setting_key?: string
+          setting_value?: Json
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -303,6 +431,26 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_audit_log: {
+        Args: {
+          p_action: string
+          p_entity_type: string
+          p_entity_id?: string
+          p_user_name?: string
+          p_user_matricula?: string
+          p_details?: string
+          p_previous_value?: string
+          p_new_value?: string
+          p_severity_level?: string
+          p_operation_type?: string
+          p_module?: string
+          p_changes_summary?: Json
+          p_affected_fields?: string[]
+          p_success?: boolean
+          p_error_message?: string
+        }
+        Returns: string
+      }
       get_user_role: {
         Args: { user_uuid: string }
         Returns: Database["public"]["Enums"]["app_role"]
