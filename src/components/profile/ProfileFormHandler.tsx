@@ -46,6 +46,7 @@ export const useProfileFormHandler = ({
     form.setValue('publicacoes', profile.publicacoes ?? "");
     form.setValue('aceiteTermos', profile.aceiteTermos || false);
     form.setValue('formacaoAcademica', profile.formacaoAcademica || []);
+    form.setValue('experienciasProfissionais', profile.experienciasProfissionais || []);
     form.setValue('informacoesComplementares', profile.informacoesComplementares ?? "");
 
     setProjetos(profile.projetos || []);
