@@ -18,30 +18,53 @@ export const useProfileData = (profileId?: string) => {
     try {
       setLoading(true);
       
-      // Se não tem profileId, usa o usuário logado
-      const targetUserId = profileId || user?.id;
+      let profile;
       
-      if (!targetUserId) {
-        setError('Usuário não encontrado');
-        return null;
-      }
+      if (profileId) {
+        // Modo admin: buscar perfil específico por ID do perfil
+        console.log('Buscando perfil específico por ID:', profileId);
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', profileId)
+          .single();
+          
+        if (error) {
+          console.error('Erro ao buscar perfil por ID:', error);
+          throw error;
+        }
+        
+        profile = data;
+      } else {
+        // Modo usuário: buscar próprio perfil
+        if (!user?.id) {
+          setError('Usuário não encontrado');
+          return null;
+        }
+        
+        console.log('Buscando próprio perfil do usuário:', user.id);
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
 
-      // Primeiro busca o perfil básico
-      const { data: profile, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq(profileId ? 'id' : 'user_id', targetUserId)
-        .single();
+        if (error && error.code !== 'PGRST116') {
+          console.error('Erro ao buscar próprio perfil:', error);
+          throw error;
+        }
 
-      if (error && error.code !== 'PGRST116') {
-        throw error;
+        profile = data;
       }
 
       if (!profile) {
+        console.log('Perfil não encontrado');
         return null;
       }
 
-      // Depois busca os dados relacionados em consultas separadas
+      console.log('Perfil encontrado:', profile);
+
+      // Buscar dados relacionados usando o profile.id
       const [projectsRes, academicRes, experiencesRes, availabilityRes] = await Promise.all([
         supabase.from('projects').select('*').eq('profile_id', profile.id),
         supabase.from('academic_formations').select('*').eq('profile_id', profile.id),
@@ -49,7 +72,14 @@ export const useProfileData = (profileId?: string) => {
         supabase.from('availability').select('*').eq('profile_id', profile.id)
       ]);
 
-      // Combina os resultados
+      console.log('Dados relacionados carregados:', {
+        projects: projectsRes.data?.length || 0,
+        academic: academicRes.data?.length || 0,
+        experiences: experiencesRes.data?.length || 0,
+        availability: availabilityRes.data?.length || 0
+      });
+
+      // Combinar os resultados
       const enrichedProfile = {
         ...profile,
         projects: projectsRes.data || [],
@@ -121,6 +151,7 @@ export const useProfileData = (profileId?: string) => {
         informacoesComplementares: enrichedProfile.informacoes_complementares || '',
       };
 
+      console.log('Perfil transformado com experiências:', transformedProfile.experienciasProfissionais);
       setUserProfile(transformedProfile);
       return transformedProfile;
     } catch (err: any) {
