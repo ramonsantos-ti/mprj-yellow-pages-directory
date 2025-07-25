@@ -38,6 +38,27 @@ const AuditTab: React.FC<AuditTabProps> = ({ auditLogs }) => {
     return 'bg-gray-100 text-gray-800';
   };
 
+  const truncateText = (text: string, maxLength: number = 50) => {
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + '...';
+  };
+
+  const formatUserInfo = (log: AuditLog) => {
+    // Se temos user_name do banco (usuário logado), use ele
+    if (log.user && log.user !== 'Unknown' && !log.user.includes('@')) {
+      return log.user + (log.userMatricula ? ` (Mat: ${log.userMatricula})` : '');
+    }
+    
+    // Se é um email, extraia o nome antes do @
+    if (log.user && log.user.includes('@')) {
+      const userName = log.user.split('@')[0];
+      return userName + (log.userMatricula ? ` (Mat: ${log.userMatricula})` : '');
+    }
+    
+    // Fallback
+    return log.user || 'Usuário não identificado';
+  };
+
   const filteredLogs = auditLogs.filter(log => {
     const matchesSearch = log.action.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          log.user.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -196,21 +217,25 @@ const AuditTab: React.FC<AuditTabProps> = ({ auditLogs }) => {
                           </div>
                           
                           <p className="text-sm font-medium text-gray-900">
-                            {log.details}
+                            {truncateText(log.details, 100)}
                           </p>
                           
                           {(log.previousValue || log.newValue) && (
                             <div className="text-xs space-y-1 bg-gray-50 p-2 rounded">
                               {log.previousValue && (
-                                <div>
+                                <div className="break-words">
                                   <span className="font-medium text-red-700">Antes:</span>
-                                  <span className="ml-1 text-gray-600">{log.previousValue}</span>
+                                  <span className="ml-1 text-gray-600" title={log.previousValue}>
+                                    {truncateText(log.previousValue, 80)}
+                                  </span>
                                 </div>
                               )}
                               {log.newValue && (
-                                <div>
+                                <div className="break-words">
                                   <span className="font-medium text-green-700">Depois:</span>
-                                  <span className="ml-1 text-gray-600">{log.newValue}</span>
+                                  <span className="ml-1 text-gray-600" title={log.newValue}>
+                                    {truncateText(log.newValue, 80)}
+                                  </span>
                                 </div>
                               )}
                             </div>
@@ -219,9 +244,8 @@ const AuditTab: React.FC<AuditTabProps> = ({ auditLogs }) => {
                           <div className="flex items-center space-x-4 text-xs text-gray-500">
                             <div className="flex items-center space-x-1">
                               <User className="w-3 h-3" />
-                              <span>
-                                {log.user}
-                                {log.userMatricula && ` (Mat: ${log.userMatricula})`}
+                              <span title={log.user}>
+                                {formatUserInfo(log)}
                               </span>
                             </div>
                             <div className="flex items-center space-x-1">
