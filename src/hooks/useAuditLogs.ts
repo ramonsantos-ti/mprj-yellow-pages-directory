@@ -28,7 +28,18 @@ export const useAuditLogs = () => {
         newValue: log.new_value,
         timestamp: new Date(log.created_at || new Date()),
         entityType: log.entity_type,
-        entityId: log.entity_id
+        entityId: log.entity_id,
+        // New enhanced fields
+        severityLevel: (log.severity_level as 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL') || 'MEDIUM',
+        ipAddress: log.ip_address as string,
+        userAgent: log.user_agent as string,
+        sessionId: log.session_id as string,
+        changesSummary: log.changes_summary as Record<string, any>,
+        affectedFields: log.affected_fields as string[],
+        operationType: (log.operation_type as 'CREATE' | 'READ' | 'UPDATE' | 'DELETE' | 'LOGIN' | 'LOGOUT') || 'UPDATE',
+        module: (log.module as 'PROFILE' | 'ADMIN' | 'AUTH' | 'REPORT' | 'NOTIFICATION') || 'PROFILE',
+        success: log.success ?? true,
+        errorMessage: log.error_message
       }));
 
       setAuditLogs(transformedLogs);
