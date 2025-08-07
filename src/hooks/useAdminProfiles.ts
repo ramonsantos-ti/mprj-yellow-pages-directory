@@ -120,7 +120,13 @@ export const useAdminProfiles = () => {
 
       if (error) throw error;
 
-      await addAuditLog('Perfil editado', `Perfil foi editado pelo administrador`);
+      const targetProfile = profiles.find(p => p.id === profileId);
+      await addAuditLog(
+        'UPDATE', 
+        `Perfil de ${targetProfile?.name || 'usuário'} foi editado pelo administrador ${user?.name || user?.email}`, 
+        profileId, 
+        targetProfile?.name
+      );
       
       await fetchAllProfiles();
     } catch (err: any) {
@@ -145,8 +151,10 @@ export const useAdminProfiles = () => {
       if (error) throw error;
 
       await addAuditLog(
-        newStatus ? 'Perfil ativado' : 'Perfil desativado',
-        `Status do perfil ${profile?.name} alterado`
+        newStatus ? 'UPDATE' : 'UPDATE',
+        `Status do perfil ${profile?.name} ${newStatus ? 'ativado' : 'desativado'} pelo administrador ${user?.name || user?.email}`,
+        profileId,
+        profile?.name
       );
       
       await fetchAllProfiles();
@@ -172,8 +180,10 @@ export const useAdminProfiles = () => {
       if (error) throw error;
 
       await addAuditLog(
-        newRole === 'admin' ? 'Usuário promovido a admin' : 'Admin rebaixado a usuário',
-        `Papel do usuário ${profile?.name} alterado`
+        'UPDATE',
+        `${profile?.name} ${newRole === 'admin' ? 'promovido a administrador' : 'rebaixado a usuário'} por ${user?.name || user?.email}`,
+        profileId,
+        profile?.name
       );
       
       await fetchAllProfiles();
@@ -252,8 +262,10 @@ export const useAdminProfiles = () => {
 
       // 3. Registrar no log de auditoria
       await addAuditLog(
-        'Usuário excluído completamente',
-        `Usuário ${profile.name} (${profile.email}) e todos os seus dados foram excluídos permanentemente do sistema`
+        'DELETE',
+        `Usuário ${profile.name} (${profile.email}) excluído permanentemente pelo administrador ${user?.name || user?.email}`,
+        profileId,
+        profile.name
       );
       
       console.log(`Usuário ${profile.name} excluído com sucesso`);
@@ -267,16 +279,21 @@ export const useAdminProfiles = () => {
     }
   };
 
-  const addAuditLog = async (action: string, details: string) => {
+  const addAuditLog = async (action: string, details: string, targetProfileId?: string, targetUserName?: string) => {
     try {
       await supabase
         .from('audit_logs')
         .insert({
           action,
-          user_name: user?.email || 'Unknown',
-          user_matricula: '',
+          user_name: user?.name || user?.email || 'Admin',
+          user_matricula: user?.matricula || '',
           details,
-          entity_type: 'Perfil'
+          entity_type: 'Perfil',
+          entity_id: targetProfileId,
+          operation_type: 'UPDATE',
+          module: 'ADMIN',
+          success: true,
+          severity_level: 'MEDIUM'
         });
     } catch (err) {
       console.error('Error adding audit log:', err);
