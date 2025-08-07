@@ -7,7 +7,7 @@ import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { Checkbox } from '../ui/checkbox';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
-import { History, User, Clock, Edit, Trash2, Plus, Eye, Download, FileText, FileSpreadsheet } from 'lucide-react';
+import { History, User, Clock, Edit, Trash2, Plus, Eye, Download, FileText, FileSpreadsheet, Shield, AlertTriangle } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { AuditLog } from '../../types/admin';
@@ -22,49 +22,92 @@ const AuditTab: React.FC<AuditTabProps> = ({ auditLogs }) => {
   const [actionFilter, setActionFilter] = useState('');
   const [selectedLogs, setSelectedLogs] = useState<string[]>([]);
 
-  const getActionIcon = (action: string) => {
-    if (action.includes('criado') || action.includes('adicionado')) return <Plus className="w-4 h-4 text-green-600" />;
-    if (action.includes('editado') || action.includes('atualizado')) return <Edit className="w-4 h-4 text-blue-600" />;
-    if (action.includes('excluído') || action.includes('removido')) return <Trash2 className="w-4 h-4 text-red-600" />;
-    if (action.includes('visualizado')) return <Eye className="w-4 h-4 text-gray-600" />;
-    return <History className="w-4 h-4 text-gray-600" />;
+  const getActionIcon = (operationType: string) => {
+    switch (operationType) {
+      case 'CREATE': return <Plus className="w-4 h-4 text-green-600" />;
+      case 'UPDATE': return <Edit className="w-4 h-4 text-blue-600" />;
+      case 'DELETE': return <Trash2 className="w-4 h-4 text-red-600" />;
+      case 'LOGIN': return <Shield className="w-4 h-4 text-purple-600" />;
+      case 'LOGOUT': return <Shield className="w-4 h-4 text-gray-600" />;
+      default: return <History className="w-4 h-4 text-gray-600" />;
+    }
   };
 
-  const getActionColor = (action: string) => {
-    if (action.includes('criado') || action.includes('adicionado')) return 'bg-green-100 text-green-800';
-    if (action.includes('editado') || action.includes('atualizado')) return 'bg-blue-100 text-blue-800';
-    if (action.includes('excluído') || action.includes('removido')) return 'bg-red-100 text-red-800';
-    if (action.includes('visualizado')) return 'bg-gray-100 text-gray-800';
-    return 'bg-gray-100 text-gray-800';
+  const getActionColor = (operationType: string, severityLevel: string) => {
+    if (severityLevel === 'CRITICAL') return 'bg-red-100 text-red-800 border-red-200';
+    if (severityLevel === 'HIGH') return 'bg-orange-100 text-orange-800 border-orange-200';
+    if (severityLevel === 'MEDIUM') return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+    if (severityLevel === 'LOW') return 'bg-gray-100 text-gray-800 border-gray-200';
+    
+    switch (operationType) {
+      case 'CREATE': return 'bg-green-100 text-green-800 border-green-200';
+      case 'UPDATE': return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'DELETE': return 'bg-red-100 text-red-800 border-red-200';
+      case 'LOGIN': return 'bg-purple-100 text-purple-800 border-purple-200';
+      case 'LOGOUT': return 'bg-gray-100 text-gray-800 border-gray-200';
+      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
   };
 
-  const truncateText = (text: string, maxLength: number = 50) => {
-    if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength) + '...';
+  const getSeverityIcon = (severityLevel: string) => {
+    if (severityLevel === 'CRITICAL' || severityLevel === 'HIGH') {
+      return <AlertTriangle className="w-3 h-3 text-red-500" />;
+    }
+    return null;
   };
 
   const formatUserInfo = (log: AuditLog) => {
-    // Se temos user_name do banco (usuário logado), use ele
-    if (log.user && log.user !== 'Unknown' && !log.user.includes('@')) {
-      return log.user + (log.userMatricula ? ` (Mat: ${log.userMatricula})` : '');
+    // Usuário que REALIZOU a ação (user_name do banco)
+    if (log.user && log.user !== 'Unknown') {
+      if (log.user.includes('@')) {
+        // Se é email, extrai o nome antes do @
+        const userName = log.user.split('@')[0].replace('.', ' ');
+        return userName.charAt(0).toUpperCase() + userName.slice(1);
+      }
+      return log.user;
     }
+    return 'Sistema';
+  };
+
+  const formatActionDescription = (log: AuditLog) => {
+    const action = log.operationType || log.action;
+    const entityType = log.entityType;
     
-    // Se é um email, extraia o nome antes do @
-    if (log.user && log.user.includes('@')) {
-      const userName = log.user.split('@')[0];
-      return userName + (log.userMatricula ? ` (Mat: ${log.userMatricula})` : '');
+    switch (action) {
+      case 'CREATE':
+        return `Criou ${entityType.toLowerCase()}`;
+      case 'UPDATE':
+        return `Atualizou ${entityType.toLowerCase()}`;
+      case 'DELETE':
+        return `Excluiu ${entityType.toLowerCase()}`;
+      case 'LOGIN':
+        return 'Login realizado';
+      case 'LOGOUT':
+        return 'Logout realizado';
+      default:
+        return log.action || 'Ação realizada';
     }
-    
-    // Fallback
-    return log.user || 'Usuário não identificado';
+  };
+
+  const isValueRelevant = (value: string | undefined) => {
+    if (!value) return false;
+    // Se é muito longo (provavelmente base64 ou dados grandes), não mostrar
+    if (value.length > 200) return false;
+    // Se contém base64, não mostrar
+    if (value.includes('data:image') || value.includes('base64')) return false;
+    return true;
   };
 
   const filteredLogs = auditLogs.filter(log => {
-    const matchesSearch = log.action.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         log.user.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         log.details.toLowerCase().includes(searchTerm.toLowerCase());
+    const userInfo = formatUserInfo(log);
+    const actionDesc = formatActionDescription(log);
     
-    const matchesAction = !actionFilter || actionFilter === 'all' || log.action.toLowerCase().includes(actionFilter.toLowerCase());
+    const matchesSearch = actionDesc.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         userInfo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         log.entityType.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesAction = !actionFilter || actionFilter === 'all' || 
+                         (log.operationType || log.action).toLowerCase().includes(actionFilter.toLowerCase());
     
     return matchesSearch && matchesAction;
   });
@@ -160,24 +203,22 @@ const AuditTab: React.FC<AuditTabProps> = ({ auditLogs }) => {
         <div className="space-y-4">
           <div className="flex space-x-4">
             <Input 
-              placeholder="Buscar por usuário, ação ou detalhes..." 
+              placeholder="Buscar por usuário, ação ou tipo de entidade..." 
               className="flex-1"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
             <Select value={actionFilter} onValueChange={setActionFilter}>
               <SelectTrigger className="w-48">
-                <SelectValue placeholder="Filtrar por ação" />
+                <SelectValue placeholder="Filtrar por operação" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todas as ações</SelectItem>
-                <SelectItem value="criado">Criação</SelectItem>
-                <SelectItem value="editado">Edição</SelectItem>
-                <SelectItem value="excluído">Exclusão</SelectItem>
-                <SelectItem value="ativado">Ativação</SelectItem>
-                <SelectItem value="desativado">Desativação</SelectItem>
-                <SelectItem value="promovido">Promoção</SelectItem>
-                <SelectItem value="notificação">Notificação</SelectItem>
+                <SelectItem value="all">Todas as operações</SelectItem>
+                <SelectItem value="create">Criação</SelectItem>
+                <SelectItem value="update">Atualização</SelectItem>
+                <SelectItem value="delete">Exclusão</SelectItem>
+                <SelectItem value="login">Login</SelectItem>
+                <SelectItem value="logout">Logout</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -198,64 +239,95 @@ const AuditTab: React.FC<AuditTabProps> = ({ auditLogs }) => {
                 </div>
                 
                 {filteredLogs.map(log => (
-                  <div key={log.id} className="p-4 hover:bg-gray-50">
+                  <div key={log.id} className="p-4 hover:bg-gray-50 border-l-4 border-transparent hover:border-blue-200">
                     <div className="flex items-start justify-between">
                       <div className="flex items-start space-x-3 flex-1">
                         <Checkbox
                           checked={selectedLogs.includes(log.id)}
                           onCheckedChange={(checked) => handleSelectLog(log.id, checked as boolean)}
                         />
-                        {getActionIcon(log.action)}
-                        <div className="flex-1 space-y-2">
-                          <div className="flex items-center space-x-2">
-                            <Badge className={getActionColor(log.action)}>
-                              {log.action}
-                            </Badge>
-                            <span className="text-sm text-gray-600">
-                              em {log.entityType}
+                        {getActionIcon(log.operationType || log.action)}
+                        <div className="flex-1 space-y-3">
+                          {/* Header com ação e severidade */}
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-2">
+                              <Badge className={`border ${getActionColor(log.operationType || log.action, log.severityLevel || 'MEDIUM')}`}>
+                                {formatActionDescription(log)}
+                              </Badge>
+                              {getSeverityIcon(log.severityLevel || 'MEDIUM')}
+                              <span className="text-sm text-gray-600">
+                                {log.entityType}
+                              </span>
+                            </div>
+                            <span className="text-xs text-gray-400">
+                              {log.module || 'Sistema'}
                             </span>
                           </div>
                           
-                          <p className="text-sm font-medium text-gray-900">
-                            {truncateText(log.details, 100)}
-                          </p>
+                          {/* Detalhes principais */}
+                          <div className="bg-gray-50 p-3 rounded-md">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                              <div className="flex items-center space-x-2">
+                                <User className="w-4 h-4 text-blue-600" />
+                                <span className="font-medium text-gray-700">Usuário:</span>
+                                <span className="text-gray-900">{formatUserInfo(log)}</span>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <Clock className="w-4 h-4 text-gray-600" />
+                                <span className="font-medium text-gray-700">Data:</span>
+                                <span className="text-gray-900">
+                                  {format(log.timestamp, "dd/MM/yyyy 'às' HH:mm:ss", { locale: ptBR })}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
                           
-                          {(log.previousValue || log.newValue) && (
-                            <div className="text-xs space-y-1 bg-gray-50 p-2 rounded">
-                              {log.previousValue && (
-                                <div className="break-words">
-                                  <span className="font-medium text-red-700">Antes:</span>
-                                  <span className="ml-1 text-gray-600" title={log.previousValue}>
-                                    {truncateText(log.previousValue, 80)}
-                                  </span>
+                          {/* Campos afetados (se disponível) */}
+                          {log.affectedFields && log.affectedFields.length > 0 && (
+                            <div className="text-xs">
+                              <span className="font-medium text-gray-700">Campos alterados: </span>
+                              <span className="text-gray-600">
+                                {log.affectedFields.filter(field => field !== 'all_fields').join(', ') || 'Múltiplos campos'}
+                              </span>
+                            </div>
+                          )}
+                          
+                          {/* Valores alterados (apenas se relevantes) */}
+                          {(isValueRelevant(log.previousValue) || isValueRelevant(log.newValue)) && (
+                            <div className="text-xs space-y-1 bg-blue-50 p-2 rounded border">
+                              {isValueRelevant(log.previousValue) && (
+                                <div>
+                                  <span className="font-medium text-red-700">Valor anterior: </span>
+                                  <span className="text-gray-700">{log.previousValue}</span>
                                 </div>
                               )}
-                              {log.newValue && (
-                                <div className="break-words">
-                                  <span className="font-medium text-green-700">Depois:</span>
-                                  <span className="ml-1 text-gray-600" title={log.newValue}>
-                                    {truncateText(log.newValue, 80)}
-                                  </span>
+                              {isValueRelevant(log.newValue) && (
+                                <div>
+                                  <span className="font-medium text-green-700">Novo valor: </span>
+                                  <span className="text-gray-700">{log.newValue}</span>
                                 </div>
                               )}
                             </div>
                           )}
                           
-                          <div className="flex items-center space-x-4 text-xs text-gray-500">
-                            <div className="flex items-center space-x-1">
-                              <User className="w-3 h-3" />
-                              <span title={log.user}>
-                                {formatUserInfo(log)}
+                          {/* Status da operação */}
+                          <div className="flex items-center justify-between text-xs">
+                            <div className="flex items-center space-x-2">
+                              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                log.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                              }`}>
+                                {log.success ? 'Sucesso' : 'Erro'}
                               </span>
-                            </div>
-                            <div className="flex items-center space-x-1">
-                              <Clock className="w-3 h-3" />
-                              <span>
-                                {format(log.timestamp, "dd/MM/yyyy 'às' HH:mm:ss", { locale: ptBR })}
-                              </span>
+                              {log.errorMessage && (
+                                <span className="text-red-600" title={log.errorMessage}>
+                                  Erro: {log.errorMessage.substring(0, 50)}...
+                                </span>
+                              )}
                             </div>
                             {log.entityId && (
-                              <span className="text-gray-400">ID: {log.entityId}</span>
+                              <span className="text-gray-400 font-mono">
+                                ID: {log.entityId.substring(0, 8)}...
+                              </span>
                             )}
                           </div>
                         </div>
