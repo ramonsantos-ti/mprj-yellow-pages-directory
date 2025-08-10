@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
 import { UseFormReturn } from 'react-hook-form';
 import { X } from 'lucide-react';
+import { ComboboxInput } from '../ui/combobox-input';
 
 interface CargoUnidadeProps {
   form: UseFormReturn<any>;
@@ -39,23 +40,15 @@ const CargoUnidade: React.FC<CargoUnidadeProps> = ({
             <FormItem>
               <FormLabel>Cargos *</FormLabel>
               <div className="space-y-2">
-                <Select onValueChange={(value) => {
-                  console.log('Cargo selected:', value, 'Type:', typeof value);
-                  if (isValidSelectValue(value) && !field.value.includes(value)) {
-                    field.onChange([...field.value, value]);
-                  }
-                }}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione um cargo" />
-                  </SelectTrigger>
-                  <SelectContent className="scrollbar-brown max-h-56">
-                    {safeCargos.map((cargo, index) => (
-                      <SelectItem key={`cargo-${index}-${cargo}`} value={cargo}>
-                        {cargo}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <ComboboxInput
+                  options={safeCargos}
+                  placeholder="Selecione ou digite um cargo"
+                  onValueAdd={(value) => {
+                    if (isValidSelectValue(value) && !field.value.includes(value)) {
+                      field.onChange([...field.value, value]);
+                    }
+                  }}
+                />
                 <div className="flex flex-wrap gap-2 max-h-20 overflow-auto">
                   {field.value.map((cargo, index) => (
                     <Badge key={index} variant="secondary" className="flex items-center space-x-1">
@@ -80,23 +73,15 @@ const CargoUnidade: React.FC<CargoUnidadeProps> = ({
             <FormItem>
               <FormLabel>Função</FormLabel>
               <div className="space-y-2">
-                <Select onValueChange={(value) => {
-                  console.log('Funcao selected:', value, 'Type:', typeof value);
-                  if (isValidSelectValue(value) && !field.value.includes(value)) {
-                    field.onChange([...field.value, value]);
-                  }
-                }}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione uma função (opcional)" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {safeFuncoes.map((funcao, index) => (
-                      <SelectItem key={`funcao-${index}-${funcao}`} value={funcao}>
-                        {funcao}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <ComboboxInput
+                  options={safeFuncoes}
+                  placeholder="Selecione ou digite uma função (opcional)"
+                  onValueAdd={(value) => {
+                    if (isValidSelectValue(value) && !field.value.includes(value)) {
+                      field.onChange([...field.value, value]);
+                    }
+                  }}
+                />
                 <div className="flex flex-wrap gap-2 max-h-20 overflow-auto">
                   {field.value.map((funcao, index) => (
                     <Badge key={index} variant="outline" className="flex items-center space-x-1">
@@ -121,23 +106,15 @@ const CargoUnidade: React.FC<CargoUnidadeProps> = ({
             <FormItem>
               <FormLabel>Unidades *</FormLabel>
               <div className="space-y-2">
-                <Select onValueChange={(value) => {
-                  console.log('Unidade selected:', value, 'Type:', typeof value);
-                  if (isValidSelectValue(value) && !field.value.includes(value)) {
-                    field.onChange([...field.value, value]);
-                  }
-                }}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione uma unidade" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {safeUnidades.map((unidade, index) => (
-                      <SelectItem key={`unidade-${index}-${unidade}`} value={unidade}>
-                        {unidade}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <ComboboxInput
+                  options={safeUnidades}
+                  placeholder="Selecione ou digite uma unidade"
+                  onValueAdd={(value) => {
+                    if (isValidSelectValue(value) && !field.value.includes(value)) {
+                      field.onChange([...field.value, value]);
+                    }
+                  }}
+                />
                 <div className="flex flex-wrap gap-2 max-h-20 overflow-auto">
                   {field.value.map((unidade, index) => (
                     <Badge key={index} variant="secondary" className="flex items-center space-x-1">

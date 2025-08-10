@@ -14,6 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { X, Plus } from 'lucide-react';
 import { CARGOS, FUNCOES, UNIDADES, IDIOMAS } from '../../data/constants';
+import { ComboboxInput } from '../ui/combobox-input';
 
 const adminProfileSchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório'),
@@ -190,31 +191,65 @@ const AdminProfileEditModal: React.FC<AdminProfileEditModalProps> = ({
           <CardContent className="space-y-4">
             <div>
               <FormLabel>Cargos</FormLabel>
-              <div className="grid grid-cols-3 gap-2 mt-2">
-                {CARGOS.map(cargo => (
-                  <div key={cargo} className="flex items-center space-x-2">
-                    <Checkbox
-                      checked={selectedCargos.includes(cargo)}
-                      onCheckedChange={() => toggleSelection(cargo, selectedCargos, setSelectedCargos)}
-                    />
-                    <span className="text-sm">{cargo}</span>
-                  </div>
-                ))}
+              <div className="space-y-4 mt-2">
+                <ComboboxInput
+                  options={CARGOS}
+                  placeholder="Selecione ou digite um cargo"
+                  onValueAdd={(value) => {
+                    if (!selectedCargos.includes(value)) {
+                      setSelectedCargos([...selectedCargos, value]);
+                    }
+                  }}
+                />
+                <div className="flex flex-wrap gap-2">
+                  {selectedCargos.map((cargo, index) => (
+                    <span
+                      key={index}
+                      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                    >
+                      {cargo}
+                      <button
+                        type="button"
+                        className="ml-1 text-blue-600 hover:text-blue-500"
+                        onClick={() => setSelectedCargos(selectedCargos.filter((_, i) => i !== index))}
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
             
             <div>
               <FormLabel>Funções</FormLabel>
-              <div className="grid grid-cols-3 gap-2 mt-2">
-                {FUNCOES.map(funcao => (
-                  <div key={funcao} className="flex items-center space-x-2">
-                    <Checkbox
-                      checked={selectedFuncoes.includes(funcao)}
-                      onCheckedChange={() => toggleSelection(funcao, selectedFuncoes, setSelectedFuncoes)}
-                    />
-                    <span className="text-sm">{funcao}</span>
-                  </div>
-                ))}
+              <div className="space-y-4 mt-2">
+                <ComboboxInput
+                  options={FUNCOES}
+                  placeholder="Selecione ou digite uma função"
+                  onValueAdd={(value) => {
+                    if (!selectedFuncoes.includes(value)) {
+                      setSelectedFuncoes([...selectedFuncoes, value]);
+                    }
+                  }}
+                />
+                <div className="flex flex-wrap gap-2">
+                  {selectedFuncoes.map((funcao, index) => (
+                    <span
+                      key={index}
+                      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                    >
+                      {funcao}
+                      <button
+                        type="button"
+                        className="ml-1 text-green-600 hover:text-green-500"
+                        onClick={() => setSelectedFuncoes(selectedFuncoes.filter((_, i) => i !== index))}
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
           </CardContent>
@@ -226,16 +261,33 @@ const AdminProfileEditModal: React.FC<AdminProfileEditModalProps> = ({
             <CardTitle>Unidades</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 gap-2">
-              {UNIDADES.map(unidade => (
-                <div key={unidade} className="flex items-center space-x-2">
-                  <Checkbox
-                    checked={selectedUnidades.includes(unidade)}
-                    onCheckedChange={() => toggleSelection(unidade, selectedUnidades, setSelectedUnidades)}
-                  />
-                  <span className="text-sm">{unidade}</span>
-                </div>
-              ))}
+            <div className="space-y-4">
+              <ComboboxInput
+                options={UNIDADES}
+                placeholder="Selecione ou digite uma unidade"
+                onValueAdd={(value) => {
+                  if (!selectedUnidades.includes(value)) {
+                    setSelectedUnidades([...selectedUnidades, value]);
+                  }
+                }}
+              />
+              <div className="flex flex-wrap gap-2">
+                {selectedUnidades.map((unidade, index) => (
+                  <span
+                    key={index}
+                    className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                  >
+                    {unidade}
+                    <button
+                      type="button"
+                      className="ml-1 text-blue-600 hover:text-blue-500"
+                      onClick={() => setSelectedUnidades(selectedUnidades.filter((_, i) => i !== index))}
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                ))}
+              </div>
             </div>
           </CardContent>
         </Card>
