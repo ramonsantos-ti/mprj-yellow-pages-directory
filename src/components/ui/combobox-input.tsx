@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select';
 import { Input } from './input';
 import { Button } from './button';
-import { Plus } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
 
 interface ComboboxInputProps {
   options: string[];
@@ -41,17 +41,22 @@ export const ComboboxInput: React.FC<ComboboxInputProps> = ({
       e.preventDefault();
       handleCustomAdd();
     }
+    if (e.key === 'Escape') {
+      setShowCustomInput(false);
+      setCustomInput('');
+    }
   };
 
   if (showCustomInput) {
     return (
-      <div className={`flex gap-2 ${className}`}>
+      <div className={`flex gap-2 ${className || ''}`}>
         <Input
           value={customInput}
           onChange={(e) => setCustomInput(e.target.value)}
           placeholder="Digite uma nova opção"
-          onKeyPress={handleKeyPress}
+          onKeyDown={handleKeyPress}
           className="flex-1"
+          autoFocus
         />
         <Button 
           type="button"
@@ -71,7 +76,7 @@ export const ComboboxInput: React.FC<ComboboxInputProps> = ({
           variant="outline"
           size="sm"
         >
-          Cancelar
+          <X className="w-4 h-4" />
         </Button>
       </div>
     );
@@ -82,13 +87,13 @@ export const ComboboxInput: React.FC<ComboboxInputProps> = ({
       <SelectTrigger className={className}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent className="max-h-56 overflow-y-auto">
         {options.map((option, index) => (
           <SelectItem key={`option-${index}-${option}`} value={option}>
             {option}
           </SelectItem>
         ))}
-        <SelectItem value="__custom__" className="font-medium text-primary">
+        <SelectItem value="__custom__" className="font-medium text-primary border-t">
           + Adicionar nova opção
         </SelectItem>
       </SelectContent>
