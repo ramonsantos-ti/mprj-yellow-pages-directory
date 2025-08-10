@@ -4,7 +4,6 @@ import ProfileCard from '../components/ProfileCard';
 import { Card, CardContent } from '../components/ui/card';
 import { Input } from '../components/ui/input';
 import { Search, Users, Loader2, AlertCircle } from 'lucide-react';
-import Indicadores from "../components/Indicadores";
 
 const Home: React.FC = () => {
   const { profiles, loading, error } = useProfiles();
@@ -129,11 +128,3 @@ const Home: React.FC = () => {
 };
 
 export default Home;
-export default function Home() {
-  return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Bem-vindo</h1>
-      <Indicadores />
-    </div>
-  );
-}
