@@ -38,6 +38,7 @@ export const useProfileData = (profileId?: string) => {
       } else {
         // Modo usuário: buscar próprio perfil
         if (!user?.id) {
+          console.log('Usuário não encontrado ou não logado:', user);
           setError('Usuário não encontrado');
           return null;
         }
@@ -47,7 +48,7 @@ export const useProfileData = (profileId?: string) => {
           .from('profiles')
           .select('*')
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle();
 
         if (error && error.code !== 'PGRST116') {
           console.error('Erro ao buscar próprio perfil:', error);

@@ -83,7 +83,9 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ profileId, isAdminEdi
     profileId,
     isAdminEdit,
     userProfileId: userProfile?.id,
-    userProfileName: userProfile?.name
+    userProfileName: userProfile?.name,
+    hasProfileId: !!profileId,
+    isAdminEditFlag: !!isAdminEdit
   });
 
   return <div className="max-w-6xl mx-auto space-y-6">
