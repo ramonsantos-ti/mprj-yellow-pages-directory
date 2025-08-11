@@ -71,13 +71,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               <div className="flex items-center space-x-4">
                 {user ? (
                   <>
-                    <Link to="/">
-                      <Button variant="ghost" size="sm" className="flex items-center space-x-2">
-                        <Home className="w-4 h-4" />
-                        <span className="hidden sm:inline">Início</span>
-                      </Button>
-                    </Link>
-
                      <Link to="/">
                       <Button variant="ghost" size="sm" className="flex items-center space-x-2">
                         <Search className="w-4 h-4" />
