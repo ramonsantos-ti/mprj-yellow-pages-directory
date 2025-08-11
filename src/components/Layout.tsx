@@ -66,6 +66,19 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                         <span className="hidden sm:inline">Início</span>
                       </Button>
                     </Link>
+
+                     <Link to="/">
+                      <Button variant="ghost" size="sm" className="flex items-center space-x-2">
+                        <Search className="w-4 h-4" />
+                        <span className="hidden sm:inline">Buscar especialistas</span>
+                      </Button>
+                    </Link>
+                    <Link to="/indicadores">
+                      <Button variant="ghost" size="sm" className="flex items-center space-x-2">
+                        <BarChart3 className="w-4 h-4" />
+                        <span className="hidden sm:inline">Indicadores</span>
+                      </Button>
+                    </Link>
                     
                     {user.role === 'admin' && (
                       <Link to="/admin">
