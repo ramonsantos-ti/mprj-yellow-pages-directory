@@ -129,7 +129,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   </>
                 ) : (
                   <Link to="/auth">
-                    <Button className="bg-red-900 hover:bg-red-800">
+                    <Button className="bg-red-900 hover:bg-red-800 py-3 px-6 rounded-lg text-xl">
                       Entrar
                     </Button>
                   </Link>
