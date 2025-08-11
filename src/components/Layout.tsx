@@ -13,7 +13,6 @@ import {
 import { Avatar, AvatarFallback } from './ui/avatar';
 import { LogOut, User, Settings, Home } from 'lucide-react';
 import { SidebarProvider, SidebarTrigger } from './ui/sidebar';
-import { AppSidebar } from './AppSidebar';
 import { BarChart3, Search } from "lucide-react";
 import {
   Sidebar,
@@ -144,7 +143,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
         {/* Main area with sidebar */}
         <div className="flex w-full">
-          <AppSidebar />
           <main className="flex-1 max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
             {children}
           </main>
