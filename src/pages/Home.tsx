@@ -4,6 +4,7 @@ import ProfileCard from '../components/ProfileCard';
 import { Card, CardContent } from '../components/ui/card';
 import { Input } from '../components/ui/input';
 import { Search, Users, Loader2, AlertCircle } from 'lucide-react';
+import AnalyticsTab from '../components/admin/AnalyticsTab';
 
 const Home: React.FC = () => {
   const { profiles, loading, error } = useProfiles();
@@ -80,6 +81,12 @@ const Home: React.FC = () => {
           <span>{filteredProfiles.length} encontrados</span>
         </div>
       </div>
+
+      {/* Indicadores Públicos */}
+      <section aria-labelledby="public-indicators" className="space-y-4">
+        <h2 id="public-indicators" className="text-2xl font-semibold">Indicadores</h2>
+        <AnalyticsTab profiles={profiles} />
+      </section>
 
       {/* Search Only */}
       <Card>

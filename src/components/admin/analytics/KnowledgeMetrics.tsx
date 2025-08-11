@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
 import { Badge } from '../../ui/badge';
 import { Progress } from '../../ui/progress';
 import { GraduationCap, Users, Brain, Target } from 'lucide-react';
+import MetricLabel from '../../common/MetricLabel';
 
 interface KnowledgeMetricsProps {
   profiles: Profile[];
@@ -67,7 +68,7 @@ const KnowledgeMetrics: React.FC<KnowledgeMetricsProps> = ({ profiles }) => {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center space-x-2">
               <GraduationCap className="w-4 h-4" />
-              <span>Doutores</span>
+              <MetricLabel label="Doutores" description="Perfis com doutorado (PhD) cadastrados." />
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -82,7 +83,7 @@ const KnowledgeMetrics: React.FC<KnowledgeMetricsProps> = ({ profiles }) => {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center space-x-2">
               <GraduationCap className="w-4 h-4" />
-              <span>Mestres</span>
+              <MetricLabel label="Mestres" description="Perfis com formação de mestrado cadastrada." />
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -97,7 +98,7 @@ const KnowledgeMetrics: React.FC<KnowledgeMetricsProps> = ({ profiles }) => {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center space-x-2">
               <Brain className="w-4 h-4" />
-              <span>Áreas de Conhecimento</span>
+              <MetricLabel label="Áreas de Conhecimento" description="Número de temas únicos de conhecimento mapeados na base." />
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -110,7 +111,7 @@ const KnowledgeMetrics: React.FC<KnowledgeMetricsProps> = ({ profiles }) => {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center space-x-2">
               <Target className="w-4 h-4" />
-              <span>Cobertura de Conhecimento</span>
+              <MetricLabel label="Cobertura de Conhecimento" description="Percentual de áreas sem lacunas críticas (com especialistas suficientes)." />
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -127,7 +128,7 @@ const KnowledgeMetrics: React.FC<KnowledgeMetricsProps> = ({ profiles }) => {
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <Users className="w-5 h-5" />
-            <span>Densidade de Especialistas por Área</span>
+            <MetricLabel label="Densidade de Especialistas por Área" description="Quantidade relativa de especialistas por tema de conhecimento." />
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -158,7 +159,9 @@ const KnowledgeMetrics: React.FC<KnowledgeMetricsProps> = ({ profiles }) => {
       {/* Diversidade por Unidade */}
       <Card>
         <CardHeader>
-          <CardTitle>Índice de Diversidade de Conhecimento por Unidade</CardTitle>
+          <CardTitle>
+            <MetricLabel label="Índice de Diversidade de Conhecimento por Unidade" description="Áreas únicas por pessoa em cada unidade (maior = maior diversidade)." />
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">

@@ -13,6 +13,7 @@ import {
   Target,
   Award 
 } from 'lucide-react';
+import MetricLabel from '../../common/MetricLabel';
 
 interface ExecutiveDashboardProps {
   profiles: Profile[];
@@ -98,7 +99,7 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({ profiles }) => 
           <CardHeader className="pb-2">
             <CardTitle className="text-xs font-medium flex items-center space-x-1">
               <Users className="w-3 h-3" />
-              <span>Perfis Ativos</span>
+              <MetricLabel label="Perfis Ativos" description="Total de perfis ativos no sistema." />
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -113,7 +114,7 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({ profiles }) => 
           <CardHeader className="pb-2">
             <CardTitle className="text-xs font-medium flex items-center space-x-1">
               <Brain className="w-3 h-3" />
-              <span>Áreas de Conhecimento</span>
+              <MetricLabel label="Áreas de Conhecimento" description="Quantidade de áreas únicas de conhecimento mapeadas." />
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -126,7 +127,7 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({ profiles }) => 
           <CardHeader className="pb-2">
             <CardTitle className="text-xs font-medium flex items-center space-x-1">
               <Award className="w-3 h-3" />
-              <span>Especialistas</span>
+              <MetricLabel label="Especialistas" description="Perfis com formação de mestrado ou doutorado." />
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -139,7 +140,7 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({ profiles }) => 
           <CardHeader className="pb-2">
             <CardTitle className="text-xs font-medium flex items-center space-x-1">
               <CheckCircle className="w-3 h-3" />
-              <span>Qualidade</span>
+              <MetricLabel label="Qualidade" description="Percentual de perfis com informações essenciais completas." />
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -152,7 +153,7 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({ profiles }) => 
           <CardHeader className="pb-2">
             <CardTitle className="text-xs font-medium flex items-center space-x-1">
               <TrendingUp className="w-3 h-3" />
-              <span>Engajamento</span>
+              <MetricLabel label="Engajamento" description="Percentual de perfis com disponibilidade para colaboração." />
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -165,7 +166,7 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({ profiles }) => 
           <CardHeader className="pb-2">
             <CardTitle className="text-xs font-medium flex items-center space-x-1">
               <Clock className="w-3 h-3" />
-              <span>Atualização</span>
+              <MetricLabel label="Atualização" description="Percentual de perfis atualizados no último mês." />
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -180,14 +181,14 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({ profiles }) => 
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <Target className="w-5 h-5" />
-            <span>Índices de Performance da Gestão do Conhecimento</span>
+            <MetricLabel label="Índices de Performance da Gestão do Conhecimento" description="Métricas consolidadas que avaliam cobertura, qualidade, especialização, engajamento e atualização da base." />
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <span className="text-sm font-medium">Cobertura de Conhecimento</span>
+                <MetricLabel className="text-sm font-medium" label="Cobertura de Conhecimento" description="Percentual de áreas cobertas sem lacunas críticas." />
                 <Badge variant={performanceIndices.knowledgeCoverage >= 80 ? "default" : "secondary"}>
                   {performanceIndices.knowledgeCoverage}%
                 </Badge>
@@ -200,7 +201,7 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({ profiles }) => 
 
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <span className="text-sm font-medium">Qualidade dos Dados</span>
+                <MetricLabel className="text-sm font-medium" label="Qualidade dos Dados" description="Percentual de perfis com informações essenciais preenchidas." />
                 <Badge variant={performanceIndices.dataQuality >= 70 ? "default" : "secondary"}>
                   {performanceIndices.dataQuality}%
                 </Badge>
@@ -213,7 +214,7 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({ profiles }) => 
 
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <span className="text-sm font-medium">Nível de Especialização</span>
+                <MetricLabel className="text-sm font-medium" label="Nível de Especialização" description="Proporção de perfis com pós-graduação (mestrado/doutorado)." />
                 <Badge variant={performanceIndices.expertise >= 30 ? "default" : "secondary"}>
                   {performanceIndices.expertise}%
                 </Badge>
@@ -226,7 +227,7 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({ profiles }) => 
 
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <span className="text-sm font-medium">Engajamento Colaborativo</span>
+                <MetricLabel className="text-sm font-medium" label="Engajamento Colaborativo" description="Percentual de perfis disponíveis para colaborar em projetos e iniciativas." />
                 <Badge variant={performanceIndices.engagement >= 50 ? "default" : "secondary"}>
                   {performanceIndices.engagement}%
                 </Badge>
@@ -239,7 +240,7 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({ profiles }) => 
 
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <span className="text-sm font-medium">Atualização da Base</span>
+                <MetricLabel className="text-sm font-medium" label="Atualização da Base" description="Percentual de perfis atualizados recentemente (último mês)." />
                 <Badge variant={performanceIndices.freshness >= 25 ? "default" : "secondary"}>
                   {performanceIndices.freshness}%
                 </Badge>
@@ -252,7 +253,7 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({ profiles }) => 
 
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <span className="text-sm font-medium">Score Geral</span>
+                <MetricLabel className="text-sm font-medium" label="Score Geral" description="Média dos índices principais: cobertura, qualidade, especialização, engajamento e atualização." />
                 <Badge variant="default">
                   {Math.round((performanceIndices.knowledgeCoverage + performanceIndices.dataQuality + 
                     performanceIndices.expertise + performanceIndices.engagement + 
@@ -278,7 +279,7 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({ profiles }) => 
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <AlertTriangle className="w-5 h-5" />
-            <span>Alertas e Recomendações</span>
+            <MetricLabel label="Alertas e Recomendações" description="Resumo de avisos e oportunidades de melhoria com base nos dados atuais." />
           </CardTitle>
         </CardHeader>
         <CardContent>

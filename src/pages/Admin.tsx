@@ -10,7 +10,6 @@ import ProfilesTab from '../components/admin/ProfilesTab';
 import AuditTab from '../components/admin/AuditTab';
 import NotificationsTab from '../components/admin/NotificationsTab';
 import ReportsTab from '../components/admin/ReportsTab';
-import AnalyticsTab from '../components/admin/AnalyticsTab';
 
 const Admin: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -163,12 +162,11 @@ const Admin: React.FC = () => {
       </div>
 
       <Tabs defaultValue="profiles" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="profiles">Gestão de Perfis</TabsTrigger>
           <TabsTrigger value="audit">Logs de Auditoria</TabsTrigger>
           <TabsTrigger value="notifications">Notificações</TabsTrigger>
           <TabsTrigger value="reports">Relatórios</TabsTrigger>
-          <TabsTrigger value="analytics">Indicadores</TabsTrigger>
         </TabsList>
 
         <TabsContent value="profiles">
@@ -215,9 +213,6 @@ const Admin: React.FC = () => {
           />
         </TabsContent>
 
-        <TabsContent value="analytics">
-          <AnalyticsTab profiles={profiles} />
-        </TabsContent>
       </Tabs>
     </div>
   );
