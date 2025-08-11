@@ -14,6 +14,18 @@ import { Avatar, AvatarFallback } from './ui/avatar';
 import { LogOut, User, Settings, Home } from 'lucide-react';
 import { SidebarProvider, SidebarTrigger } from './ui/sidebar';
 import { AppSidebar } from './AppSidebar';
+import { Link, useLocation } from "react-router-dom";
+import { BarChart3, Search } from "lucide-react";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "@/components/ui/sidebar";
 
 interface LayoutProps {
   children: React.ReactNode;
