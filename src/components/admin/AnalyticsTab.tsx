@@ -15,7 +15,7 @@ interface AnalyticsTabProps {
 
 const AnalyticsTab: React.FC<AnalyticsTabProps> = ({ profiles }) => {
   return (
-    <Tabs defaultValue="executive" className="w-full">
+    <Tabs defaultValue="visualizações" className="w-full">
       <TabsList className="grid w-full grid-cols-6">
         <TabsTrigger value="visualization">Visualizações</TabsTrigger>
         <TabsTrigger value="knowledge">Conhecimento</TabsTrigger>
