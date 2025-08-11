@@ -13,6 +13,7 @@ import ProfileDetail from "./pages/ProfileDetail";
 import ProfileEdit from "./pages/ProfileEdit";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
+import Indicadores from "./pages/Indicadores";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +43,11 @@ const App = () => (
                 <ProtectedRoute requiredRole="admin">
                   <Admin />
                 </ProtectedRoute>
+              </Layout>
+            } />
+            <Route path="/indicadores" element={
+              <Layout>
+                <Indicadores />
               </Layout>
             } />
             <Route path="/" element={
