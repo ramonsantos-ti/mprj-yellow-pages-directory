@@ -17,11 +17,11 @@ const AnalyticsTab: React.FC<AnalyticsTabProps> = ({ profiles }) => {
   return (
     <Tabs defaultValue="executive" className="w-full">
       <TabsList className="grid w-full grid-cols-6">
-        <TabsTrigger value="executive">Executivo</TabsTrigger>
+        <TabsTrigger value="visualization">Visualizações</TabsTrigger>
         <TabsTrigger value="knowledge">Conhecimento</TabsTrigger>
         <TabsTrigger value="collaboration">Colaboração</TabsTrigger>
+        <TabsTrigger value="executive">Executivo</TabsTrigger>
         <TabsTrigger value="quality">Qualidade</TabsTrigger>
-        <TabsTrigger value="visualization">Visualizações</TabsTrigger>
         <TabsTrigger value="trends">Tendências</TabsTrigger>
       </TabsList>
       
