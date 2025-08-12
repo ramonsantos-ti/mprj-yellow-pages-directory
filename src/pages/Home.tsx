@@ -155,9 +155,8 @@ const Home: React.FC = () => {
             <PaginationItem>
               <PaginationLink
                 href="#"
-                size="default"
                 aria-label="Ir para primeira página"
-                className="gap-1 pl-2.5"
+                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors
                 onClick={(e) => { e.preventDefault(); handlePageChange(1); }}
               >
                 Primeira página
@@ -230,9 +229,8 @@ const Home: React.FC = () => {
             <PaginationItem>
               <PaginationLink
                 href="#"
-                size="default"
                 aria-label="Ir para última página"
-                className="gap-1 pr-2.5"
+                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors"
                 onClick={(e) => { e.preventDefault(); handlePageChange(totalPages); }}
               >
                 Última página
