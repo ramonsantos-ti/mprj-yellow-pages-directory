@@ -1,9 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useProfiles } from '../hooks/useProfiles';
 import ProfileCard from '../components/ProfileCard';
 import { Card, CardContent } from '../components/ui/card';
 import { Input } from '../components/ui/input';
 import { Search, Users, Loader2, AlertCircle } from 'lucide-react';
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext, PaginationEllipsis } from '../components/ui/pagination';
 
 
 const Home: React.FC = () => {
@@ -22,6 +23,31 @@ const Home: React.FC = () => {
       return matchesSearch;
     });
   }, [profiles, searchTerm]);
+
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 6;
+  const totalPages = Math.max(1, Math.ceil(filteredProfiles.length / pageSize));
+
+  useEffect(() => {
+    // Reset to first page when search term changes
+    setCurrentPage(1);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    // Clamp current page when total pages decreases
+    if (currentPage > totalPages) setCurrentPage(totalPages);
+  }, [totalPages]);
+
+  const handlePageChange = (page: number) => {
+    const next = Math.min(Math.max(page, 1), totalPages);
+    setCurrentPage(next);
+  };
+
+  const paginatedProfiles = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredProfiles.slice(start, start + pageSize);
+  }, [filteredProfiles, currentPage]);
 
   if (loading) {
     return (
@@ -118,11 +144,103 @@ const Home: React.FC = () => {
           )}
         </div>
       ) : (
+        <>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {filteredProfiles.map((profile) => (
+          {paginatedProfiles.map((profile) => (
             <ProfileCard key={profile.id} profile={profile} />
           ))}
         </div>
+        <Pagination className="mt-4">
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationLink
+                href="#"
+                size="default"
+                aria-label="Ir para primeira página"
+                className="gap-1 pl-2.5"
+                onClick={(e) => { e.preventDefault(); handlePageChange(1); }}
+              >
+                First
+              </PaginationLink>
+            </PaginationItem>
+
+            <PaginationItem>
+              <PaginationPrevious
+                href="#"
+                onClick={(e) => { e.preventDefault(); handlePageChange(currentPage - 1); }}
+              />
+            </PaginationItem>
+
+            {/* Page numbers */}
+            <PaginationItem>
+              <PaginationLink
+                href="#"
+                isActive={currentPage === 1}
+                onClick={(e) => { e.preventDefault(); handlePageChange(1); }}
+              >
+                1
+              </PaginationLink>
+            </PaginationItem>
+
+            {currentPage > 3 && (
+              <PaginationItem>
+                <PaginationEllipsis />
+              </PaginationItem>
+            )}
+
+            {Array.from({ length: 3 }, (_, i) => currentPage - 1 + i).map((page) =>
+              page > 1 && page < totalPages ? (
+                <PaginationItem key={page}>
+                  <PaginationLink
+                    href="#"
+                    isActive={currentPage === page}
+                    onClick={(e) => { e.preventDefault(); handlePageChange(page); }}
+                  >
+                    {page}
+                  </PaginationLink>
+                </PaginationItem>
+              ) : null
+            )}
+
+            {currentPage < totalPages - 2 && (
+              <PaginationItem>
+                <PaginationEllipsis />
+              </PaginationItem>
+            )}
+
+            {totalPages > 1 && (
+              <PaginationItem>
+                <PaginationLink
+                  href="#"
+                  isActive={currentPage === totalPages}
+                  onClick={(e) => { e.preventDefault(); handlePageChange(totalPages); }}
+                >
+                  {totalPages}
+                </PaginationLink>
+              </PaginationItem>
+            )}
+
+            <PaginationItem>
+              <PaginationNext
+                href="#"
+                onClick={(e) => { e.preventDefault(); handlePageChange(currentPage + 1); }}
+              />
+            </PaginationItem>
+
+            <PaginationItem>
+              <PaginationLink
+                href="#"
+                size="default"
+                aria-label="Ir para última página"
+                className="gap-1 pr-2.5"
+                onClick={(e) => { e.preventDefault(); handlePageChange(totalPages); }}
+              >
+                Last
+              </PaginationLink>
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+        </>
       )}
     </div>
   );
