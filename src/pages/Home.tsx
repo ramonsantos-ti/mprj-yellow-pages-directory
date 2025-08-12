@@ -160,7 +160,7 @@ const Home: React.FC = () => {
                 className="gap-1 pl-2.5"
                 onClick={(e) => { e.preventDefault(); handlePageChange(1); }}
               >
-                First
+                Primeira página
               </PaginationLink>
             </PaginationItem>
 
@@ -235,7 +235,7 @@ const Home: React.FC = () => {
                 className="gap-1 pr-2.5"
                 onClick={(e) => { e.preventDefault(); handlePageChange(totalPages); }}
               >
-                Last
+                Última página
               </PaginationLink>
             </PaginationItem>
           </PaginationContent>
