@@ -3,9 +3,16 @@ import { useProfiles } from '../hooks/useProfiles';
 import ProfileCard from '../components/ProfileCard';
 import { Card, CardContent } from '../components/ui/card';
 import { Input } from '../components/ui/input';
-import { Search, Users, Loader2, AlertCircle } from 'lucide-react';
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext, PaginationEllipsis } from '../components/ui/pagination';
-
+import { Search, Users, Loader2, AlertCircle, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationPrevious,
+  PaginationNext,
+  PaginationEllipsis,
+} from '../components/ui/pagination';
 
 const Home: React.FC = () => {
   const { profiles, loading, error } = useProfiles();
@@ -13,11 +20,12 @@ const Home: React.FC = () => {
 
   const filteredProfiles = useMemo(() => {
     return profiles.filter(profile => {
-      const matchesSearch = !searchTerm || 
+      const matchesSearch =
+        !searchTerm ||
         profile.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         profile.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
         profile.matricula.includes(searchTerm) ||
-        profile.temasInteresse.some(area => 
+        profile.temasInteresse.some(area =>
           area.toLowerCase().includes(searchTerm.toLowerCase())
         );
       return matchesSearch;
@@ -30,12 +38,10 @@ const Home: React.FC = () => {
   const totalPages = Math.max(1, Math.ceil(filteredProfiles.length / pageSize));
 
   useEffect(() => {
-    // Reset to first page when search term changes
     setCurrentPage(1);
   }, [searchTerm]);
 
   useEffect(() => {
-    // Clamp current page when total pages decreases
     if (currentPage > totalPages) setCurrentPage(totalPages);
   }, [totalPages]);
 
@@ -67,7 +73,9 @@ const Home: React.FC = () => {
           <CardContent className="pt-6">
             <div className="text-center">
               <AlertCircle className="w-8 h-8 mx-auto mb-4 text-red-600" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Erro ao carregar perfis</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Erro ao carregar perfis
+              </h3>
               <p className="text-gray-600 mb-4">{error}</p>
               <button
                 onClick={() => window.location.reload()}
@@ -85,15 +93,14 @@ const Home: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="text-center space-y-4">
-        {/* Logo Secundária */}
         <div className="flex justify-center mb-6">
-          <img 
-            src="/lovable-uploads/2aae1185-7d52-453a-942a-1ef1876196b1.jpg" 
-            alt="MPRJ Logo Secundária" 
+          <img
+            src="/lovable-uploads/2aae1185-7d52-453a-942a-1ef1876196b1.jpg"
+            alt="MPRJ Logo Secundária"
             className="h-40 w-auto"
           />
         </div>
-        
+
         <h1 className="text-4xl font-bold text-gray-900">
           Sistema de Especialistas
         </h1>
@@ -108,7 +115,6 @@ const Home: React.FC = () => {
         </div>
       </div>
 
-      {/* Search Only */}
       <Card>
         <CardContent className="pt-6">
           <div className="space-y-4">
@@ -145,99 +151,121 @@ const Home: React.FC = () => {
         </div>
       ) : (
         <>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {paginatedProfiles.map((profile) => (
-            <ProfileCard key={profile.id} profile={profile} />
-          ))}
-        </div>
-        <Pagination className="mt-4">
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationLink
-                href="#"
-                aria-label="Ir para primeira página"
-                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors"
-                onClick={(e) => { e.preventDefault(); handlePageChange(1); }}
-              >
-                Primeira página
-              </PaginationLink>
-            </PaginationItem>
-
-            <PaginationItem>
-              <PaginationPrevious
-                href="#"
-                onClick={(e) => { e.preventDefault(); handlePageChange(currentPage - 1); }}
-              />
-            </PaginationItem>
-
-            {/* Page numbers */}
-            <PaginationItem>
-              <PaginationLink
-                href="#"
-                isActive={currentPage === 1}
-                onClick={(e) => { e.preventDefault(); handlePageChange(1); }}
-              >
-                1
-              </PaginationLink>
-            </PaginationItem>
-
-            {currentPage > 3 && (
-              <PaginationItem>
-                <PaginationEllipsis />
-              </PaginationItem>
-            )}
-
-            {Array.from({ length: 3 }, (_, i) => currentPage - 1 + i).map((page) =>
-              page > 1 && page < totalPages ? (
-                <PaginationItem key={page}>
-                  <PaginationLink
-                    href="#"
-                    isActive={currentPage === page}
-                    onClick={(e) => { e.preventDefault(); handlePageChange(page); }}
-                  >
-                    {page}
-                  </PaginationLink>
-                </PaginationItem>
-              ) : null
-            )}
-
-            {currentPage < totalPages - 2 && (
-              <PaginationItem>
-                <PaginationEllipsis />
-              </PaginationItem>
-            )}
-
-            {totalPages > 1 && (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {paginatedProfiles.map(profile => (
+              <ProfileCard key={profile.id} profile={profile} />
+            ))}
+          </div>
+          <Pagination className="mt-4">
+            <PaginationContent>
               <PaginationItem>
                 <PaginationLink
                   href="#"
-                  isActive={currentPage === totalPages}
-                  onClick={(e) => { e.preventDefault(); handlePageChange(totalPages); }}
+                  size="default"
+                  className="gap-1 pl-2.5"
+                  onClick={e => {
+                    e.preventDefault();
+                    handlePageChange(1);
+                  }}
                 >
-                  {totalPages}
+                  <ChevronsLeft className="h-4 w-4" />
+                  <span>Primeira página</span>
                 </PaginationLink>
               </PaginationItem>
-            )}
 
-            <PaginationItem>
-              <PaginationNext
-                href="#"
-                onClick={(e) => { e.preventDefault(); handlePageChange(currentPage + 1); }}
-              />
-            </PaginationItem>
+              <PaginationItem>
+                <PaginationPrevious
+                  href="#"
+                  onClick={e => {
+                    e.preventDefault();
+                    handlePageChange(currentPage - 1);
+                  }}
+                />
+              </PaginationItem>
 
-            <PaginationItem>
-              <PaginationLink
-                href="#"
-                aria-label="Ir para última página"
-                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors"
-                onClick={(e) => { e.preventDefault(); handlePageChange(totalPages); }}
-              >
-                Última página
-              </PaginationLink>
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
+              <PaginationItem>
+                <PaginationLink
+                  href="#"
+                  isActive={currentPage === 1}
+                  onClick={e => {
+                    e.preventDefault();
+                    handlePageChange(1);
+                  }}
+                >
+                  1
+                </PaginationLink>
+              </PaginationItem>
+
+              {currentPage > 3 && (
+                <PaginationItem>
+                  <PaginationEllipsis />
+                </PaginationItem>
+              )}
+
+              {Array.from({ length: 3 }, (_, i) => currentPage - 1 + i).map(page =>
+                page > 1 && page < totalPages ? (
+                  <PaginationItem key={page}>
+                    <PaginationLink
+                      href="#"
+                      isActive={currentPage === page}
+                      onClick={e => {
+                        e.preventDefault();
+                        handlePageChange(page);
+                      }}
+                    >
+                      {page}
+                    </PaginationLink>
+                  </PaginationItem>
+                ) : null
+              )}
+
+              {currentPage < totalPages - 2 && (
+                <PaginationItem>
+                  <PaginationEllipsis />
+                </PaginationItem>
+              )}
+
+              {totalPages > 1 && (
+                <PaginationItem>
+                  <PaginationLink
+                    href="#"
+                    isActive={currentPage === totalPages}
+                    onClick={e => {
+                      e.preventDefault();
+                      handlePageChange(totalPages);
+                    }}
+                  >
+                    {totalPages}
+                  </PaginationLink>
+                </PaginationItem>
+              )}
+
+              <PaginationItem>
+                <PaginationNext
+                  href="#"
+                  onClick={e => {
+                    e.preventDefault();
+                    handlePageChange(currentPage + 1);
+                  }}
+                />
+              </PaginationItem>
+
+              <PaginationItem>
+                <PaginationLink
+                  href="#"
+                  size="default"
+                  className="gap-1 pr-2.5"
+                  onClick={e => {
+                    e.preventDefault();
+                    handlePageChange(totalPages);
+                  }}
+                >
+                  <span>Última página</span>
+                  <ChevronsRight className="h-4 w-4" />
+                </PaginationLink>
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
         </>
       )}
     </div>
