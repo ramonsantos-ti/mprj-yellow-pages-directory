@@ -50,19 +50,28 @@ export const AccessibilityProvider = ({ children }: { children: ReactNode }) => 
   // Apply theme and font size to document
   useEffect(() => {
     const html = document.documentElement;
+    const body = document.body;
     
     // Remove existing theme classes
     html.classList.remove('accessibility-dark', 'accessibility-light');
+    body.classList.remove('accessibility-dark', 'accessibility-light');
     
-    // Apply new theme
+    // Apply new theme to both html and body for better coverage
     if (theme === 'dark') {
       html.classList.add('accessibility-dark');
+      body.classList.add('accessibility-dark');
     } else if (theme === 'light') {
       html.classList.add('accessibility-light');
+      body.classList.add('accessibility-light');
     }
     
     // Apply font size
     html.setAttribute('data-font-size', fontSize);
+    
+    // Force repaint
+    html.style.display = 'none';
+    html.offsetHeight; // trigger reflow
+    html.style.display = '';
   }, [theme, fontSize]);
 
   return (
