@@ -5,6 +5,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
+import { AccessibilityProvider } from "./contexts/AccessibilityContext";
+import { AccessibilityWidget } from "./components/AccessibilityWidget";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Home from "./pages/Home";
@@ -22,7 +24,8 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <AuthProvider>
+      <AccessibilityProvider>
+        <AuthProvider>
         <BrowserRouter>
           <Routes>
             <Route path="/auth" element={<Auth />} />
@@ -59,9 +62,11 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
+        <AccessibilityWidget />
       </AuthProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
+    </AccessibilityProvider>
+  </TooltipProvider>
+</QueryClientProvider>
 );
 
 export default App;

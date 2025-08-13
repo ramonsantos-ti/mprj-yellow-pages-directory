@@ -1,28 +1,79 @@
-import React, { createContext, useState, ReactNode } from 'react';
+import React, { createContext, useState, ReactNode, useEffect } from 'react';
 
-type FontSize = 'base' | 'lg' | 'xl';
-type Contrast = 'normal' | 'high';
+type FontSize = 'small' | 'medium' | 'large';
+type Theme = 'original' | 'dark' | 'light';
 
 interface AccessibilityContextType {
-  contrast: Contrast;
+  theme: Theme;
   fontSize: FontSize;
-  toggleContrast: () => void;
-  increaseFont: () => void;
-  decreaseFont: () => void;
+  setTheme: (theme: Theme) => void;
+  increaseFontSize: () => void;
+  decreaseFontSize: () => void;
+  resetFontSize: () => void;
 }
 
 export const AccessibilityContext = createContext<AccessibilityContextType | undefined>(undefined);
 
 export const AccessibilityProvider = ({ children }: { children: ReactNode }) => {
-  const [contrast, setContrast] = useState<Contrast>('normal');
-  const [fontSize, setFontSize] = useState<FontSize>('base');
+  const [theme, setThemeState] = useState<Theme>(() => {
+    const saved = localStorage.getItem('accessibility-theme');
+    return (saved as Theme) || 'original';
+  });
+  
+  const [fontSize, setFontSizeState] = useState<FontSize>(() => {
+    const saved = localStorage.getItem('accessibility-font-size');
+    return (saved as FontSize) || 'medium';
+  });
 
-  const toggleContrast = () => setContrast(c => c === 'normal' ? 'high' : 'normal');
-  const increaseFont = () => setFontSize(f => f === 'base' ? 'lg' : f === 'lg' ? 'xl' : 'xl');
-  const decreaseFont = () => setFontSize(f => f === 'xl' ? 'lg' : f === 'lg' ? 'base' : 'base');
+  const setTheme = (newTheme: Theme) => {
+    setThemeState(newTheme);
+    localStorage.setItem('accessibility-theme', newTheme);
+  };
+
+  const increaseFontSize = () => {
+    const newSize = fontSize === 'small' ? 'medium' : fontSize === 'medium' ? 'large' : 'large';
+    setFontSizeState(newSize);
+    localStorage.setItem('accessibility-font-size', newSize);
+  };
+
+  const decreaseFontSize = () => {
+    const newSize = fontSize === 'large' ? 'medium' : fontSize === 'medium' ? 'small' : 'small';
+    setFontSizeState(newSize);
+    localStorage.setItem('accessibility-font-size', newSize);
+  };
+
+  const resetFontSize = () => {
+    setFontSizeState('medium');
+    localStorage.setItem('accessibility-font-size', 'medium');
+  };
+
+  // Apply theme and font size to document
+  useEffect(() => {
+    const html = document.documentElement;
+    
+    // Remove existing theme classes
+    html.classList.remove('accessibility-dark', 'accessibility-light');
+    
+    // Apply new theme
+    if (theme === 'dark') {
+      html.classList.add('accessibility-dark');
+    } else if (theme === 'light') {
+      html.classList.add('accessibility-light');
+    }
+    
+    // Apply font size
+    html.setAttribute('data-font-size', fontSize);
+  }, [theme, fontSize]);
 
   return (
-    <AccessibilityContext.Provider value={{ contrast, fontSize, toggleContrast, increaseFont, decreaseFont }}>
+    <AccessibilityContext.Provider value={{ 
+      theme, 
+      fontSize, 
+      setTheme, 
+      increaseFontSize, 
+      decreaseFontSize, 
+      resetFontSize 
+    }}>
       {children}
     </AccessibilityContext.Provider>
   );
