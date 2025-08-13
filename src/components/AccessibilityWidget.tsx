@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Settings, Plus, Minus, RotateCcw, Sun, Moon, Palette } from 'lucide-react';
+import { Accessibility, Plus, Minus, RotateCcw, Sun, Moon, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -19,7 +19,7 @@ export const AccessibilityWidget = () => {
 
   return (
     <TooltipProvider>
-      <div className="fixed left-4 bottom-20 z-50">
+      <div className="fixed left-4 top-1/2 -translate-y-1/2 z-50">
         {/* Main Toggle Button */}
         <Tooltip>
           <TooltipTrigger asChild>
@@ -30,7 +30,7 @@ export const AccessibilityWidget = () => {
               onClick={() => setIsOpen(!isOpen)}
               aria-label="Abrir configurações de acessibilidade"
             >
-              <Settings className="h-6 w-6" />
+              <Accessibility className="h-6 w-6" />
             </Button>
           </TooltipTrigger>
           <TooltipContent side="right">
