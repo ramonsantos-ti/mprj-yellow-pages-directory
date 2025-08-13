@@ -95,6 +95,10 @@
     @apply border-border;
   }
 
+  html {
+    font-size: 125%; /* 25% increase from default 100% */
+  }
+
   body {
     @apply bg-background text-foreground;
   }

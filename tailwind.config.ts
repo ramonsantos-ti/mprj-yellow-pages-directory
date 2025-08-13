@@ -13,21 +13,25 @@ export default {
 	theme: {
 		container: {
 			center: true,
-			padding: '2rem',
+			padding: '2.5rem', // 25% increase from 2rem
 			screens: {
-				'2xl': '1400px'
+				'2xl': '1750px' // 25% increase from 1400px
 			}
 		},
 		extend: {
+			spacing: {
+				'18': '4.5rem', // 72px - 25% increase from 3.5rem (56px)
+				'22': '5.5rem', // 88px - 25% increase from 4.5rem (72px)
+			},
 			width: {
-				'30': '7.5rem', // 120px - for 50% increase from w-20 (80px)
-				'36': '9rem',   // 144px - for 50% increase from w-24 (96px)
-				'48': '12rem'   // 192px - for 50% increase from w-32 (128px)
+				'30': '9.375rem', // 150px - 25% increase from 7.5rem (120px)
+				'36': '11.25rem', // 180px - 25% increase from 9rem (144px)
+				'48': '15rem'     // 240px - 25% increase from 12rem (192px)
 			},
 			height: {
-				'42': '10.5rem', // 168px - for 50% increase from h-28 (112px)
-				'36': '9rem',    // 144px - for 50% increase from h-24 (96px)
-				'48': '12rem'    // 192px - for 50% increase from h-32 (128px)
+				'42': '13.125rem', // 210px - 25% increase from 10.5rem (168px)
+				'36': '11.25rem',  // 180px - 25% increase from 9rem (144px)
+				'48': '15rem'      // 240px - 25% increase from 12rem (192px)
 			},
 			colors: {
 				'custom-bg': '#CDB9B3',
