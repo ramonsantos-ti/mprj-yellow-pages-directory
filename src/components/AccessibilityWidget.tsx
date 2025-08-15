@@ -1,31 +1,9 @@
 import React, { useState } from 'react';
-import { Plus, Minus, RotateCcw, Sun, Moon, Palette } from 'lucide-react';
+import { ALargeSmall, Contrast, Plus, Minus, RotateCcw, Sun, Moon, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAccessibility } from '@/hooks/useAccessibility';
-
-// SVG no estilo "lucide-react" harmonizado
-const AccessibilityIcon = ({ className }) => (
-  <svg
-    className={className}
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <circle cx="12" cy="12" r="10" />
-    <circle cx="12" cy="6" r="1" />
-    <path d="M15 9h3" />
-    <path d="M6 9h3" />
-    <path d="M12 7v4" />
-    <path d="M12 11l-2 7" />
-    <path d="M12 11l2 7" />
-  </svg>
-);
 
 export const AccessibilityWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -36,13 +14,14 @@ export const AccessibilityWidget = () => {
       case 'small': return 'A-';
       case 'medium': return 'A';
       case 'large': return 'A+';
+      default: return 'A';
     }
   };
 
   return (
     <TooltipProvider>
       <div className="fixed left-4 top-1/2 -translate-y-1/2 z-50">
-        {/* Main Toggle Button */}
+        {/* Main Toggle Button (agora com ALargeSmall + Contrast) */}
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
@@ -52,7 +31,10 @@ export const AccessibilityWidget = () => {
               onClick={() => setIsOpen(!isOpen)}
               aria-label="Abrir configurações de acessibilidade"
             >
-              <AccessibilityIcon className="h-7 w-7" />
+              <div className="flex items-center justify-center gap-1">
+                <ALargeSmall className="h-5 w-5" />
+                <Contrast className="h-5 w-5" />
+              </div>
             </Button>
           </TooltipTrigger>
           <TooltipContent side="right">
