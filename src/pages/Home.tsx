@@ -97,7 +97,7 @@ const Home: React.FC = () => {
             <img
               src="/lovable-uploads/2aae1185-7d52-453a-942a-1ef1876196b1.jpg"
               alt="MPRJ Logo Secundária"
-              className="h-40 w-auto"
+              className="h-40 w-auto rounded-xl border border-gray-200 shadow-sm"
             />
           </div>
 
