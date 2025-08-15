@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ALargeSmall, Contrast, Plus, Minus, RotateCcw, Sun, Moon, Palette } from 'lucide-react';
+import { Plus, Minus, RotateCcw, Sun, Moon, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -21,7 +21,7 @@ export const AccessibilityWidget = () => {
   return (
     <TooltipProvider>
       <div className="fixed left-4 top-1/2 -translate-y-1/2 z-50">
-        {/* Main Toggle Button (agora com ALargeSmall + Contrast) */}
+        {/* Main Toggle Button com imagem */}
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
@@ -31,9 +31,12 @@ export const AccessibilityWidget = () => {
               onClick={() => setIsOpen(!isOpen)}
               aria-label="Abrir configurações de acessibilidade"
             >
-              <div className="flex items-center justify-center gap-1">
-                <ALargeSmall className="h-5 w-5" />
-                <Contrast className="h-5 w-5" />
+              <div className="flex items-center justify-center">
+                <img
+                  src="src/components/simbolo-de-acessibilidade-logo-universal.png"
+                  alt="Acessibilidade"
+                  className="h-6 w-6"
+                />
               </div>
             </Button>
           </TooltipTrigger>
