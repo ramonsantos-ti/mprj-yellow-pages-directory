@@ -5,15 +5,25 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAccessibility } from '@/hooks/useAccessibility';
 
-// SVG customizado para símbolo universal de acessibilidade
+// SVG no estilo "lucide-react" harmonizado
 const AccessibilityIcon = ({ className }) => (
   <svg
     className={className}
-    viewBox="0 0 512 512"
-    fill="currentColor"
     xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
   >
-    <path d="M256 48C141.1 48 48 141.1 48 256s93.1 208 208 208 208-93.1 208-208S370.9 48 256 48zm0 80a40 40 0 1 1 0 80 40 40 0 1 1 0-80zm0 352c-97 0-176-79-176-176S159 128 256 128s176 79 176 176-79 176-176 176zm120-224h-64v192h-48V304h-16v144h-48V256h-64v-32h96V160h48v64h96v32z" />
+    <circle cx="12" cy="12" r="10" />
+    <circle cx="12" cy="6" r="1" />
+    <path d="M15 9h3" />
+    <path d="M6 9h3" />
+    <path d="M12 7v4" />
+    <path d="M12 11l-2 7" />
+    <path d="M12 11l2 7" />
   </svg>
 );
 
@@ -42,7 +52,7 @@ export const AccessibilityWidget = () => {
               onClick={() => setIsOpen(!isOpen)}
               aria-label="Abrir configurações de acessibilidade"
             >
-              <AccessibilityIcon className="h-6 w-6" />
+              <AccessibilityIcon className="h-7 w-7" />
             </Button>
           </TooltipTrigger>
           <TooltipContent side="right">
