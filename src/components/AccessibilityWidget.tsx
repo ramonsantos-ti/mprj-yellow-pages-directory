@@ -5,6 +5,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAccessibility } from '@/hooks/useAccessibility';
 
+// Importando a imagem diretamente
+import accessibilityImg from './simbolo-de-acessibilidade-logo-universal.png';
+
 export const AccessibilityWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { theme, fontSize, setTheme, increaseFontSize, decreaseFontSize, resetFontSize } = useAccessibility();
@@ -33,7 +36,7 @@ export const AccessibilityWidget = () => {
             >
               <div className="flex items-center justify-center">
                 <img
-                  src="src/components/simbolo-de-acessibilidade-logo-universal.png"
+                  src={accessibilityImg}
                   alt="Acessibilidade"
                   className="h-6 w-6"
                 />
