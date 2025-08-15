@@ -34,7 +34,7 @@ export const AccessibilityWidget = () => {
               onClick={() => setIsOpen(!isOpen)}
               aria-label="Abrir configurações de acessibilidade"
             >
-              <div className="flex items-center justify-center">
+              <div className="flex items-center justify-center bg-white rounded-full p-1">
                 <img
                   src={accessibilityImg}
                   alt="Acessibilidade"
