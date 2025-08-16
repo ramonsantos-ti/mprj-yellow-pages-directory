@@ -1,10 +1,9 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
-import { SearchFilters as SearchFiltersType } from '../types';
+import { Search, X } from 'lucide-react';
 import { 
   CARGOS,
   FUNCOES,
@@ -16,17 +15,21 @@ import {
   IDIOMAS,
   DISPONIBILIDADE_ESTIMADA
 } from '../data/constants';
-import { Search, X } from 'lucide-react';
+import { SearchFilters as SearchFiltersType } from '../types';
 
 interface SearchFiltersProps {
   filters: SearchFiltersType;
+  operator: "AND" | "OR";
   onFiltersChange: (filters: SearchFiltersType) => void;
+  onOperatorChange: (operator: "AND" | "OR") => void;
   onClearFilters: () => void;
 }
 
 const SearchFiltersComponent: React.FC<SearchFiltersProps> = ({
   filters,
+  operator,
   onFiltersChange,
+  onOperatorChange,
   onClearFilters
 }) => {
   const handleFilterChange = (key: keyof SearchFiltersType, value: string) => {
@@ -54,6 +57,7 @@ const SearchFiltersComponent: React.FC<SearchFiltersProps> = ({
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Cargo */}
           <div>
             <label className="text-sm font-medium text-gray-700 mb-2 block">Cargo</label>
             <Select value={filters.cargo || ''} onValueChange={(value) => handleFilterChange('cargo', value)}>
@@ -62,14 +66,13 @@ const SearchFiltersComponent: React.FC<SearchFiltersProps> = ({
               </SelectTrigger>
               <SelectContent>
                 {CARGOS.map((cargo) => (
-                  <SelectItem key={cargo} value={cargo}>
-                    {cargo}
-                  </SelectItem>
+                  <SelectItem key={cargo} value={cargo}>{cargo}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
+          {/* Função */}
           <div>
             <label className="text-sm font-medium text-gray-700 mb-2 block">Função</label>
             <Select value={filters.funcao || ''} onValueChange={(value) => handleFilterChange('funcao', value)}>
@@ -78,14 +81,13 @@ const SearchFiltersComponent: React.FC<SearchFiltersProps> = ({
               </SelectTrigger>
               <SelectContent>
                 {FUNCOES.map((funcao) => (
-                  <SelectItem key={funcao} value={funcao}>
-                    {funcao}
-                  </SelectItem>
+                  <SelectItem key={funcao} value={funcao}>{funcao}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
+          {/* Unidade */}
           <div>
             <label className="text-sm font-medium text-gray-700 mb-2 block">Unidade</label>
             <Select value={filters.unidade || ''} onValueChange={(value) => handleFilterChange('unidade', value)}>
@@ -94,14 +96,13 @@ const SearchFiltersComponent: React.FC<SearchFiltersProps> = ({
               </SelectTrigger>
               <SelectContent>
                 {UNIDADES.map((unidade) => (
-                  <SelectItem key={unidade} value={unidade}>
-                    {unidade}
-                  </SelectItem>
+                  <SelectItem key={unidade} value={unidade}>{unidade}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
+          {/* Área de conhecimento */}
           <div>
             <label className="text-sm font-medium text-gray-700 mb-2 block">Área de Conhecimento</label>
             <Select value={filters.areaConhecimento || ''} onValueChange={(value) => handleFilterChange('areaConhecimento', value)}>
@@ -110,14 +111,13 @@ const SearchFiltersComponent: React.FC<SearchFiltersProps> = ({
               </SelectTrigger>
               <SelectContent>
                 {[...AREAS_JURIDICAS, ...AREAS_ADMINISTRATIVAS].map((area) => (
-                  <SelectItem key={area} value={area}>
-                    {area}
-                  </SelectItem>
+                  <SelectItem key={area} value={area}>{area}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
+          {/* Habilidade técnica */}
           <div>
             <label className="text-sm font-medium text-gray-700 mb-2 block">Habilidade Técnica</label>
             <Select value={filters.habilidadeTecnica || ''} onValueChange={(value) => handleFilterChange('habilidadeTecnica', value)}>
@@ -126,14 +126,13 @@ const SearchFiltersComponent: React.FC<SearchFiltersProps> = ({
               </SelectTrigger>
               <SelectContent>
                 {HABILIDADES_TECNICAS.map((habilidade) => (
-                  <SelectItem key={habilidade} value={habilidade}>
-                    {habilidade}
-                  </SelectItem>
+                  <SelectItem key={habilidade} value={habilidade}>{habilidade}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
+          {/* Formação */}
           <div>
             <label className="text-sm font-medium text-gray-700 mb-2 block">Formação</label>
             <Select value={filters.formacao || ''} onValueChange={(value) => handleFilterChange('formacao', value)}>
@@ -142,14 +141,13 @@ const SearchFiltersComponent: React.FC<SearchFiltersProps> = ({
               </SelectTrigger>
               <SelectContent>
                 {NIVEIS_FORMACAO.map((nivel) => (
-                  <SelectItem key={nivel} value={nivel}>
-                    {nivel}
-                  </SelectItem>
+                  <SelectItem key={nivel} value={nivel}>{nivel}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
+          {/* Idioma */}
           <div>
             <label className="text-sm font-medium text-gray-700 mb-2 block">Idioma</label>
             <Select value={filters.idioma || ''} onValueChange={(value) => handleFilterChange('idioma', value)}>
@@ -158,14 +156,13 @@ const SearchFiltersComponent: React.FC<SearchFiltersProps> = ({
               </SelectTrigger>
               <SelectContent>
                 {IDIOMAS.map((idioma) => (
-                  <SelectItem key={idioma} value={idioma}>
-                    {idioma}
-                  </SelectItem>
+                  <SelectItem key={idioma} value={idioma}>{idioma}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
+          {/* Disponibilidade */}
           <div>
             <label className="text-sm font-medium text-gray-700 mb-2 block">Disponibilidade</label>
             <Select value={filters.disponibilidade || ''} onValueChange={(value) => handleFilterChange('disponibilidade', value)}>
@@ -174,13 +171,24 @@ const SearchFiltersComponent: React.FC<SearchFiltersProps> = ({
               </SelectTrigger>
               <SelectContent>
                 {DISPONIBILIDADE_ESTIMADA.map((disp) => (
-                  <SelectItem key={disp} value={disp}>
-                    {disp}
-                  </SelectItem>
+                  <SelectItem key={disp} value={disp}>{disp}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
+        </div>
+
+        {/* Conectivo E/OU */}
+        <div className="mt-6">
+          <label className="text-sm font-medium text-gray-700 mb-2 block">Conectivo</label>
+          <select
+            value={operator}
+            onChange={(e) => onOperatorChange(e.target.value as "AND" | "OR")}
+            className="border rounded p-2 w-full"
+          >
+            <option value="AND">E</option>
+            <option value="OR">OU</option>
+          </select>
         </div>
       </CardContent>
     </Card>
