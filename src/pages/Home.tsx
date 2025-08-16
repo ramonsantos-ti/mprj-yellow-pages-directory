@@ -14,32 +14,80 @@ import {
   PaginationEllipsis,
 } from '../components/ui/pagination';
 
+// Função auxiliar para aplicar os conectivos "e" / "ou"
+const parseSearch = (term: string) => {
+  if (!term) return [];
+  const lower = term.toLowerCase();
+
+  if (lower.includes(" ou ")) {
+    return { type: "or", terms: lower.split(" ou ").map(t => t.trim()).filter(Boolean) };
+  }
+  if (lower.includes(" e ")) {
+    return { type: "and", terms: lower.split(" e ").map(t => t.trim()).filter(Boolean) };
+  }
+  return { type: "or", terms: [lower] }; // padrão é OR com 1 termo
+};
+
 const Home: React.FC = () => {
   const { profiles, loading, error } = useProfiles();
+
   const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredProfiles = useMemo(() => {
-    return profiles.filter(profile => {
-      const matchesSearch =
-        !searchTerm ||
-        profile.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        profile.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        profile.matricula.includes(searchTerm) ||
-        profile.temasInteresse.some(area =>
-          area.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-      return matchesSearch;
-    });
-  }, [profiles, searchTerm]);
+  // Filtros avançados
+  const [cargoFilter, setCargoFilter] = useState('');
+  const [unidadeFilter, setUnidadeFilter] = useState('');
+  const [matriculaFilter, setMatriculaFilter] = useState('');
+  const [areaInteresseFilter, setAreaInteresseFilter] = useState('');
 
-  // Pagination
+  const filteredProfiles = useMemo(() => {
+    const parsed = parseSearch(searchTerm);
+
+    return profiles.filter(profile => {
+      // ---- Busca no campo principal (com "e" e "ou") ----
+      const searchMatch = parsed.terms.length === 0
+        ? true
+        : parsed.type === "or"
+          ? parsed.terms.some(term =>
+              profile.name.toLowerCase().includes(term) ||
+              profile.email.toLowerCase().includes(term) ||
+              profile.matricula.toLowerCase().includes(term) ||
+              profile.cargo?.toLowerCase().includes(term) ||
+              profile.unidade?.toLowerCase().includes(term) ||
+              profile.temasInteresse?.some(area =>
+                area.toLowerCase().includes(term)
+              )
+            )
+          : parsed.terms.every(term =>
+              profile.name.toLowerCase().includes(term) ||
+              profile.email.toLowerCase().includes(term) ||
+              profile.matricula.toLowerCase().includes(term) ||
+              profile.cargo?.toLowerCase().includes(term) ||
+              profile.unidade?.toLowerCase().includes(term) ||
+              profile.temasInteresse?.some(area =>
+                area.toLowerCase().includes(term)
+              )
+            );
+
+      // ---- Filtros individuais ----
+      const cargoMatch = !cargoFilter || profile.cargo?.toLowerCase().includes(cargoFilter.toLowerCase());
+      const unidadeMatch = !unidadeFilter || profile.unidade?.toLowerCase().includes(unidadeFilter.toLowerCase());
+      const matriculaMatch = !matriculaFilter || profile.matricula.toLowerCase().includes(matriculaFilter.toLowerCase());
+      const areaMatch = !areaInteresseFilter || profile.temasInteresse?.some(area =>
+        area.toLowerCase().includes(areaInteresseFilter.toLowerCase())
+      );
+
+      return searchMatch && cargoMatch && unidadeMatch && matriculaMatch && areaMatch;
+    });
+  }, [profiles, searchTerm, cargoFilter, unidadeFilter, matriculaFilter, areaInteresseFilter]);
+
+  // Paginação
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 6;
   const totalPages = Math.max(1, Math.ceil(filteredProfiles.length / pageSize));
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm]);
+  }, [searchTerm, cargoFilter, unidadeFilter, matriculaFilter, areaInteresseFilter]);
 
   useEffect(() => {
     if (currentPage > totalPages) setCurrentPage(totalPages);
@@ -91,46 +139,71 @@ const Home: React.FC = () => {
   }
 
   return (
-      <div className="space-y-6">
-        <div className="text-center space-y-4 bg-white rounded-xl shadow-md p-6">
-          <div className="flex justify-center mb-6">
-            <img
-              src="/lovable-uploads/2aae1185-7d52-453a-942a-1ef1876196b1.jpg"
-              alt="MPRJ Logo Secundária"
-              className="h-40 w-auto rounded-xl border border-gray-200 shadow-sm"
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="text-center space-y-4 bg-white rounded-xl shadow-md p-6">
+        <div className="flex justify-center mb-6">
+          <img
+            src="/lovable-uploads/2aae1185-7d52-453a-942a-1ef1876196b1.jpg"
+            alt="MPRJ Logo Secundária"
+            className="h-40 w-auto rounded-xl border border-gray-200 shadow-sm"
+          />
+        </div>
+        <h1 className="text-4xl font-bold text-gray-900">
+          Sistema de Especialistas
+        </h1>
+        <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          Encontre especialistas do MPRJ por área de conhecimento, cargo ou unidade de trabalho
+        </p>
+        <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
+          <Users className="w-4 h-4" />
+          <span>{profiles.length} especialistas cadastrados</span>
+          <span>•</span>
+          <span>{filteredProfiles.length} encontrados</span>
+        </div>
+      </div>
+
+      {/* Filtros */}
+      <Card>
+        <CardContent className="pt-6 space-y-4">
+          {/* Busca principal */}
+          <div className="relative">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Buscar por nome, email, matrícula, cargo, unidade ou interesse (use 'e' / 'ou')"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
             />
           </div>
 
-          <h1 className="text-4xl font-bold text-gray-900">
-            Sistema de Especialistas
-          </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Encontre especialistas do MPRJ por área de conhecimento, cargo ou unidade de trabalho
-          </p>
-          <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
-            <Users className="w-4 h-4" />
-            <span>{profiles.length} especialistas cadastrados</span>
-            <span>•</span>
-            <span>{filteredProfiles.length} encontrados</span>
-          </div>
-        </div>
-
-      <Card>
-        <CardContent className="pt-6">
-          <div className="space-y-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Buscar por nome, email, matrícula ou tema de interesse..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
+          {/* Filtros adicionais */}
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <Input
+              placeholder="Filtrar por Cargo"
+              value={cargoFilter}
+              onChange={(e) => setCargoFilter(e.target.value)}
+            />
+            <Input
+              placeholder="Filtrar por Unidade"
+              value={unidadeFilter}
+              onChange={(e) => setUnidadeFilter(e.target.value)}
+            />
+            <Input
+              placeholder="Filtrar por Matrícula"
+              value={matriculaFilter}
+              onChange={(e) => setMatriculaFilter(e.target.value)}
+            />
+            <Input
+              placeholder="Filtrar por Área de Interesse"
+              value={areaInteresseFilter}
+              onChange={(e) => setAreaInteresseFilter(e.target.value)}
+            />
           </div>
         </CardContent>
       </Card>
 
+      {/* Lista de resultados */}
       {filteredProfiles.length === 0 ? (
         <div className="text-center py-12">
           <Search className="w-16 h-16 mx-auto mb-4 text-gray-300" />
@@ -156,6 +229,7 @@ const Home: React.FC = () => {
               <ProfileCard key={profile.id} profile={profile} />
             ))}
           </div>
+          {/* Paginação */}
           <Pagination className="mt-4">
             <PaginationContent>
               <PaginationItem>
