@@ -1,141 +1,275 @@
-import React, { useState, useMemo } from "react";
-import { SearchFiltersComponent } from "./SearchFiltersComponent";
-import { Card, CardContent } from "@/components/ui/card";
+import React, { useState, useMemo, useEffect } from 'react';
+import { useProfiles } from '../hooks/useProfiles';
+import ProfileCard from '../components/ProfileCard';
+import { Card, CardContent } from '../components/ui/card';
+import { Input } from '../components/ui/input';
+import { Search, Users, Loader2, AlertCircle, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationPrevious,
+  PaginationNext,
+  PaginationEllipsis,
+} from '../components/ui/pagination';
 
-interface Profile {
-  name?: string;
-  email?: string;
-  matricula?: string;
-  cargo?: string;
-  unidade?: string;
-  temasInteresse?: string[];
-}
-
-interface HomeProps {
-  profiles: Profile[];
-}
-
-// Função para quebrar o termo de busca em "E" ou "OU"
-const parseSearch = (term: string) => {
-  const lower = (term || "").toLowerCase().trim();
-  if (!lower) return { type: "or" as const, terms: [] };
-
-  if (lower.includes(" ou ")) {
-    return {
-      type: "or" as const,
-      terms: lower.split(" ou ").map((t) => t.trim()).filter(Boolean),
-    };
-  }
-  if (lower.includes(" e ")) {
-    return {
-      type: "and" as const,
-      terms: lower.split(" e ").map((t) => t.trim()).filter(Boolean),
-    };
-  }
-  return { type: "or" as const, terms: [lower] };
-};
-
-export const Home: React.FC<HomeProps> = ({ profiles }) => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [cargoFilter, setCargoFilter] = useState("");
-  const [unidadeFilter, setUnidadeFilter] = useState("");
-  const [matriculaFilter, setMatriculaFilter] = useState("");
-  const [areaInteresseFilter, setAreaInteresseFilter] = useState("");
+const Home: React.FC = () => {
+  const { profiles, loading, error } = useProfiles();
+  const [searchTerm, setSearchTerm] = useState('');
 
   const filteredProfiles = useMemo(() => {
-    const safeProfiles = Array.isArray(profiles) ? profiles : [];
-    const { type, terms } = parseSearch(searchTerm);
-
-    return safeProfiles.filter((profile) => {
-      // Normaliza campos (evita undefined)
-      const name = (profile?.name || "").toLowerCase();
-      const email = (profile?.email || "").toLowerCase();
-      const matricula = (profile?.matricula || "").toLowerCase();
-      const cargo = (profile?.cargo || "").toLowerCase();
-      const unidade = (profile?.unidade || "").toLowerCase();
-      const interesses: string[] = Array.isArray(profile?.temasInteresse)
-        ? profile.temasInteresse
-        : [];
-      const interessesLower = interesses.map((a) => (a || "").toLowerCase());
-
-      // 🔎 Busca principal (com conectivos)
-      const searchMatch =
-        terms.length === 0
-          ? true
-          : type === "or"
-          ? terms.some(
-              (term) =>
-                name.includes(term) ||
-                email.includes(term) ||
-                matricula.includes(term) ||
-                cargo.includes(term) ||
-                unidade.includes(term) ||
-                interessesLower.some((a) => a.includes(term))
-            )
-          : terms.every(
-              (term) =>
-                name.includes(term) ||
-                email.includes(term) ||
-                matricula.includes(term) ||
-                cargo.includes(term) ||
-                unidade.includes(term) ||
-                interessesLower.some((a) => a.includes(term))
-            );
-
-      // Filtros individuais
-      const cargoMatch = !cargoFilter || cargo.includes(cargoFilter.toLowerCase());
-      const unidadeMatch = !unidadeFilter || unidade.includes(unidadeFilter.toLowerCase());
-      const matriculaMatch = !matriculaFilter || matricula.includes(matriculaFilter.toLowerCase());
-      const areaMatch =
-        !areaInteresseFilter ||
-        interessesLower.some((a) =>
-          a.includes(areaInteresseFilter.toLowerCase())
+    return profiles.filter(profile => {
+      const matchesSearch =
+        !searchTerm ||
+        profile.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        profile.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        profile.matricula.includes(searchTerm) ||
+        profile.temasInteresse.some(area =>
+          area.toLowerCase().includes(searchTerm.toLowerCase())
         );
-
-      return searchMatch && cargoMatch && unidadeMatch && matriculaMatch && areaMatch;
+      return matchesSearch;
     });
-  }, [profiles, searchTerm, cargoFilter, unidadeFilter, matriculaFilter, areaInteresseFilter]);
+  }, [profiles, searchTerm]);
+
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 6;
+  const totalPages = Math.max(1, Math.ceil(filteredProfiles.length / pageSize));
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(totalPages);
+  }, [totalPages]);
+
+  const handlePageChange = (page: number) => {
+    const next = Math.min(Math.max(page, 1), totalPages);
+    setCurrentPage(next);
+  };
+
+  const paginatedProfiles = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredProfiles.slice(start, start + pageSize);
+  }, [filteredProfiles, currentPage]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 mx-auto mb-4 animate-spin text-red-600" />
+          <p className="text-gray-600">Carregando perfis...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Card className="w-full max-w-md">
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <AlertCircle className="w-8 h-8 mx-auto mb-4 text-red-600" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Erro ao carregar perfis
+              </h3>
+              <p className="text-gray-600 mb-4">{error}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              >
+                Tentar novamente
+              </button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
-    <div className="grid grid-cols-4 gap-4">
-      {/* Filtros */}
-      <div className="col-span-1">
-        <SearchFiltersComponent
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          cargoFilter={cargoFilter}
-          setCargoFilter={setCargoFilter}
-          unidadeFilter={unidadeFilter}
-          setUnidadeFilter={setUnidadeFilter}
-          matriculaFilter={matriculaFilter}
-          setMatriculaFilter={setMatriculaFilter}
-          areaInteresseFilter={areaInteresseFilter}
-          setAreaInteresseFilter={setAreaInteresseFilter}
-        />
-      </div>
+      <div className="space-y-6">
+        <div className="text-center space-y-4 bg-white rounded-xl shadow-md p-6">
+          <div className="flex justify-center mb-6">
+            <img
+              src="/lovable-uploads/2aae1185-7d52-453a-942a-1ef1876196b1.jpg"
+              alt="MPRJ Logo Secundária"
+              className="h-40 w-auto rounded-xl border border-gray-200 shadow-sm"
+            />
+          </div>
 
-      {/* Resultados */}
-      <div className="col-span-3 space-y-4">
-        {filteredProfiles.map((profile, idx) => (
-          <Card key={idx}>
-            <CardContent className="p-4">
-              <h3 className="font-bold">{profile.name}</h3>
-              <p>Email: {profile.email}</p>
-              <p>Matrícula: {profile.matricula}</p>
-              <p>Cargo: {profile.cargo}</p>
-              <p>Unidade: {profile.unidade}</p>
-              <p>
-                Áreas de interesse:{" "}
-                {profile.temasInteresse?.join(", ") || "Não informado"}
-              </p>
-            </CardContent>
-          </Card>
-        ))}
+          <h1 className="text-4xl font-bold text-gray-900">
+            Sistema de Especialistas
+          </h1>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            Encontre especialistas do MPRJ por área de conhecimento, cargo ou unidade de trabalho
+          </p>
+          <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
+            <Users className="w-4 h-4" />
+            <span>{profiles.length} especialistas cadastrados</span>
+            <span>•</span>
+            <span>{filteredProfiles.length} encontrados</span>
+          </div>
+        </div>
 
-        {filteredProfiles.length === 0 && (
-          <p className="text-gray-500">Nenhum resultado encontrado.</p>
-        )}
-      </div>
+      <Card>
+        <CardContent className="pt-6">
+          <div className="space-y-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Buscar por nome, email, matrícula ou tema de interesse..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {filteredProfiles.length === 0 ? (
+        <div className="text-center py-12">
+          <Search className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            Nenhum especialista encontrado
+          </h3>
+          <p className="text-gray-600 mb-4">
+            Tente ajustar os termos de busca utilizados
+          </p>
+          {searchTerm && (
+            <button
+              onClick={() => setSearchTerm('')}
+              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+            >
+              Limpar busca
+            </button>
+          )}
+        </div>
+      ) : (
+        <>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {paginatedProfiles.map(profile => (
+              <ProfileCard key={profile.id} profile={profile} />
+            ))}
+          </div>
+          <Pagination className="mt-4">
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationLink
+                  href="#"
+                  size="default"
+                  className="gap-1 pl-2.5"
+                  onClick={e => {
+                    e.preventDefault();
+                    handlePageChange(1);
+                  }}
+                >
+                  <ChevronsLeft className="h-4 w-4" />
+                  <span>Primeira página</span>
+                </PaginationLink>
+              </PaginationItem>
+
+              <PaginationItem>
+                <PaginationPrevious
+                  href="#"
+                  onClick={e => {
+                    e.preventDefault();
+                    handlePageChange(currentPage - 1);
+                  }}
+                />
+              </PaginationItem>
+
+              <PaginationItem>
+                <PaginationLink
+                  href="#"
+                  isActive={currentPage === 1}
+                  onClick={e => {
+                    e.preventDefault();
+                    handlePageChange(1);
+                  }}
+                >
+                  1
+                </PaginationLink>
+              </PaginationItem>
+
+              {currentPage > 3 && (
+                <PaginationItem>
+                  <PaginationEllipsis />
+                </PaginationItem>
+              )}
+
+              {Array.from({ length: 3 }, (_, i) => currentPage - 1 + i).map(page =>
+                page > 1 && page < totalPages ? (
+                  <PaginationItem key={page}>
+                    <PaginationLink
+                      href="#"
+                      isActive={currentPage === page}
+                      onClick={e => {
+                        e.preventDefault();
+                        handlePageChange(page);
+                      }}
+                    >
+                      {page}
+                    </PaginationLink>
+                  </PaginationItem>
+                ) : null
+              )}
+
+              {currentPage < totalPages - 2 && (
+                <PaginationItem>
+                  <PaginationEllipsis />
+                </PaginationItem>
+              )}
+
+              {totalPages > 1 && (
+                <PaginationItem>
+                  <PaginationLink
+                    href="#"
+                    isActive={currentPage === totalPages}
+                    onClick={e => {
+                      e.preventDefault();
+                      handlePageChange(totalPages);
+                    }}
+                  >
+                    {totalPages}
+                  </PaginationLink>
+                </PaginationItem>
+              )}
+
+              <PaginationItem>
+                <PaginationNext
+                  href="#"
+                  onClick={e => {
+                    e.preventDefault();
+                    handlePageChange(currentPage + 1);
+                  }}
+                />
+              </PaginationItem>
+
+              <PaginationItem>
+                <PaginationLink
+                  href="#"
+                  size="default"
+                  className="gap-1 pr-2.5"
+                  onClick={e => {
+                    e.preventDefault();
+                    handlePageChange(totalPages);
+                  }}
+                >
+                  <span>Última página</span>
+                  <ChevronsRight className="h-4 w-4" />
+                </PaginationLink>
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </>
+      )}
     </div>
   );
 };
+
+export default Home;
