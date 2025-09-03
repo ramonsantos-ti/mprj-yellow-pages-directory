@@ -13,17 +13,32 @@ export const useProfileSave = () => {
   const [saving, setSaving] = useState(false);
 
   const toArray = (value: any): string[] => {
-    if (Array.isArray(value)) return value.filter((v) => typeof v === 'string');
+    // Accept already-valid arrays of strings
+    if (Array.isArray(value)) {
+      return value
+        .filter((v) => typeof v === 'string')
+        .map((v: string) => v.trim())
+        .filter((v) => v.length > 0);
+    }
+
+    // If it's a JSON-like string array, try to parse it
     if (typeof value === 'string') {
       const trimmed = value.trim();
       if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
         try {
           const parsed = JSON.parse(trimmed);
-          if (Array.isArray(parsed)) return parsed.filter((v: any) => typeof v === 'string');
-        } catch {}
+          if (Array.isArray(parsed)) {
+            return parsed
+              .filter((v: any) => typeof v === 'string')
+              .map((v: string) => v.trim())
+              .filter((v) => v.length > 0);
+          }
+        } catch {/* ignore parse errors */}
       }
-      if (trimmed.length > 0) return [trimmed];
+      // For any other plain string (e.g., "cargo"), return empty to avoid malformed array literal
+      return [];
     }
+
     return [];
   };
 

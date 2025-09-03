@@ -85,10 +85,32 @@ export function useProfileEditFormController(profileId?: string, isAdminEdit?: b
     const biografia = typeof data.biografia === 'string' ? data.biografia : (data.biografia ? String(data.biografia) : '');
     const publicacoes = typeof data.publicacoes === 'string' ? data.publicacoes : (data.publicacoes ? String(data.publicacoes) : '');
 
+    const ensureArray = (v: any) => Array.isArray(v) ? v : (typeof v === 'string' && v.trim().startsWith('[') ? (() => { try { const p = JSON.parse(v); return Array.isArray(p) ? p : []; } catch { return []; } })() : []);
+
+    const cleanedData = {
+      ...data,
+      biografia,
+      publicacoes,
+      cargo: ensureArray(data.cargo),
+      funcao: ensureArray(data.funcao),
+      unidade: ensureArray(data.unidade),
+      temasInteresse: ensureArray(data.temasInteresse),
+      idiomas: ensureArray(data.idiomas),
+      certificacoes: ensureArray(data.certificacoes),
+    };
+
     console.log('[DEBUG][FORM BEFORE SUBMIT]:', {
       biografia,
       publicacoes,
-      formData: data,
+      formData: cleanedData,
+      types: {
+        cargo: typeof cleanedData.cargo,
+        funcao: typeof cleanedData.funcao,
+        unidade: typeof cleanedData.unidade,
+        temasInteresse: typeof cleanedData.temasInteresse,
+        idiomas: typeof cleanedData.idiomas,
+        certificacoes: typeof cleanedData.certificacoes,
+      },
       profileIdBeingEdited: profileId,
       isAdminEdit,
       targetProfileId: userProfile?.id
@@ -96,9 +118,9 @@ export function useProfileEditFormController(profileId?: string, isAdminEdit?: b
 
     // Atualizar os campos de biografia e publicacoes antes do submit
     await saveProfile(
-      { ...data, biografia, publicacoes },
+      cleanedData,
       fotoPreview,
-      data.formacaoAcademica || [],
+      cleanedData.formacaoAcademica || [],
       projetos,
       disponibilidade,
       profileId // Passando o profileId específico para o saveProfile
