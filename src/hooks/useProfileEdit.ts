@@ -46,7 +46,8 @@ export const useProfileEdit = (profileId?: string) => {
         () => {
           showSuccessMessage('Perfil salvo com sucesso!');
           loadUserProfile();
-        }
+        },
+        targetProfileId
       );
       
     } catch (err: any) {

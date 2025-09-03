@@ -19,7 +19,8 @@ export const useProfileSave = () => {
     projetos: any[],
     disponibilidade: any,
     userProfile?: Profile | null,
-    onSuccess?: () => void
+    onSuccess?: () => void,
+    targetProfileId?: string
   ) => {
     try {
       setSaving(true);
