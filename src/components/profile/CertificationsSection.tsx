@@ -88,11 +88,7 @@ const CertificationsSection: React.FC<CertificationsSectionProps> = ({ form }) =
           </div>
         )}
 
-        <input
-          type="hidden"
-          {...register('certificacoes')}
-          value={JSON.stringify(certificacoes)}
-        />
+        {/* Removido input oculto que serializava o array e causava problemas no submit */}
       </CardContent>
     </Card>
   );

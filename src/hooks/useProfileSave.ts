@@ -12,6 +12,21 @@ export const useProfileSave = () => {
   const { user } = useAuth();
   const [saving, setSaving] = useState(false);
 
+  const toArray = (value: any): string[] => {
+    if (Array.isArray(value)) return value.filter((v) => typeof v === 'string');
+    if (typeof value === 'string') {
+      const trimmed = value.trim();
+      if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+        try {
+          const parsed = JSON.parse(trimmed);
+          if (Array.isArray(parsed)) return parsed.filter((v: any) => typeof v === 'string');
+        } catch {}
+      }
+      if (trimmed.length > 0) return [trimmed];
+    }
+    return [];
+  };
+
   const saveProfile = async (
     data: any,
     fotoPreview: string,
@@ -45,15 +60,15 @@ export const useProfileSave = () => {
         email: data.email,
         telefone: data.telefone || null,
         biografia: safeBiografia || "",
-        cargo: data.cargo || [],
-        funcao: data.funcao || [],
-        unidade: data.unidade || [],
+        cargo: toArray(data.cargo),
+        funcao: toArray(data.funcao),
+        unidade: toArray(data.unidade),
         informacoes_complementares: informacoesComplementares || "",
-        temas_interesse: data.temasInteresse || [],
-        idiomas: data.idiomas || [],
+        temas_interesse: toArray(data.temasInteresse),
+        idiomas: toArray(data.idiomas),
         link_curriculo: data.linkCurriculo || "",
-        foto_url: fotoPreview || "",
-        certificacoes: data.certificacoes || [],
+        foto_url: typeof fotoPreview === 'string' ? fotoPreview : '',
+        certificacoes: toArray(data.certificacoes),
         publicacoes: safePublicacoes || "",
         aceite_termos: data.aceiteTermos || false,
         updated_at: new Date().toISOString(),
