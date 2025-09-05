@@ -52,7 +52,7 @@ export function useProfileEditFormController(profileId?: string, isAdminEdit?: b
       hasPopulatedProfile.current = true;
     } else if (!userProfile && user && !profileId && !hasPopulatedProfile.current) {
       // Novo usuário ou profile não existente, popular valores mínimos
-      form.setValue('name', user.email || '');
+      form.setValue('name', user.name || ''); // Usar o nome do usuário, não o email
       form.setValue('email', user.email || '');
       form.setValue('matricula', '');
       hasPopulatedProfile.current = true;

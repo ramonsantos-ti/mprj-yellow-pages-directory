@@ -90,9 +90,10 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ profileId, isAdminEdi
 
   return <div className="max-w-6xl mx-auto space-y-6">
       <div className="text-center space-y-4">
-        <h1 className="text-3xl font-bold text-gray-900">
-          {isAdminEdit && userProfile ? `Editando Perfil: ${userProfile.name}` : userProfile ? 'Editar Perfil' : 'Criar Perfil'}
-        </h1>
+         <h1 className="text-3xl font-bold text-gray-900">
+           {isAdminEdit && userProfile ? `Editando Perfil: ${userProfile.name}` : 
+            (userProfile || (!profileId && loading === false)) ? 'Editar Perfil' : 'Criar Perfil'}
+         </h1>
         <p className="text-lg text-gray-600">
           {isAdminEdit ? 'Editando perfil como administrador' : 'Complete suas informações para aparecer nas buscas públicas'}
         </p>
