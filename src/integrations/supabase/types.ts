@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -434,20 +434,20 @@ export type Database = {
       create_audit_log: {
         Args: {
           p_action: string
-          p_entity_type: string
-          p_entity_id?: string
-          p_user_name?: string
-          p_user_matricula?: string
-          p_details?: string
-          p_previous_value?: string
-          p_new_value?: string
-          p_severity_level?: string
-          p_operation_type?: string
-          p_module?: string
-          p_changes_summary?: Json
           p_affected_fields?: string[]
-          p_success?: boolean
+          p_changes_summary?: Json
+          p_details?: string
+          p_entity_id?: string
+          p_entity_type: string
           p_error_message?: string
+          p_module?: string
+          p_new_value?: string
+          p_operation_type?: string
+          p_previous_value?: string
+          p_severity_level?: string
+          p_success?: boolean
+          p_user_matricula?: string
+          p_user_name?: string
         }
         Returns: string
       }
