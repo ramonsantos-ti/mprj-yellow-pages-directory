@@ -64,6 +64,18 @@ export const useProfileData = (profileId?: string) => {
       }
 
       console.log('Perfil encontrado:', profile);
+      console.log('Dados completos do perfil da base:', {
+        name: profile.name,
+        email: profile.email,
+        cargo: profile.cargo,
+        funcao: profile.funcao,
+        unidade: profile.unidade,
+        telefone: profile.telefone,
+        biografia: profile.biografia,
+        temas_interesse: profile.temas_interesse,
+        idiomas: profile.idiomas,
+        certificacoes: profile.certificacoes
+      });
 
       // Buscar dados relacionados usando o profile.id
       const [projectsRes, academicRes, experiencesRes, availabilityRes] = await Promise.all([
@@ -152,7 +164,19 @@ export const useProfileData = (profileId?: string) => {
         informacoesComplementares: enrichedProfile.informacoes_complementares || '',
       };
 
-      console.log('Perfil transformado com experiências:', transformedProfile.experienciasProfissionais);
+      console.log('Profile transformado final:', transformedProfile);
+      console.log('Dados específicos transformados:', {
+        name: transformedProfile.name,
+        email: transformedProfile.email,
+        cargo: transformedProfile.cargo,
+        funcao: transformedProfile.funcao,
+        unidade: transformedProfile.unidade,
+        telefone: transformedProfile.telefone,
+        biografia: transformedProfile.biografia,
+        temasInteresse: transformedProfile.temasInteresse,
+        idiomas: transformedProfile.idiomas,
+        certificacoes: transformedProfile.certificacoes
+      });
       setUserProfile(transformedProfile);
       return transformedProfile;
     } catch (err: any) {

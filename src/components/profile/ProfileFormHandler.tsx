@@ -29,6 +29,19 @@ export const useProfileFormHandler = ({
 }: ProfileFormHandlerProps) => {
 
   const populateFormWithProfile = (profile: Profile) => {
+    console.log('[ProfileFormHandler] Populando formulário com perfil:', profile);
+    console.log('[ProfileFormHandler] Dados específicos recebidos:', {
+      name: profile.name,
+      email: profile.email,
+      cargo: profile.cargo,
+      funcao: profile.funcao,
+      unidade: profile.unidade,
+      telefone: profile.telefone,
+      biografia: profile.biografia,
+      temasInteresse: profile.temasInteresse,
+      idiomas: profile.idiomas,
+      certificacoes: profile.certificacoes
+    });
     setFotoPreview(profile.fotoUrl || '');
     form.setValue('name', profile.name || '');
     form.setValue('matricula', profile.matricula || '');
@@ -48,6 +61,19 @@ export const useProfileFormHandler = ({
     form.setValue('formacaoAcademica', profile.formacaoAcademica || []);
     form.setValue('experienciasProfissionais', profile.experienciasProfissionais || []);
     form.setValue('informacoesComplementares', profile.informacoesComplementares ?? "");
+
+    console.log('[ProfileFormHandler] Valores definidos no formulário:', {
+      name: form.getValues('name'),
+      email: form.getValues('email'),
+      cargo: form.getValues('cargo'),
+      funcao: form.getValues('funcao'),
+      unidade: form.getValues('unidade'),
+      telefone: form.getValues('telefone'),
+      biografia: form.getValues('biografia'),
+      temasInteresse: form.getValues('temasInteresse'),
+      idiomas: form.getValues('idiomas'),
+      certificacoes: form.getValues('certificacoes')
+    });
 
     setProjetos(profile.projetos || []);
 
