@@ -50,8 +50,9 @@ export function useProfileEditFormController(profileId?: string, isAdminEdit?: b
       console.log("[DEBUG] É edição admin?", isAdminEdit);
       populateFormWithProfile(userProfile);
       hasPopulatedProfile.current = true;
-    } else if (!userProfile && user && !profileId && !hasPopulatedProfile.current) {
-      // Novo usuário ou profile não existente, popular valores mínimos
+    } else if (!userProfile && user && !profileId && !loading && !hasPopulatedProfile.current) {
+      // Novo usuário ou profile não existente (apenas se não estiver carregando), popular valores mínimos
+      console.log("[DEBUG] Populando dados mínimos para novo usuário");
       form.setValue('name', user.name || ''); // Usar o nome do usuário, não o email
       form.setValue('email', user.email || '');
       form.setValue('matricula', '');
