@@ -17,7 +17,14 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 }) => {
   const { user, isLoading } = useAuth();
 
+  console.log('[ProtectedRoute] States:', { 
+    user: user ? { id: user.id, email: user.email, name: user.name } : null, 
+    isLoading, 
+    requiredRole 
+  });
+
   if (isLoading) {
+    console.log('[ProtectedRoute] Still loading, showing loading screen');
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -29,6 +36,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   if (!user) {
+    console.log('[ProtectedRoute] No user found, showing access denied');
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
         <Card className="max-w-md w-full">
