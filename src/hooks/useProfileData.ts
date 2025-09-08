@@ -17,6 +17,12 @@ export const useProfileData = (profileId?: string) => {
   const loadUserProfile = async () => {
     try {
       setLoading(true);
+      console.log('[useProfileData] Iniciando carregamento. States:', { 
+        profileId, 
+        userId: user?.id, 
+        userEmail: user?.email,
+        userName: user?.name 
+      });
       
       let profile;
       
@@ -56,6 +62,7 @@ export const useProfileData = (profileId?: string) => {
         }
 
         profile = data;
+        console.log('[useProfileData] Resultado da busca por user_id:', { data, error });
       }
 
       if (!profile) {

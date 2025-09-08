@@ -44,6 +44,14 @@ export function useProfileEditFormController(profileId?: string, isAdminEdit?: b
   const hasPopulatedProfile = useRef(false);
 
   useEffect(() => {
+    console.log("[DEBUG] Effect triggered - States:", {
+      hasUserProfile: !!userProfile,
+      hasUser: !!user,
+      profileId,
+      loading,
+      hasPopulated: hasPopulatedProfile.current
+    });
+    
     if (userProfile && !hasPopulatedProfile.current) {
       console.log("[DEBUG] Populando formulário com userProfile:", userProfile);
       console.log("[DEBUG] Profile ID sendo editado:", profileId || "próprio usuário");
