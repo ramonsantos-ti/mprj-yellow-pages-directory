@@ -114,7 +114,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                         </div>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
-                          <Link to="/profile" className="flex items-center">
+                          <Link 
+                            to="/profile" 
+                            className="flex items-center"
+                            onClick={() => console.log('[Layout] Clicando em Meu Perfil - navegando para /profile')}
+                          >
                             <User className="mr-2 h-4 w-4" />
                             <span>Meu Perfil</span>
                           </Link>
