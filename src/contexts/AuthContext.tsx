@@ -41,6 +41,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const fetchUserProfile = async (supabaseUser: SupabaseUser): Promise<User | null> => {
     try {
       console.log('AuthContext: Fetching profile for user:', supabaseUser.id, supabaseUser.email);
+      console.log('AuthContext: User metadata:', supabaseUser.user_metadata);
       
       let { data: profile, error } = await supabase
         .from('profiles')
