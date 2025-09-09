@@ -33,6 +33,18 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
+  // Debug temporário
+  console.log('[Layout] Current user state:', {
+    hasUser: !!user,
+    user: user ? {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      profileId: user.profileId
+    } : null
+  });
+
   const handleLogout = async () => {
     await logout();
     navigate('/auth');
