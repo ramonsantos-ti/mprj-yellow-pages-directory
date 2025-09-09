@@ -29,8 +29,6 @@ interface ProfileEditFormProps {
 
 // Componente apenas para renderizar o formulário, lógica ficou separada
 const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ profileId, isAdminEdit }) => {
-  console.log('[ProfileEditForm] INICIO - Component mounting with props:', { profileId, isAdminEdit });
-  
   const {
     userProfile,
     loading,
@@ -47,16 +45,6 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ profileId, isAdminEdi
     disponibilidade,
     setDisponibilidade
   } = useProfileEditFormController(profileId, isAdminEdit);
-
-  console.log('[ProfileEditForm] Hook states received:', {
-    hasUserProfile: !!userProfile,
-    loading,
-    saving,
-    error,
-    userProfileId: userProfile?.id,
-    userProfileName: userProfile?.name,
-    userProfileEmail: userProfile?.email
-  });
 
   function renderFormErrors() {
     const errors = form.formState.errors;
@@ -90,15 +78,6 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ profileId, isAdminEdi
       </div>;
   }
 
-  // Debug info para o teste
-  console.log('[DEBUG][ProfileEditForm] Props recebidas:', {
-    profileId,
-    isAdminEdit,
-    userProfileId: userProfile?.id,
-    userProfileName: userProfile?.name,
-    hasProfileId: !!profileId,
-    isAdminEditFlag: !!isAdminEdit
-  });
 
   return <div className="max-w-6xl mx-auto space-y-6">
       <div className="text-center space-y-4">

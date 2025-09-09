@@ -17,18 +17,25 @@ export const useProfileData = (profileId?: string) => {
   const loadUserProfile = async () => {
     try {
       setLoading(true);
+      
+      // Obter o auth.uid() diretamente do Supabase
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      const authUserId = authUser?.id;
+      
       console.log('[useProfileData] Iniciando carregamento. States:', { 
         profileId, 
-        userId: user?.id, 
+        authUserId,
+        contextUserId: user?.id, 
         userEmail: user?.email,
-        userName: user?.name 
+        userName: user?.name,
+        authUserEmail: authUser?.email
       });
       
       let profile;
       
       if (profileId) {
         // Modo admin: buscar perfil específico por ID do perfil
-        console.log('Buscando perfil específico por ID:', profileId);
+        console.log('[useProfileData] Buscando perfil específico por ID:', profileId);
         const { data, error } = await supabase
           .from('profiles')
           .select('*')
@@ -36,33 +43,43 @@ export const useProfileData = (profileId?: string) => {
           .single();
           
         if (error) {
-          console.error('Erro ao buscar perfil por ID:', error);
+          console.error('[useProfileData] Erro ao buscar perfil por ID:', error);
           throw error;
         }
         
         profile = data;
+        console.log('[useProfileData] Perfil encontrado por ID:', profile);
       } else {
         // Modo usuário: buscar próprio perfil
-        if (!user?.id) {
-          console.log('Usuário não encontrado ou não logado:', user);
+        // Priorizar auth.uid(), fallback para user.id
+        const targetUserId = authUserId || user?.id;
+        
+        if (!targetUserId) {
+          console.log('[useProfileData] Usuário não encontrado ou não logado. Auth user:', authUser, 'Context user:', user);
           setError('Usuário não encontrado');
           return null;
         }
         
-        console.log('Buscando próprio perfil do usuário:', user.id);
+        console.log('[useProfileData] Buscando próprio perfil do usuário:', targetUserId);
         const { data, error } = await supabase
           .from('profiles')
           .select('*')
-          .eq('user_id', user.id)
+          .eq('user_id', targetUserId)
           .maybeSingle();
 
         if (error && error.code !== 'PGRST116') {
-          console.error('Erro ao buscar próprio perfil:', error);
+          console.error('[useProfileData] Erro ao buscar próprio perfil:', error);
           throw error;
         }
 
         profile = data;
-        console.log('[useProfileData] Resultado da busca por user_id:', { data, error });
+        console.log('[useProfileData] Resultado da busca por user_id:', { 
+          targetUserId, 
+          data, 
+          error,
+          authUserId,
+          contextUserId: user?.id
+        });
       }
 
       if (!profile) {

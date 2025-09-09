@@ -37,10 +37,7 @@ const App = () => (
             <Route path="/profile" element={
               <Layout>
                 <ProtectedRoute>
-                  {(() => {
-                    console.log('[App] Renderizando rota /profile - ProfileEdit');
-                    return <ProfileEdit />;
-                  })()}
+                  <ProfileEdit />
                 </ProtectedRoute>
               </Layout>
             } />

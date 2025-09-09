@@ -49,26 +49,48 @@ export function useProfileEditFormController(profileId?: string, isAdminEdit?: b
       hasUser: !!user,
       profileId,
       loading,
-      hasPopulated: hasPopulatedProfile.current
+      hasPopulated: hasPopulatedProfile.current,
+      userProfileData: userProfile ? {
+        id: userProfile.id,
+        name: userProfile.name,
+        email: userProfile.email
+      } : null
     });
     
     if (userProfile && !hasPopulatedProfile.current) {
-      console.log("[DEBUG] Populando formulário com userProfile:", userProfile);
+      console.log("[DEBUG] Populando formulário com userProfile:", {
+        profileId: userProfile.id,
+        name: userProfile.name,
+        email: userProfile.email,
+        matricula: userProfile.matricula
+      });
       console.log("[DEBUG] Profile ID sendo editado:", profileId || "próprio usuário");
       console.log("[DEBUG] É edição admin?", isAdminEdit);
       populateFormWithProfile(userProfile);
       hasPopulatedProfile.current = true;
     } else if (!userProfile && user && !profileId && !loading && !hasPopulatedProfile.current) {
       // Novo usuário ou profile não existente (apenas se não estiver carregando), popular valores mínimos
-      console.log("[DEBUG] Populando dados mínimos para novo usuário");
+      console.log("[DEBUG] Populando dados mínimos para novo usuário:", {
+        userId: user.id,
+        userName: user.name,
+        userEmail: user.email
+      });
       form.setValue('name', user.name || ''); // Usar o nome do usuário, não o email
       form.setValue('email', user.email || '');
       form.setValue('matricula', '');
       hasPopulatedProfile.current = true;
       console.log("[DEBUG] Form setado para dados mínimos");
+    } else {
+      console.log("[DEBUG] Condições não atendidas para popular form:", {
+        hasUserProfile: !!userProfile,
+        hasUser: !!user,
+        profileId,
+        loading,
+        hasPopulated: hasPopulatedProfile.current
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userProfile, user, profileId]);
+  }, [userProfile, user, profileId, loading]);
 
   // Resetar controle se mudar o profile (novo login/etc)
   useEffect(() => {

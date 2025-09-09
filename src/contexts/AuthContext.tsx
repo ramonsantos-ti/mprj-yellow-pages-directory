@@ -40,53 +40,64 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Fetch user profile data from Supabase
   const fetchUserProfile = async (supabaseUser: SupabaseUser): Promise<User | null> => {
     try {
-      console.log('AuthContext: Fetching profile for user:', supabaseUser.id, supabaseUser.email);
-      console.log('AuthContext: User metadata:', supabaseUser.user_metadata);
+      console.log('[AuthContext] Fetching profile for user:', supabaseUser.id, supabaseUser.email);
+      console.log('[AuthContext] User metadata:', supabaseUser.user_metadata);
       
       let { data: profile, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('user_id', supabaseUser.id)
-        .single();
+        .maybeSingle();
 
-      if (error) {
-        console.error('Error fetching user profile:', error);
-        
+      console.log('[AuthContext] Profile search by user_id result:', { profile, error });
+
+      if (!profile && !error) {
         // Se não encontrou o perfil pelo user_id, tenta buscar pelo email
-        console.log('AuthContext: Trying to fetch profile by email:', supabaseUser.email);
+        console.log('[AuthContext] Trying to fetch profile by email:', supabaseUser.email);
         const { data: profileByEmail, error: emailError } = await supabase
           .from('profiles')
           .select('*')
           .eq('email', supabaseUser.email)
-          .single();
+          .maybeSingle();
           
-        if (emailError) {
-          console.error('Error fetching user profile by email:', emailError);
-          return null;
-        }
-        
-        // Atualiza o user_id do perfil encontrado
-        const { error: updateError } = await supabase
-          .from('profiles')
-          .update({ user_id: supabaseUser.id })
-          .eq('id', profileByEmail.id);
+        console.log('[AuthContext] Profile search by email result:', { profileByEmail, emailError });
           
-        if (updateError) {
-          console.error('Error updating profile user_id:', updateError);
+        if (profileByEmail && !emailError) {
+          // Atualiza o user_id do perfil encontrado
+          const { error: updateError } = await supabase
+            .from('profiles')
+            .update({ user_id: supabaseUser.id })
+            .eq('id', profileByEmail.id);
+            
+          if (updateError) {
+            console.error('[AuthContext] Error updating profile user_id:', updateError);
+          } else {
+            console.log('[AuthContext] Profile user_id updated successfully');
+          }
+          
+          profile = { ...profileByEmail, user_id: supabaseUser.id };
         }
-        
-        profile = profileByEmail;
       }
 
-      if (!profile) {
-        console.error('No profile found for user:', supabaseUser.email);
+      if (error && error.code !== 'PGRST116') {
+        console.error('[AuthContext] Error fetching user profile:', error);
         return null;
       }
 
-      console.log('AuthContext: Profile loaded successfully:', profile.name, profile.role);
+      if (!profile) {
+        console.log('[AuthContext] No profile found for user:', supabaseUser.email);
+        return null;
+      }
+
+      console.log('[AuthContext] Profile loaded successfully:', {
+        name: profile.name,
+        role: profile.role,
+        profileId: profile.id,
+        userId: profile.user_id
+      });
 
       return {
-        id: supabaseUser.id,
+        id: supabaseUser.id, // Garantir que seja sempre o auth.uid()
         email: profile.email,
         name: profile.name,
         matricula: profile.matricula,
