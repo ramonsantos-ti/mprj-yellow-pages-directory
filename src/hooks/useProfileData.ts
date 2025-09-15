@@ -51,35 +51,48 @@ export const useProfileData = (profileId?: string) => {
         console.log('[useProfileData] Perfil encontrado por ID:', profile);
       } else {
         // Modo usuário: buscar próprio perfil
-        // Priorizar auth.uid(), fallback para user.id
+        // Estratégia: priorizar busca por e-mail (robusta contra user_id inconsistente), depois fallback por user_id
+        const targetEmail = authUser?.email || user?.email;
         const targetUserId = authUserId || user?.id;
-        
-        if (!targetUserId) {
-          console.log('[useProfileData] Usuário não encontrado ou não logado. Auth user:', authUser, 'Context user:', user);
-          setError('Usuário não encontrado');
-          return null;
+
+        let data: any = null;
+        let error: any = null;
+
+        if (targetEmail) {
+          console.log('[useProfileData] Buscando perfil pelo e-mail (prioritário):', targetEmail);
+          const byEmailRes = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('email', targetEmail)
+            .order('updated_at', { ascending: false })
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
+          data = byEmailRes.data as any;
+          error = byEmailRes.error;
+          console.log('[useProfileData] Resultado da busca por e-mail:', { found: !!data, error });
         }
-        
-        console.log('[useProfileData] Buscando próprio perfil do usuário:', targetUserId);
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('user_id', targetUserId)
-          .maybeSingle();
+
+        if (!data && targetUserId) {
+          console.log('[useProfileData] Fallback: buscando perfil por user_id:', targetUserId);
+          const byUserIdRes = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('user_id', targetUserId)
+            .maybeSingle();
+
+          data = byUserIdRes.data as any;
+          error = byUserIdRes.error;
+          console.log('[useProfileData] Resultado da busca por user_id (fallback):', { found: !!data, error });
+        }
 
         if (error && error.code !== 'PGRST116') {
-          console.error('[useProfileData] Erro ao buscar próprio perfil:', error);
+          console.error('[useProfileData] Erro ao buscar perfil do usuário:', error);
           throw error;
         }
 
         profile = data;
-        console.log('[useProfileData] Resultado da busca por user_id:', { 
-          targetUserId, 
-          data, 
-          error,
-          authUserId,
-          contextUserId: user?.id
-        });
       }
 
       if (!profile) {
