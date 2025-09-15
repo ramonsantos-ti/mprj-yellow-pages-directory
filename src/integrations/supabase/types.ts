@@ -269,6 +269,30 @@ export type Database = {
           },
         ]
       }
+      disability_types: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       professional_experiences: {
         Row: {
           atividades: string | null
@@ -310,6 +334,38 @@ export type Database = {
           },
         ]
       }
+      profile_disabilities: {
+        Row: {
+          additional_info: string | null
+          created_at: string
+          disability_type_id: string
+          id: string
+          profile_id: string
+        }
+        Insert: {
+          additional_info?: string | null
+          created_at?: string
+          disability_type_id: string
+          id?: string
+          profile_id: string
+        }
+        Update: {
+          additional_info?: string | null
+          created_at?: string
+          disability_type_id?: string
+          id?: string
+          profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_disabilities_disability_type_id_fkey"
+            columns: ["disability_type_id"]
+            isOneToOne: false
+            referencedRelation: "disability_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           aceite_termos: boolean | null
@@ -324,9 +380,11 @@ export type Database = {
           idiomas: string[] | null
           informacoes_complementares: string | null
           is_active: boolean | null
+          is_pcd: boolean | null
           link_curriculo: string | null
           matricula: string
           name: string
+          pcd_visibility_level: string | null
           publicacoes: string | null
           role: Database["public"]["Enums"]["app_role"] | null
           telefone: string | null
@@ -349,9 +407,11 @@ export type Database = {
           idiomas?: string[] | null
           informacoes_complementares?: string | null
           is_active?: boolean | null
+          is_pcd?: boolean | null
           link_curriculo?: string | null
           matricula: string
           name: string
+          pcd_visibility_level?: string | null
           publicacoes?: string | null
           role?: Database["public"]["Enums"]["app_role"] | null
           telefone?: string | null
@@ -374,9 +434,11 @@ export type Database = {
           idiomas?: string[] | null
           informacoes_complementares?: string | null
           is_active?: boolean | null
+          is_pcd?: boolean | null
           link_curriculo?: string | null
           matricula?: string
           name?: string
+          pcd_visibility_level?: string | null
           publicacoes?: string | null
           role?: Database["public"]["Enums"]["app_role"] | null
           telefone?: string | null

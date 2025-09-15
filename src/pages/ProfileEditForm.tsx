@@ -18,6 +18,7 @@ import ProfessionalExperienceSection from '../components/profile/ProfessionalExp
 import StatusMessages from '../components/profile/StatusMessages';
 import InterestAreaSelector from '../components/InterestAreaSelector';
 import LanguagesSection from '../components/profile/LanguagesSection';
+import { DisabilitySection } from '../components/profile/DisabilitySection';
 import { Form } from '../components/ui/form';
 import { safeCargos, safeFuncoes, safeUnidades, safeTiposColaboracao, safeDisponibilidadeEstimada, safeFormasContato, isValidSelectValue } from '../components/profile/ProfileFormConstants';
 import { useProfileEditFormController } from '../hooks/useProfileEditFormController';
@@ -142,6 +143,8 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ profileId, isAdminEdi
           </div>
 
           <AdditionalInfo form={form} />
+          
+          <DisabilitySection form={form} />
 
           {renderFormErrors()}
 

@@ -7,6 +7,7 @@ import { saveAcademicFormations } from './profileSave/saveAcademicFormations';
 import { saveProjects } from './profileSave/saveProjects';
 import { saveProfessionalExperiences } from './profileSave/saveProfessionalExperiences';
 import { saveAvailability } from './profileSave/saveAvailability';
+import { saveDisabilities } from './profileSave/saveDisabilities';
 
 export const useProfileSave = () => {
   const { user } = useAuth();
@@ -86,6 +87,8 @@ export const useProfileSave = () => {
         certificacoes: toArray(data.certificacoes),
         publicacoes: safePublicacoes || "",
         aceite_termos: data.aceiteTermos || false,
+        is_pcd: data.isPcd || false,
+        pcd_visibility_level: data.pcdVisibilityLevel || 'logged_users',
         updated_at: new Date().toISOString(),
         updated_by_admin: userProfile && userProfile.userId !== user?.id // Marca como editado por admin se for diferente
       };
@@ -173,6 +176,7 @@ export const useProfileSave = () => {
         await saveProjects(profileId, projetos);
         await saveProfessionalExperiences(profileId, data.experienciasProfissionais);
         await saveAvailability(profileId, disponibilidade);
+        await saveDisabilities(profileId, data.disabilities || []);
         console.log('[DEBUG][useProfileSave] Dados relacionados salvos para perfil ID:', profileId);
       }
       onSuccess?.();

@@ -12,6 +12,7 @@ import ProfileAdditionalInfo from "./ProfileAdditionalInfo";
 import LanguagesAndCertifications from "./LanguagesAndCertifications";
 import ProfileInterestAreas from "./ProfileInterestAreas";
 import PublicationsAndCurriculum from "./PublicationsAndCurriculum";
+import { ProfileDisabilityCard } from "./ProfileDisabilityCard";
 
 interface ProfileDetailViewProps {
   profileId: string;
@@ -52,6 +53,15 @@ const ProfileDetailView: React.FC<ProfileDetailViewProps> = ({ profileId }) => {
         <ProfileInterestAreas temasInteresse={userProfile.temasInteresse || []} />
         <ProfileAdditionalInfo informacoesComplementares={userProfile.informacoesComplementares || ""} />
       </div>
+
+      {/* Informações sobre Deficiência */}
+      {userProfile.isPcd && userProfile.disabilities && userProfile.disabilities.length > 0 && (
+        <ProfileDisabilityCard 
+          disabilities={userProfile.disabilities} 
+          visibilityLevel={userProfile.pcdVisibilityLevel || 'logged_users'}
+          showVisibilityInfo={true}
+        />
+      )}
 
       <LanguagesAndCertifications idiomas={userProfile.idiomas || []} certificacoes={userProfile.certificacoes || []} />
       <PublicationsAndCurriculum

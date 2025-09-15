@@ -105,18 +105,23 @@ export const useProfileData = (profileId?: string) => {
       console.log('Perfil encontrado:', profile);
 
       // Buscar dados relacionados usando o profile.id
-      const [projectsRes, academicRes, experiencesRes, availabilityRes] = await Promise.all([
+      const [projectsRes, academicRes, experiencesRes, availabilityRes, disabilitiesRes] = await Promise.all([
         supabase.from('projects').select('*').eq('profile_id', profile.id),
         supabase.from('academic_formations').select('*').eq('profile_id', profile.id),
         supabase.from('professional_experiences').select('*').eq('profile_id', profile.id),
-        supabase.from('availability').select('*').eq('profile_id', profile.id)
+        supabase.from('availability').select('*').eq('profile_id', profile.id),
+        supabase.from('profile_disabilities').select(`
+          *,
+          disability_type:disability_types(*)
+        `).eq('profile_id', profile.id)
       ]);
 
       console.log('Dados relacionados carregados:', {
         projects: projectsRes.data?.length || 0,
         academic: academicRes.data?.length || 0,
         experiences: experiencesRes.data?.length || 0,
-        availability: availabilityRes.data?.length || 0
+        availability: availabilityRes.data?.length || 0,
+        disabilities: disabilitiesRes.data?.length || 0
       });
 
       // Combinar os resultados
@@ -125,7 +130,8 @@ export const useProfileData = (profileId?: string) => {
         projects: projectsRes.data || [],
         academic_formations: academicRes.data || [],
         professional_experiences: experiencesRes.data || [],
-        availability: availabilityRes.data || []
+        availability: availabilityRes.data || [],
+        disabilities: disabilitiesRes.data || []
       };
 
       const transformedProfile: Profile = {
@@ -189,6 +195,9 @@ export const useProfileData = (profileId?: string) => {
           horarioPreferencial: ''
         },
         informacoesComplementares: enrichedProfile.informacoes_complementares || '',
+        isPcd: enrichedProfile.is_pcd || false,
+        pcdVisibilityLevel: enrichedProfile.pcd_visibility_level || 'logged_users',
+        disabilities: enrichedProfile.disabilities || []
       };
 
       console.log('Profile transformado final:', transformedProfile);

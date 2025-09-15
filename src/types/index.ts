@@ -39,6 +39,9 @@ export interface Profile {
   role?: 'admin' | 'user';
   updatedByAdmin?: boolean;
   informacoesComplementares?: string;
+  isPcd?: boolean;
+  pcdVisibilityLevel?: PcdVisibilityLevel;
+  disabilities?: ProfileDisability[];
 }
 
 export interface Project {
@@ -76,6 +79,25 @@ export interface ContatoPreferencia {
   horarioPreferencial?: string;
 }
 
+export type PcdVisibilityLevel = 'public' | 'logged_users' | 'admin_only';
+
+export interface DisabilityType {
+  id: string;
+  name: string;
+  category: 'fisica' | 'visual' | 'auditiva' | 'intelectual' | 'multipla';
+  description?: string;
+  created_at?: string;
+}
+
+export interface ProfileDisability {
+  id: string;
+  profile_id: string;
+  disability_type_id: string;
+  disability_type?: DisabilityType;
+  additional_info?: string;
+  created_at?: string;
+}
+
 export interface SearchFilters {
   cargo?: string;
   funcao?: string;
@@ -85,4 +107,6 @@ export interface SearchFilters {
   formacao?: string;
   idioma?: string;
   disponibilidade?: string;
+  deficiencia?: string;
+  tipoPcd?: string;
 }

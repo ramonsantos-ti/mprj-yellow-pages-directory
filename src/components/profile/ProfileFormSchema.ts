@@ -20,6 +20,12 @@ export const experienciaProfissionalSchema = z.object({
   atividades: z.string().optional(),
 });
 
+// Schema para informações de deficiência
+export const profileDisabilitySchema = z.object({
+  disabilityTypeId: z.string(),
+  additionalInfo: z.string().optional(),
+});
+
 // Schema principal do perfil
 export const profileSchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório'),
@@ -39,6 +45,9 @@ export const profileSchema = z.object({
   aceiteTermos: z.boolean().refine(val => val === true, 'Você deve aceitar os termos'),
   formacaoAcademica: z.array(formacaoAcademicaSchema).optional(),
   experienciasProfissionais: z.array(experienciaProfissionalSchema).optional(),
+  isPcd: z.boolean().optional(),
+  pcdVisibilityLevel: z.enum(['public', 'logged_users', 'admin_only']).optional(),
+  disabilities: z.array(profileDisabilitySchema).optional(),
 });
 
 // Valores padrão para o formulário
@@ -60,6 +69,9 @@ export const defaultFormValues = {
   aceiteTermos: false,
   formacaoAcademica: [],
   experienciasProfissionais: [],
+  isPcd: false,
+  pcdVisibilityLevel: 'logged_users' as const,
+  disabilities: [],
 };
 
 export type ProfileFormData = z.infer<typeof profileSchema>;

@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { SearchFilters as SearchFiltersType } from '../types';
+import { useDisabilityTypes } from '@/hooks/useDisabilityTypes';
 import { 
   CARGOS,
   FUNCOES,
@@ -29,6 +30,8 @@ const SearchFiltersComponent: React.FC<SearchFiltersProps> = ({
   onFiltersChange,
   onClearFilters
 }) => {
+  const { disabilityTypes } = useDisabilityTypes();
+  
   const handleFilterChange = (key: keyof SearchFiltersType, value: string) => {
     onFiltersChange({
       ...filters,
@@ -176,6 +179,35 @@ const SearchFiltersComponent: React.FC<SearchFiltersProps> = ({
                 {DISPONIBILIDADE_ESTIMADA.map((disp) => (
                   <SelectItem key={disp} value={disp}>
                     {disp}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <label className="text-sm font-medium text-gray-700 mb-2 block">Pessoa com Deficiência</label>
+            <Select value={filters.deficiencia || ''} onValueChange={(value) => handleFilterChange('deficiencia', value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Filtrar por PcD" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="true">Apenas PcD</SelectItem>
+                <SelectItem value="false">Excluir PcD</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <label className="text-sm font-medium text-gray-700 mb-2 block">Tipo de Deficiência</label>
+            <Select value={filters.tipoPcd || ''} onValueChange={(value) => handleFilterChange('tipoPcd', value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione tipo de deficiência" />
+              </SelectTrigger>
+              <SelectContent>
+                {disabilityTypes.map((type) => (
+                  <SelectItem key={type.id} value={type.name}>
+                    {type.name}
                   </SelectItem>
                 ))}
               </SelectContent>
