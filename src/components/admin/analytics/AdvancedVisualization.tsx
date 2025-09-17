@@ -123,14 +123,14 @@ const AdvancedVisualization: React.FC<AdvancedVisualizationProps> = ({ profiles 
   return (
     <div className="space-y-6">
       {/* Primeira linha - Gráficos principais */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6">
         {/* Distribuição por Unidades */}
         <Card>
           <CardHeader>
             <CardTitle>Distribuição por Unidades</CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={450}>
               <PieChart>
                 <Pie
                   data={unitData}
@@ -158,7 +158,7 @@ const AdvancedVisualization: React.FC<AdvancedVisualizationProps> = ({ profiles 
             <CardTitle>Top 10 Áreas de Conhecimento</CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={450}>
               <BarChart data={areasData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis 
@@ -178,14 +178,14 @@ const AdvancedVisualization: React.FC<AdvancedVisualizationProps> = ({ profiles 
       </div>
 
       {/* Segunda linha - Formação e Timeline */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6">
         {/* Distribuição de Formação */}
         <Card>
           <CardHeader>
             <CardTitle>Distribuição por Formação Acadêmica</CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={250}>
+            <ResponsiveContainer width="100%" height={400}>
               <PieChart>
                 <Pie
                   data={educationChartData}
@@ -213,7 +213,7 @@ const AdvancedVisualization: React.FC<AdvancedVisualizationProps> = ({ profiles 
             <CardTitle>Evolução da Base de Conhecimento</CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={250}>
+            <ResponsiveContainer width="100%" height={400}>
               <AreaChart data={timelineData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="month" />
@@ -228,14 +228,14 @@ const AdvancedVisualization: React.FC<AdvancedVisualizationProps> = ({ profiles 
       </div>
 
       {/* Terceira linha - Engajamento e Matriz de Competências */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6">
         {/* Engajamento por Unidade */}
         <Card>
           <CardHeader>
             <CardTitle>Engajamento por Unidade</CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={400}>
               <BarChart data={engagementData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" angle={-45} textAnchor="end" height={80} fontSize={12} />

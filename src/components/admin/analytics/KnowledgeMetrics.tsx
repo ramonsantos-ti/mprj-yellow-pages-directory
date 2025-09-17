@@ -3,8 +3,9 @@ import { Profile } from '../../../types';
 import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
 import { Badge } from '../../ui/badge';
 import { Progress } from '../../ui/progress';
-import { GraduationCap, Users, Brain, Target } from 'lucide-react';
+import { GraduationCap, Users, Brain, Target, AlertTriangle } from 'lucide-react';
 import MetricLabel from '../../common/MetricLabel';
+import { INTEREST_AREAS } from '../../../data/interestAreas';
 
 interface KnowledgeMetricsProps {
   profiles: Profile[];
@@ -35,11 +36,14 @@ const KnowledgeMetrics: React.FC<KnowledgeMetricsProps> = ({ profiles }) => {
   const totalKnowledgeAreas = allAreas.length;
   
   // Especialistas por área (densidade)
-  const areaSpecialists = allAreas.map(area => ({
-    area,
-    count: activeProfiles.filter(p => p.temasInteresse?.includes(area)).length,
-    density: (activeProfiles.filter(p => p.temasInteresse?.includes(area)).length / activeProfiles.length) * 100
-  })).sort((a, b) => b.count - a.count);
+  const areaSpecialists = allAreas.map(area => {
+    const specialistProfiles = activeProfiles.filter(p => p.temasInteresse?.includes(area));
+    return {
+      area,
+      count: specialistProfiles.length,
+      density: (specialistProfiles.length / activeProfiles.length) * 100
+    };
+  }).sort((a, b) => b.count - a.count);
 
   // Lacunas de conhecimento (áreas com poucos especialistas)
   const knowledgeGaps = areaSpecialists.filter(area => area.count <= 2);
@@ -47,10 +51,21 @@ const KnowledgeMetrics: React.FC<KnowledgeMetricsProps> = ({ profiles }) => {
   // Cobertura de conhecimento organizacional
   const coverageScore = Math.round(((totalKnowledgeAreas - knowledgeGaps.length) / totalKnowledgeAreas) * 100);
 
+  // Áreas mapeadas que não possuem especialistas
+  const allMappedAreas = Object.values(INTEREST_AREAS).flat();
+  const areasWithoutSpecialists = allMappedAreas.filter(mappedArea => 
+    !activeProfiles.some(profile => 
+      profile.temasInteresse?.some(tema => 
+        tema.toLowerCase().includes(mappedArea.toLowerCase()) || 
+        mappedArea.toLowerCase().includes(tema.toLowerCase())
+      )
+    )
+  );
+
   // Índice de diversidade por unidade
   const allUnidades = [...new Set(activeProfiles.flatMap(p => p.unidade || []))];
-  const unitDiversity = allUnidades.map(unit => {
-    const unitProfiles = activeProfiles.filter(p => p.unidade?.includes(unit));
+  const unitDiversity = allUnidades.filter(unit => unit && unit.trim()).map(unit => {
+    const unitProfiles = activeProfiles.filter(p => p.unidade?.some(u => u === unit));
     const unitAreas = [...new Set(unitProfiles.flatMap(p => p.temasInteresse || []))];
     return {
       unit,
@@ -58,7 +73,7 @@ const KnowledgeMetrics: React.FC<KnowledgeMetricsProps> = ({ profiles }) => {
       areasCount: unitAreas.length,
       diversityIndex: unitProfiles.length > 0 ? Math.round((unitAreas.length / unitProfiles.length) * 100) / 100 : 0
     };
-  }).sort((a, b) => b.diversityIndex - a.diversityIndex);
+  }).filter(unit => unit.profileCount > 0).sort((a, b) => b.diversityIndex - a.diversityIndex);
 
   return (
     <div className="space-y-6">
@@ -87,7 +102,7 @@ const KnowledgeMetrics: React.FC<KnowledgeMetricsProps> = ({ profiles }) => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-secondary">{educationLevels.mestrado || 0}</div>
+            <div className="text-2xl font-bold text-black">{educationLevels.mestrado || 0}</div>
             <div className="text-xs text-muted-foreground">
               {Math.round(((educationLevels.mestrado || 0) / activeProfiles.length) * 100)}% do total
             </div>
@@ -102,7 +117,7 @@ const KnowledgeMetrics: React.FC<KnowledgeMetricsProps> = ({ profiles }) => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-accent">{totalKnowledgeAreas}</div>
+            <div className="text-2xl font-bold text-black">{totalKnowledgeAreas}</div>
             <div className="text-xs text-muted-foreground">Temas únicos mapeados</div>
           </CardContent>
         </Card>
@@ -183,6 +198,56 @@ const KnowledgeMetrics: React.FC<KnowledgeMetricsProps> = ({ profiles }) => {
                 </div>
               </div>
             ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Lacunas de Conhecimento */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <AlertTriangle className="w-5 h-5" />
+            <MetricLabel label="Lacunas de Conhecimento" description="Áreas mapeadas no sistema que não possuem especialistas cadastrados." />
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+              <div>
+                <h4 className="font-semibold text-red-600 mb-2">Total de lacunas: {areasWithoutSpecialists.length}</h4>
+                <p className="text-muted-foreground text-xs">
+                  De {allMappedAreas.length} áreas mapeadas, {areasWithoutSpecialists.length} não possuem especialistas.
+                </p>
+              </div>
+            </div>
+            
+            <div className="space-y-3">
+              {Object.entries(INTEREST_AREAS).map(([category, areas]) => {
+                const categoryGaps = areas.filter(area => areasWithoutSpecialists.includes(area));
+                if (categoryGaps.length === 0) return null;
+                
+                return (
+                  <div key={category} className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <h4 className="font-medium text-sm">{category}</h4>
+                      <Badge variant="destructive">{categoryGaps.length} lacunas</Badge>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                      {categoryGaps.slice(0, 8).map((area, index) => (
+                        <div key={index} className="text-xs p-2 bg-red-50 rounded border-l-2 border-red-300">
+                          {area}
+                        </div>
+                      ))}
+                      {categoryGaps.length > 8 && (
+                        <div className="text-xs p-2 bg-gray-50 rounded border-l-2 border-gray-300 text-muted-foreground">
+                          +{categoryGaps.length - 8} outras
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </CardContent>
       </Card>

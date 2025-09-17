@@ -12,6 +12,23 @@ interface CollaborationMetricsProps {
 const CollaborationMetrics: React.FC<CollaborationMetricsProps> = ({ profiles }) => {
   const activeProfiles = profiles.filter(p => p.isActive !== false);
   
+  // Mapeamento de tipos de colaboração para versões acentuadas
+  const collaborationMapping: Record<string, string> = {
+    'Consultoria interna': 'Consultoria Interna',
+    'Parecer tecnico': 'Parecer Técnico',
+    'Parecer técnico': 'Parecer Técnico',
+    'Capacitacao/treinamento': 'Capacitação/Treinamento',
+    'Capacitação/treinamento': 'Capacitação/Treinamento',
+    'Projeto especial': 'Projeto Especial',
+    'Mentoria': 'Mentoria',
+    'Coaching': 'Coaching',
+    'Grupo de trabalho': 'Grupo de Trabalho',
+    'Comissao': 'Comissão',
+    'Comissão': 'Comissão',
+    'Grupo de Atuacao Especializada': 'Grupo de Atuação Especializada',
+    'Grupo de Atuação Especializada': 'Grupo de Atuação Especializada'
+  };
+
   // Disponibilidade para Colaboração
   const collaborationTypes = activeProfiles.reduce((acc, profile) => {
     profile.disponibilidade?.tipoColaboracao?.forEach(tipo => {
@@ -154,7 +171,7 @@ const CollaborationMetrics: React.FC<CollaborationMetricsProps> = ({ profiles })
               .map(([tipo, count]) => (
                 <div key={tipo} className="space-y-1">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium">{tipo}</span>
+                    <span className="text-sm font-medium">{collaborationMapping[tipo] || tipo}</span>
                     <div className="flex items-center space-x-2">
                       <Badge variant="secondary">{count} pessoas</Badge>
                       <span className="text-xs text-muted-foreground">

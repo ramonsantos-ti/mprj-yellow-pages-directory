@@ -8,6 +8,7 @@ import CollaborationMetrics from './analytics/CollaborationMetrics';
 import DataQualityMetrics from './analytics/DataQualityMetrics';
 import AdvancedVisualization from './analytics/AdvancedVisualization';
 import TrendAnalysis from './analytics/TrendAnalysis';
+import PcdMetrics from './analytics/PcdMetrics';
 
 interface AnalyticsTabProps {
   profiles: Profile[];
@@ -22,6 +23,7 @@ const AnalyticsTab: React.FC<AnalyticsTabProps> = ({ profiles }) => {
         <TabsTrigger value="collaboration">Colaboração</TabsTrigger>
         <TabsTrigger value="executive">Executivo</TabsTrigger>
         <TabsTrigger value="quality">Qualidade</TabsTrigger>
+        <TabsTrigger value="pcd">PcD</TabsTrigger>
         <TabsTrigger value="trends">Tendências</TabsTrigger>
       </TabsList>
       
