@@ -130,15 +130,15 @@ const AdvancedVisualization: React.FC<AdvancedVisualizationProps> = ({ profiles 
             <CardTitle>Distribuição por Unidades</CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={450}>
+            <ResponsiveContainer width="100%" height={500}>
               <PieChart>
                 <Pie
                   data={unitData}
                   cx="50%"
                   cy="50%"
-                  labelLine={false}
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                  outerRadius={80}
+                  labelLine={true}
+                  label={({ fullName, percent }) => `${fullName}: ${(percent * 100).toFixed(0)}%`}
+                  outerRadius={120}
                   fill="#8884d8"
                   dataKey="value"
                 >
@@ -158,15 +158,16 @@ const AdvancedVisualization: React.FC<AdvancedVisualizationProps> = ({ profiles 
             <CardTitle>Top 10 Áreas de Conhecimento</CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={450}>
-              <BarChart data={areasData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+            <ResponsiveContainer width="100%" height={500}>
+              <BarChart data={areasData} margin={{ top: 5, right: 30, left: 20, bottom: 120 }}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis 
-                  dataKey="name" 
+                  dataKey="fullName" 
                   angle={-45}
                   textAnchor="end"
-                  height={100}
-                  fontSize={12}
+                  height={120}
+                  fontSize={11}
+                  interval={0}
                 />
                 <YAxis />
                 <Tooltip formatter={(value, name, props) => [value, `Especialistas em ${props.payload.fullName}`]} />
@@ -235,10 +236,10 @@ const AdvancedVisualization: React.FC<AdvancedVisualizationProps> = ({ profiles 
             <CardTitle>Engajamento por Unidade</CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={400}>
-              <BarChart data={engagementData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+            <ResponsiveContainer width="100%" height={450}>
+              <BarChart data={engagementData.map(d => ({ ...d, fullName: unitData.find(u => u.name === d.name)?.fullName || d.name }))} margin={{ top: 5, right: 30, left: 20, bottom: 120 }}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" angle={-45} textAnchor="end" height={80} fontSize={12} />
+                <XAxis dataKey="fullName" angle={-45} textAnchor="end" height={120} fontSize={11} interval={0} />
                 <YAxis />
                 <Tooltip />
                 <Bar dataKey="disponibilidade" fill="#00C49F" name="% Disponível para Colaboração" />
@@ -252,17 +253,32 @@ const AdvancedVisualization: React.FC<AdvancedVisualizationProps> = ({ profiles 
         <Card>
           <CardHeader>
             <CardTitle>Matriz de Competências (Unidade x Área)</CardTitle>
+            <p className="text-sm text-muted-foreground mt-2">
+              Esta matriz mostra a distribuição de especialistas por área de conhecimento em cada unidade. 
+              Cada célula representa a quantidade de profissionais que atuam em uma área específica dentro da unidade.
+              Cores mais intensas indicam maior concentração de especialistas.
+            </p>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
+            <div className="space-y-3">
+              {/* Cabeçalho com áreas */}
+              <div className="flex space-x-1 pl-32">
+                {areasData.slice(0, 6).map((area, idx) => (
+                  <div key={idx} className="flex-1 text-xs text-center font-medium text-muted-foreground">
+                    <div className="transform -rotate-45 origin-left">{area.name}</div>
+                  </div>
+                ))}
+              </div>
+              
+              {/* Linhas da matriz */}
               {competencyMatrix.map((unit, unitIndex) => (
-                <div key={unitIndex} className="space-y-1">
-                  <div className="text-sm font-medium">{unit.unit}</div>
-                  <div className="flex space-x-1">
+                <div key={unitIndex} className="flex space-x-1 items-center">
+                  <div className="text-sm font-medium w-32 truncate" title={unit.unit}>{unit.unit}</div>
+                  <div className="flex space-x-1 flex-1">
                     {unit.areas.map((area, areaIndex) => (
                       <div 
                         key={areaIndex}
-                        className="flex-1 h-6 rounded text-xs flex items-center justify-center text-white font-medium"
+                        className="flex-1 h-8 rounded text-xs flex items-center justify-center text-white font-medium cursor-help"
                         style={{
                           backgroundColor: area.count === 0 ? '#e5e7eb' : 
                                          area.count <= 2 ? '#fbbf24' :
@@ -270,28 +286,30 @@ const AdvancedVisualization: React.FC<AdvancedVisualizationProps> = ({ profiles 
                         }}
                         title={`${area.area}: ${area.count} especialistas`}
                       >
-                        {area.count}
+                        {area.count > 0 ? area.count : '-'}
                       </div>
                     ))}
                   </div>
                 </div>
               ))}
-              <div className="flex justify-center space-x-4 text-xs mt-4">
+              
+              {/* Legenda */}
+              <div className="flex justify-center space-x-4 text-xs mt-4 pt-4 border-t">
                 <div className="flex items-center space-x-1">
                   <div className="w-4 h-4 bg-gray-300 rounded"></div>
-                  <span>0</span>
+                  <span>Nenhum</span>
                 </div>
                 <div className="flex items-center space-x-1">
                   <div className="w-4 h-4 bg-yellow-400 rounded"></div>
-                  <span>1-2</span>
+                  <span>1-2 especialistas</span>
                 </div>
                 <div className="flex items-center space-x-1">
                   <div className="w-4 h-4 bg-blue-500 rounded"></div>
-                  <span>3-5</span>
+                  <span>3-5 especialistas</span>
                 </div>
                 <div className="flex items-center space-x-1">
                   <div className="w-4 h-4 bg-green-500 rounded"></div>
-                  <span>6+</span>
+                  <span>6+ especialistas</span>
                 </div>
               </div>
             </div>

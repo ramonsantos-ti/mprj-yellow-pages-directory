@@ -17,14 +17,14 @@ interface AnalyticsTabProps {
 const AnalyticsTab: React.FC<AnalyticsTabProps> = ({ profiles }) => {
   return (
     <Tabs defaultValue="visualization" className="w-full">
-      <TabsList className="grid w-full grid-cols-6">
-        <TabsTrigger value="visualization">Visualizações</TabsTrigger>
-        <TabsTrigger value="knowledge">Conhecimento</TabsTrigger>
-        <TabsTrigger value="collaboration">Colaboração</TabsTrigger>
-        <TabsTrigger value="executive">Executivo</TabsTrigger>
-        <TabsTrigger value="quality">Qualidade</TabsTrigger>
-        <TabsTrigger value="pcd">PcD</TabsTrigger>
-        <TabsTrigger value="trends">Tendências</TabsTrigger>
+      <TabsList className="grid w-full grid-cols-7 gap-1">
+        <TabsTrigger value="visualization" className="text-xs px-2">Visualizações</TabsTrigger>
+        <TabsTrigger value="knowledge" className="text-xs px-2">Conhecimento</TabsTrigger>
+        <TabsTrigger value="collaboration" className="text-xs px-2">Colaboração</TabsTrigger>
+        <TabsTrigger value="executive" className="text-xs px-2">Executivo</TabsTrigger>
+        <TabsTrigger value="quality" className="text-xs px-2">Qualidade</TabsTrigger>
+        <TabsTrigger value="pcd" className="text-xs px-2">PcD</TabsTrigger>
+        <TabsTrigger value="trends" className="text-xs px-2">Tendências</TabsTrigger>
       </TabsList>
       
       <TabsContent value="executive" className="mt-6">
@@ -45,6 +45,10 @@ const AnalyticsTab: React.FC<AnalyticsTabProps> = ({ profiles }) => {
       
       <TabsContent value="visualization" className="mt-6">
         <AdvancedVisualization profiles={profiles} />
+      </TabsContent>
+      
+      <TabsContent value="pcd" className="mt-6">
+        <PcdMetrics profiles={profiles} />
       </TabsContent>
       
       <TabsContent value="trends" className="mt-6">

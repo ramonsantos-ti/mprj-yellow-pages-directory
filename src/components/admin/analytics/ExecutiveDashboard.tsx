@@ -259,39 +259,6 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({ profiles }) => 
       </Card>
 
 
-      {/* Resumo Executivo */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Resumo Executivo - Gestão do Conhecimento</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="prose max-w-none text-sm">
-            <p className="mb-3">
-              <strong>Situação Atual:</strong> O MPRJ conta com <strong>{kpis.totalActive} perfis ativos</strong> 
-              mapeados em <strong>{kpis.knowledgeAreas} áreas de conhecimento</strong>, sendo 
-              <strong> {kpis.experts} profissionais</strong> com formação de pós-graduação.
-            </p>
-            
-            <p className="mb-3">
-              <strong>Principais Fortalezas:</strong> Forte concentração de expertise jurídica, 
-              boa base de profissionais qualificados ({performanceIndices.expertise}% com pós-graduação), 
-              e {performanceIndices.engagement}% dos perfis disponíveis para colaboração interna.
-            </p>
-            
-            <p className="mb-3">
-              <strong>Desafios Identificados:</strong> Existem lacunas significativas em áreas não-jurídicas, 
-              especialmente em tecnologia, engenharia e comunicação. A cobertura de conhecimento atual 
-              é de {performanceIndices.knowledgeCoverage}%, indicando necessidade de diversificação.
-            </p>
-            
-            <p>
-              <strong>Recomendações Estratégicas:</strong> 1) Mapear competências críticas em áreas carentes; 
-              2) Desenvolver parcerias para suprir lacunas técnicas; 3) Incentivar capacitação multidisciplinar; 
-              4) Implementar programa de mentoria interna para maximizar transferência de conhecimento.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 };

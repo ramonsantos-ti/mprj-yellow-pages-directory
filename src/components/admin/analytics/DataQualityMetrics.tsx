@@ -96,12 +96,13 @@ const DataQualityMetrics: React.FC<DataQualityMetricsProps> = ({ profiles }) => 
     const avgCompleteness = unitCompleteness.length > 0 
       ? Math.round(unitCompleteness.reduce((acc, score) => acc + score, 0) / unitCompleteness.length)
       : 0;
+    const excellentCount = unitProfiles.filter(p => calculateCompletenessScore(p) >= 90).length;
     
     return {
       unit,
       profileCount: unitProfiles.length,
       avgCompleteness,
-      excellentProfiles: unitProfiles.filter(p => calculateCompletenessScore(p) >= 90).length
+      excellentProfiles: excellentCount
     };
   }).sort((a, b) => b.avgCompleteness - a.avgCompleteness);
 

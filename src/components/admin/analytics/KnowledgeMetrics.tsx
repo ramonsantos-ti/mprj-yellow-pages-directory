@@ -130,9 +130,11 @@ const KnowledgeMetrics: React.FC<KnowledgeMetricsProps> = ({ profiles }) => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{coverageScore}%</div>
+            <div className="text-2xl font-bold text-green-600">
+              {Math.round(((allAreas.length / Object.values(INTEREST_AREAS).flat().length) * 100))}%
+            </div>
             <div className="text-xs text-muted-foreground">
-              {knowledgeGaps.length} lacunas identificadas
+              {allAreas.length} de {Object.values(INTEREST_AREAS).flat().length} áreas mapeadas cobertas
             </div>
           </CardContent>
         </Card>
@@ -148,7 +150,7 @@ const KnowledgeMetrics: React.FC<KnowledgeMetricsProps> = ({ profiles }) => {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {areaSpecialists.slice(0, 8).map((area, index) => (
+            {areaSpecialists.map((area, index) => (
               <div key={index} className="space-y-1">
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-medium">{area.area}</span>
@@ -180,7 +182,7 @@ const KnowledgeMetrics: React.FC<KnowledgeMetricsProps> = ({ profiles }) => {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {unitDiversity.slice(0, 6).map((unit, index) => (
+            {unitDiversity.map((unit, index) => (
               <div key={index} className="flex justify-between items-center">
                 <div className="flex-1">
                   <div className="font-medium text-sm">{unit.unit}</div>
