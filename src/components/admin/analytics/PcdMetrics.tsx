@@ -28,7 +28,8 @@ const PcdMetrics: React.FC<PcdMetricsProps> = ({ profiles }) => {
   
   // Filtrar apenas perfis PcD que o usuário pode visualizar
   const pcdProfiles = activeProfiles.filter(p => {
-    if (!p.isPcd || !p.disabilities || p.disabilities.length === 0) return false;
+    // Verificar se tem deficiências cadastradas
+    if (!p.disabilities || p.disabilities.length === 0) return false;
     
     // Verificar se pode visualizar baseado no nível de visibilidade
     const visibilityLevel = p.pcdVisibilityLevel || 'logged_users';
