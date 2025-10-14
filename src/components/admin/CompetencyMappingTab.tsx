@@ -62,21 +62,10 @@ const CompetencyMappingTab: React.FC = () => {
   const loadAdminCompetencies = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('admin_competencies')
-        .select('*')
-        .order('category', { ascending: true })
-        .order('name', { ascending: true });
-
-      if (error) throw error;
-      setAdminCompetencies(data || []);
+      // Tabela admin_competencies ainda não foi criada no banco
+      setAdminCompetencies([]);
     } catch (error) {
       console.error('Erro ao carregar competências:', error);
-      toast({
-        title: "Erro",
-        description: "Não foi possível carregar as competências cadastradas.",
-        variant: "destructive"
-      });
     } finally {
       setLoading(false);
     }
@@ -88,112 +77,29 @@ const CompetencyMappingTab: React.FC = () => {
 
   // Adicionar nova competência
   const handleAddCompetency = async () => {
-    if (!formData.name.trim() || !formData.category) {
-      toast({
-        title: "Erro",
-        description: "Nome e categoria são obrigatórios.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    try {
-      const { error } = await supabase
-        .from('admin_competencies')
-        .insert([{
-          name: formData.name.trim(),
-          category: formData.category,
-          description: formData.description.trim() || null,
-          is_active: true
-        }]);
-
-      if (error) throw error;
-
-      toast({
-        title: "Sucesso",
-        description: "Competência adicionada com sucesso."
-      });
-
-      setFormData({ name: '', category: '', description: '' });
-      setIsAddDialogOpen(false);
-      loadAdminCompetencies();
-    } catch (error) {
-      console.error('Erro ao adicionar competência:', error);
-      toast({
-        title: "Erro",
-        description: "Não foi possível adicionar a competência.",
-        variant: "destructive"
-      });
-    }
+    toast({
+      title: "Funcionalidade em Configuração",
+      description: "É necessário criar a tabela admin_competencies no banco de dados primeiro.",
+      variant: "destructive"
+    });
   };
 
   // Editar competência
   const handleEditCompetency = async () => {
-    if (!editingCompetency || !formData.name.trim() || !formData.category) {
-      toast({
-        title: "Erro",
-        description: "Nome e categoria são obrigatórios.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    try {
-      const { error } = await supabase
-        .from('admin_competencies')
-        .update({
-          name: formData.name.trim(),
-          category: formData.category,
-          description: formData.description.trim() || null
-        })
-        .eq('id', editingCompetency.id);
-
-      if (error) throw error;
-
-      toast({
-        title: "Sucesso",
-        description: "Competência atualizada com sucesso."
-      });
-
-      setEditingCompetency(null);
-      setFormData({ name: '', category: '', description: '' });
-      loadAdminCompetencies();
-    } catch (error) {
-      console.error('Erro ao atualizar competência:', error);
-      toast({
-        title: "Erro",
-        description: "Não foi possível atualizar a competência.",
-        variant: "destructive"
-      });
-    }
+    toast({
+      title: "Funcionalidade em Configuração",
+      description: "É necessário criar a tabela admin_competencies no banco de dados primeiro.",
+      variant: "destructive"
+    });
   };
 
   // Remover competência
   const handleRemoveCompetency = async (id: string) => {
-    if (!confirm('Tem certeza que deseja remover esta competência?')) return;
-
-    try {
-      const { error } = await supabase
-        .from('admin_competencies')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-
-      toast({
-        title: "Sucesso",
-        description: "Competência removida com sucesso."
-      });
-
-      loadAdminCompetencies();
-    } catch (error) {
-      console.error('Erro ao remover competência:', error);
-      toast({
-        title: "Erro",
-        description: "Não foi possível remover a competência.",
-        variant: "destructive"
-      });
-    }
+    toast({
+      title: "Funcionalidade em Configuração",
+      description: "É necessário criar a tabela admin_competencies no banco de dados primeiro.",
+      variant: "destructive"
+    });
   };
 
   // Preparar edição
@@ -370,46 +276,18 @@ const CompetencyMappingTab: React.FC = () => {
               <span>Áreas Cadastradas pelo Admin</span>
             </CardTitle>
             <p className="text-sm text-muted-foreground">
-              Competências gerenciadas pelos administradores ({adminCompetencies.length} cadastradas)
+              Competências gerenciadas pelos administradores (0 cadastradas)
             </p>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3 max-h-96 overflow-y-auto">
-              {filteredAdminCompetencies.map((competency) => (
-                <div key={competency.id} className="flex justify-between items-center p-3 border rounded-lg">
-                  <div className="flex-1">
-                    <div className="font-medium text-sm">{competency.name}</div>
-                    <div className="text-xs text-muted-foreground">
-                      {competency.category}
-                      {competency.description && ` • ${competency.description.substring(0, 50)}...`}
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Badge variant={competency.is_active ? "default" : "secondary"}>
-                      {competency.is_active ? "Ativo" : "Inativo"}
-                    </Badge>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => startEdit(competency)}
-                    >
-                      <Edit className="w-3 h-3" />
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleRemoveCompetency(competency.id)}
-                    >
-                      <Trash2 className="w-3 h-3" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
-              {filteredAdminCompetencies.length === 0 && (
-                <div className="text-center text-muted-foreground py-8">
-                  Nenhuma competência cadastrada encontrada com os filtros aplicados.
-                </div>
-              )}
+            <div className="flex flex-col items-center justify-center py-12 space-y-4">
+              <Settings className="w-12 h-12 text-muted-foreground" />
+              <div className="text-center space-y-2">
+                <p className="font-medium">Funcionalidade em Configuração</p>
+                <p className="text-sm text-muted-foreground max-w-md">
+                  Para utilizar o gerenciamento de competências pelo administrador, é necessário criar a tabela <code className="bg-muted px-1 py-0.5 rounded">admin_competencies</code> no banco de dados.
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>
