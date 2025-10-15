@@ -19,8 +19,19 @@ export const useAdminProfiles = () => {
           projects(*),
           academic_formations(*),
           professional_experiences(*),
-          availability(*),
-          profile_disabilities:profile_disabilities(
+          availability(*)
+        `)
+        .order('updated_at', { ascending: false });
+
+      if (error) throw error;
+
+      // Buscar deficiências separadamente
+      const profileIds = data.map(p => p.id);
+      let disabilitiesByProfile: Record<string, any[]> = {};
+      if (profileIds.length > 0) {
+        const { data: disData, error: disError } = await supabase
+          .from('profile_disabilities')
+          .select(`
             id,
             profile_id,
             disability_type_id,
@@ -29,11 +40,16 @@ export const useAdminProfiles = () => {
             disability_types:disability_types(
               id, name, category, description, created_at
             )
-          )
-        `)
-        .order('updated_at', { ascending: false });
-
-      if (error) throw error;
+          `)
+          .in('profile_id', profileIds);
+        
+        if (!disError && disData) {
+          disabilitiesByProfile = disData.reduce((acc, d: any) => {
+            (acc[d.profile_id] ||= []).push(d);
+            return acc;
+          }, {} as Record<string, any[]>);
+        }
+      }
 
       const transformedProfiles: Profile[] = data.map(profile => ({
         id: profile.id,
@@ -95,7 +111,7 @@ export const useAdminProfiles = () => {
         },
         isPcd: profile.is_pcd ?? false,
         pcdVisibilityLevel: (profile.pcd_visibility_level as 'public' | 'logged_users' | 'admin_only') || 'logged_users',
-        disabilities: (profile.profile_disabilities || []).map((d: any) => ({
+        disabilities: (disabilitiesByProfile[profile.id] || []).map((d: any) => ({
           id: d.id,
           profile_id: d.profile_id,
           disability_type_id: d.disability_type_id,
