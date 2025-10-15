@@ -27,8 +27,35 @@ export const useProfiles = () => {
 
       console.log('Raw profiles data from Supabase:', data);
 
-      // Transform Supabase data to match our Profile type
-      const transformedProfiles: Profile[] = data.map(profile => {
+      // Buscar deficiências separadamente (não há relação declarada profiles -> profile_disabilities)
+      const profileIds = (data as any[]).map(p => p.id);
+      let disabilitiesByProfile: Record<string, any[]> = {};
+      if (profileIds.length > 0) {
+        const { data: disData, error: disError } = await supabase
+          .from('profile_disabilities')
+          .select(`
+            id,
+            profile_id,
+            disability_type_id,
+            additional_info,
+            created_at,
+            disability_types:disability_types(
+              id, name, category, description, created_at
+            )
+          `)
+          .in('profile_id', profileIds);
+        if (!disError && disData) {
+          disabilitiesByProfile = (disData as any[]).reduce((acc, d) => {
+            (acc[d.profile_id] ||= []).push(d);
+            return acc;
+          }, {} as Record<string, any[]>);
+        } else {
+          console.warn('Não foi possível carregar deficiências:', disError);
+        }
+      }
+
+      // Transform Supabase data para nosso tipo Profile, anexando deficiências
+      const transformedProfiles: Profile[] = (data as any[]).map((profile: any) => {
         console.log('Processing profile:', profile.name, 'foto_url:', profile.foto_url);
         
         return {
@@ -88,7 +115,23 @@ export const useProfiles = () => {
           } : {
             formaContato: 'email',
             horarioPreferencial: ''
-          }
+          },
+          isPcd: profile.is_pcd ?? false,
+          pcdVisibilityLevel: (profile.pcd_visibility_level as 'public' | 'logged_users' | 'admin_only') || 'logged_users',
+          disabilities: (profile.profile_disabilities || []).map((d: any) => ({
+            id: d.id,
+            profile_id: d.profile_id,
+            disability_type_id: d.disability_type_id,
+            additional_info: d.additional_info || '',
+            created_at: d.created_at,
+            disability_type: d.disability_types ? {
+              id: d.disability_types.id,
+              name: d.disability_types.name,
+              category: d.disability_types.category,
+              description: d.disability_types.description,
+              created_at: d.disability_types.created_at
+            } : undefined
+          }))
         };
       });
 

@@ -19,7 +19,17 @@ export const useAdminProfiles = () => {
           projects(*),
           academic_formations(*),
           professional_experiences(*),
-          availability(*)
+          availability(*),
+          profile_disabilities:profile_disabilities(
+            id,
+            profile_id,
+            disability_type_id,
+            additional_info,
+            created_at,
+            disability_types:disability_types(
+              id, name, category, description, created_at
+            )
+          )
         `)
         .order('updated_at', { ascending: false });
 
@@ -82,7 +92,23 @@ export const useAdminProfiles = () => {
         } : {
           formaContato: 'email',
           horarioPreferencial: ''
-        }
+        },
+        isPcd: profile.is_pcd ?? false,
+        pcdVisibilityLevel: (profile.pcd_visibility_level as 'public' | 'logged_users' | 'admin_only') || 'logged_users',
+        disabilities: (profile.profile_disabilities || []).map((d: any) => ({
+          id: d.id,
+          profile_id: d.profile_id,
+          disability_type_id: d.disability_type_id,
+          additional_info: d.additional_info || '',
+          created_at: d.created_at,
+          disability_type: d.disability_types ? {
+            id: d.disability_types.id,
+            name: d.disability_types.name,
+            category: d.disability_types.category,
+            description: d.disability_types.description,
+            created_at: d.disability_types.created_at
+          } : undefined
+        }))
       }));
 
       setProfiles(transformedProfiles);
