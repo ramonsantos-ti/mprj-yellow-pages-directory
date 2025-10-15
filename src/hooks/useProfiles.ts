@@ -30,6 +30,7 @@ export const useProfiles = () => {
       // Buscar deficiências separadamente (não há relação declarada profiles -> profile_disabilities)
       const profileIds = (data as any[]).map(p => p.id);
       let disabilitiesByProfile: Record<string, any[]> = {};
+      let disabilityTypesMap: Record<string, any> = {};
       if (profileIds.length > 0) {
         const { data: disData, error: disError } = await supabase
           .from('profile_disabilities')
@@ -38,10 +39,7 @@ export const useProfiles = () => {
             profile_id,
             disability_type_id,
             additional_info,
-            created_at,
-            disability_types:disability_types(
-              id, name, category, description, created_at
-            )
+            created_at
           `)
           .in('profile_id', profileIds);
         if (!disError && disData) {
@@ -51,6 +49,19 @@ export const useProfiles = () => {
           }, {} as Record<string, any[]>);
         } else {
           console.warn('Não foi possível carregar deficiências:', disError);
+        }
+
+        // Carregar tipos de deficiência separadamente (leitura pública permitida)
+        const { data: typesData, error: typesError } = await supabase
+          .from('disability_types')
+          .select('id, name, category, description, created_at');
+        if (!typesError && typesData) {
+          disabilityTypesMap = (typesData as any[]).reduce((acc, t) => {
+            acc[t.id] = t;
+            return acc;
+          }, {} as Record<string, any>);
+        } else {
+          console.warn('Não foi possível carregar disability_types:', typesError);
         }
       }
 
