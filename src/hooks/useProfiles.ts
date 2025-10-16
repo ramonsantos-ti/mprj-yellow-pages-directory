@@ -127,20 +127,20 @@ export const useProfiles = () => {
             formaContato: 'email',
             horarioPreferencial: ''
           },
-          isPcd: profile.is_pcd ?? false,
+          isPcd: (profile.is_pcd ?? false) || ((disabilitiesByProfile[profile.id]?.length ?? 0) > 0),
           pcdVisibilityLevel: (profile.pcd_visibility_level as 'public' | 'logged_users' | 'admin_only') || 'logged_users',
-          disabilities: (profile.profile_disabilities || []).map((d: any) => ({
+          disabilities: (disabilitiesByProfile[profile.id] || []).map((d: any) => ({
             id: d.id,
             profile_id: d.profile_id,
             disability_type_id: d.disability_type_id,
             additional_info: d.additional_info || '',
             created_at: d.created_at,
-            disability_type: d.disability_types ? {
-              id: d.disability_types.id,
-              name: d.disability_types.name,
-              category: d.disability_types.category,
-              description: d.disability_types.description,
-              created_at: d.disability_types.created_at
+            disability_type: disabilityTypesMap[d.disability_type_id] ? {
+              id: disabilityTypesMap[d.disability_type_id].id,
+              name: disabilityTypesMap[d.disability_type_id].name,
+              category: disabilityTypesMap[d.disability_type_id].category,
+              description: disabilityTypesMap[d.disability_type_id].description,
+              created_at: disabilityTypesMap[d.disability_type_id].created_at
             } : undefined
           }))
         };
