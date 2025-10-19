@@ -19,6 +19,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<{ error?: string }>;
   signup: (email: string, password: string, name: string, matricula: string) => Promise<{ error?: string }>;
   logout: () => Promise<void>;
+  changePassword: (newPassword: string) => Promise<{ error?: string }>;
   isLoading: boolean;
 }
 
@@ -245,8 +246,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const changePassword = async (newPassword: string): Promise<{ error?: string }> => {
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword
+      });
+
+      if (error) {
+        console.error('[AuthContext] Change password error:', error);
+        return { error: error.message };
+      }
+
+      return {};
+    } catch (error) {
+      console.error('[AuthContext] Change password exception:', error);
+      return { error: 'Ocorreu um erro ao alterar a senha. Tente novamente.' };
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, session, login, signup, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, session, login, signup, logout, changePassword, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

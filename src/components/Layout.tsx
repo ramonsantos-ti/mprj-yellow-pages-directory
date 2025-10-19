@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from './ui/button';
@@ -11,9 +11,10 @@ import {
   DropdownMenuTrigger 
 } from './ui/dropdown-menu';
 import { Avatar, AvatarFallback } from './ui/avatar';
-import { LogOut, User, Settings, Home } from 'lucide-react';
+import { LogOut, User, Settings, Home, Key } from 'lucide-react';
 import { SidebarProvider, SidebarTrigger } from './ui/sidebar';
 import { BarChart3, Search } from "lucide-react";
+import { ChangePasswordDialog } from './profile/ChangePasswordDialog';
 import {
   Sidebar,
   SidebarContent,
@@ -32,6 +33,7 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
 
   // Debug temporário
   console.log('[Layout] Current user state:', {
@@ -135,6 +137,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                             <span>Meu Perfil</span>
                           </Link>
                         </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setIsChangePasswordOpen(true)}>
+                          <Key className="mr-2 h-4 w-4" />
+                          <span>Alterar Senha</span>
+                        </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={handleLogout} className="text-red-600">
                           <LogOut className="mr-2 h-4 w-4" />
@@ -164,6 +170,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </main>
         </div>
       </div>
+      
+      {/* Change Password Dialog */}
+      <ChangePasswordDialog 
+        open={isChangePasswordOpen} 
+        onOpenChange={setIsChangePasswordOpen} 
+      />
     </SidebarProvider>
   );
 };
