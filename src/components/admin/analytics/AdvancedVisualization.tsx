@@ -3,6 +3,7 @@ import { Profile } from '../../../types';
 import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
 import { Badge } from '../../ui/badge';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, AreaChart, Area } from 'recharts';
+import { countProfilesByHighestEducation } from '../../../utils/educationLevels';
 
 interface AdvancedVisualizationProps {
   profiles: Profile[];
@@ -57,26 +58,8 @@ const AdvancedVisualization: React.FC<AdvancedVisualizationProps> = ({ profiles 
   }, [activeProfiles.length]);
 
 
-  // Distribuição de formação acadêmica
-  const educationData = activeProfiles.reduce((acc, profile) => {
-    profile.formacaoAcademica?.forEach(formation => {
-      const level = formation.nivel.toLowerCase();
-      let category = 'Outros';
-      
-      if (level.includes('doutorado') || level.includes('phd')) {
-        category = 'Doutorado';
-      } else if (level.includes('mestrado') || level.includes('master')) {
-        category = 'Mestrado';
-      } else if (level.includes('especialização') || level.includes('pós')) {
-        category = 'Especialização';
-      } else if (level.includes('graduação') || level.includes('bacharelado') || level.includes('licenciatura')) {
-        category = 'Graduação';
-      }
-      
-      acc[category] = (acc[category] || 0) + 1;
-    });
-    return acc;
-  }, {} as Record<string, number>);
+  // Distribuição de formação acadêmica - conta apenas a maior formação de cada pessoa
+  const educationData = countProfilesByHighestEducation(activeProfiles);
 
   const educationChartData = Object.entries(educationData)
     .map(([level, count]) => ({ name: level, value: count }))

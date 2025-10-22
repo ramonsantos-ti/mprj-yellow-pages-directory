@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import MetricLabel from '../../common/MetricLabel';
 import { usePcdPermissions } from '../../../hooks/usePcdPermissions';
+import { getHighestEducationLevel, EducationLevel } from '../../../utils/educationLevels';
 
 interface PcdMetricsProps {
   profiles: Profile[];
@@ -71,20 +72,27 @@ const PcdMetrics: React.FC<PcdMetricsProps> = ({ profiles }) => {
     .sort(([,a], [,b]) => b - a)
     .slice(0, 6);
 
-  // Formação acadêmica dos PcD
+  // Formação acadêmica dos PcD - conta apenas a maior formação de cada pessoa
   const educationStats = pcdProfiles.reduce((acc, profile) => {
-    profile.formacaoAcademica?.forEach(formation => {
-      const level = formation.nivel.toLowerCase();
-      if (level.includes('doutorado') || level.includes('phd')) {
-        acc.doutorado = (acc.doutorado || 0) + 1;
-      } else if (level.includes('mestrado') || level.includes('master')) {
-        acc.mestrado = (acc.mestrado || 0) + 1;
-      } else if (level.includes('especialização') || level.includes('pós')) {
-        acc.especializacao = (acc.especializacao || 0) + 1;
-      } else if (level.includes('graduação') || level.includes('bacharelado') || level.includes('licenciatura')) {
-        acc.graduacao = (acc.graduacao || 0) + 1;
+    const highestLevel = getHighestEducationLevel(profile);
+    
+    if (highestLevel !== null) {
+      switch (highestLevel) {
+        case EducationLevel.DOUTORADO:
+        case EducationLevel.POS_DOUTORADO:
+          acc.doutorado = (acc.doutorado || 0) + 1;
+          break;
+        case EducationLevel.MESTRADO:
+          acc.mestrado = (acc.mestrado || 0) + 1;
+          break;
+        case EducationLevel.POS_GRADUACAO:
+          acc.especializacao = (acc.especializacao || 0) + 1;
+          break;
+        case EducationLevel.SUPERIOR:
+          acc.graduacao = (acc.graduacao || 0) + 1;
+          break;
       }
-    });
+    }
     return acc;
   }, {} as Record<string, number>);
 

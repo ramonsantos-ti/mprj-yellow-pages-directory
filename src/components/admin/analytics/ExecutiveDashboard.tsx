@@ -14,6 +14,7 @@ import {
   Award 
 } from 'lucide-react';
 import MetricLabel from '../../common/MetricLabel';
+import { getHighestEducationLevel, EducationLevel } from '../../../utils/educationLevels';
 
 interface ExecutiveDashboardProps {
   profiles: Profile[];
@@ -33,14 +34,10 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({ profiles }) => 
     // Gestão do Conhecimento
     knowledgeAreas: [...new Set(activeProfiles.flatMap(p => p.temasInteresse || []))].length,
     specialists: activeProfiles.filter(p => p.temasInteresse && p.temasInteresse.length >= 3).length,
-    experts: activeProfiles.filter(p => 
-      p.formacaoAcademica?.some(f => {
-        const nivel = f.nivel.toLowerCase();
-        return nivel.includes('doutorado') || nivel.includes('mestrado') || 
-               nivel.includes('especialização') || nivel.includes('pós') ||
-               nivel.includes('mba');
-      })
-    ).length,
+    experts: activeProfiles.filter(p => {
+      const highestLevel = getHighestEducationLevel(p);
+      return highestLevel !== null && highestLevel >= EducationLevel.POS_GRADUACAO;
+    }).length,
     
     // Qualidade dos Dados
     completeProfiles: activeProfiles.filter(p => 

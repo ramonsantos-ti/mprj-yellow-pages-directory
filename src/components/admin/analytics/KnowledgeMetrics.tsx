@@ -6,6 +6,7 @@ import { Progress } from '../../ui/progress';
 import { GraduationCap, Users, Brain, Target, AlertTriangle } from 'lucide-react';
 import MetricLabel from '../../common/MetricLabel';
 import { INTEREST_AREAS } from '../../../data/interestAreas';
+import { getHighestEducationLevel, EducationLevel } from '../../../utils/educationLevels';
 
 interface KnowledgeMetricsProps {
   profiles: Profile[];
@@ -14,20 +15,27 @@ interface KnowledgeMetricsProps {
 const KnowledgeMetrics: React.FC<KnowledgeMetricsProps> = ({ profiles }) => {
   const activeProfiles = profiles.filter(p => p.isActive !== false);
   
-  // Capital Intelectual
+  // Capital Intelectual - conta apenas a maior formação de cada pessoa
   const educationLevels = activeProfiles.reduce((acc, profile) => {
-    profile.formacaoAcademica?.forEach(formation => {
-      const level = formation.nivel.toLowerCase();
-      if (level.includes('doutorado') || level.includes('phd')) {
-        acc.doutorado = (acc.doutorado || 0) + 1;
-      } else if (level.includes('mestrado') || level.includes('master')) {
-        acc.mestrado = (acc.mestrado || 0) + 1;
-      } else if (level.includes('especialização') || level.includes('pós')) {
-        acc.especializacao = (acc.especializacao || 0) + 1;
-      } else if (level.includes('graduação') || level.includes('bacharelado') || level.includes('licenciatura')) {
-        acc.graduacao = (acc.graduacao || 0) + 1;
+    const highestLevel = getHighestEducationLevel(profile);
+    
+    if (highestLevel !== null) {
+      switch (highestLevel) {
+        case EducationLevel.DOUTORADO:
+        case EducationLevel.POS_DOUTORADO:
+          acc.doutorado = (acc.doutorado || 0) + 1;
+          break;
+        case EducationLevel.MESTRADO:
+          acc.mestrado = (acc.mestrado || 0) + 1;
+          break;
+        case EducationLevel.POS_GRADUACAO:
+          acc.especializacao = (acc.especializacao || 0) + 1;
+          break;
+        case EducationLevel.SUPERIOR:
+          acc.graduacao = (acc.graduacao || 0) + 1;
+          break;
       }
-    });
+    }
     return acc;
   }, {} as Record<string, number>);
 
