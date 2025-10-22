@@ -56,23 +56,6 @@ const AdvancedVisualization: React.FC<AdvancedVisualizationProps> = ({ profiles 
     return months;
   }, [activeProfiles.length]);
 
-  // Dados para matriz de competências (heatmap simulado)
-  const competencyMatrix = React.useMemo(() => {
-    const topUnits = unitData.slice(0, 5);
-    const topAreas = areasData.slice(0, 6);
-    
-    return topUnits.map(unit => {
-      const unitProfiles = activeProfiles.filter(p => p.unidade?.includes(unit.fullName));
-      
-      return {
-        unit: unit.name,
-        areas: topAreas.map(area => ({
-          area: area.name,
-          count: unitProfiles.filter(p => p.temasInteresse?.some(tema => tema.includes(area.fullName))).length
-        }))
-      };
-    });
-  }, [activeProfiles, unitData, areasData]);
 
   // Distribuição de formação acadêmica
   const educationData = activeProfiles.reduce((acc, profile) => {
@@ -249,72 +232,6 @@ const AdvancedVisualization: React.FC<AdvancedVisualizationProps> = ({ profiles 
           </CardContent>
         </Card>
 
-        {/* Matriz de Competências */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Matriz de Competências (Unidade x Área)</CardTitle>
-            <p className="text-sm text-muted-foreground mt-2">
-              Esta matriz mostra a distribuição de especialistas por área de conhecimento em cada unidade. 
-              Cada célula representa a quantidade de profissionais que atuam em uma área específica dentro da unidade.
-              Cores mais intensas indicam maior concentração de especialistas.
-            </p>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {/* Cabeçalho com áreas */}
-              <div className="flex space-x-1 pl-32">
-                {areasData.slice(0, 6).map((area, idx) => (
-                  <div key={idx} className="flex-1 text-xs text-center font-medium text-muted-foreground">
-                    <div className="transform -rotate-45 origin-left">{area.name}</div>
-                  </div>
-                ))}
-              </div>
-              
-              {/* Linhas da matriz */}
-              {competencyMatrix.map((unit, unitIndex) => (
-                <div key={unitIndex} className="flex space-x-1 items-center">
-                  <div className="text-sm font-medium w-32 truncate" title={unit.unit}>{unit.unit}</div>
-                  <div className="flex space-x-1 flex-1">
-                    {unit.areas.map((area, areaIndex) => (
-                      <div 
-                        key={areaIndex}
-                        className="flex-1 h-8 rounded text-xs flex items-center justify-center text-white font-medium cursor-help"
-                        style={{
-                          backgroundColor: area.count === 0 ? '#e5e7eb' : 
-                                         area.count <= 2 ? '#fbbf24' :
-                                         area.count <= 5 ? '#3b82f6' : '#10b981'
-                        }}
-                        title={`${area.area}: ${area.count} especialistas`}
-                      >
-                        {area.count > 0 ? area.count : '-'}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-              
-              {/* Legenda */}
-              <div className="flex justify-center space-x-4 text-xs mt-4 pt-4 border-t">
-                <div className="flex items-center space-x-1">
-                  <div className="w-4 h-4 bg-gray-300 rounded"></div>
-                  <span>Nenhum</span>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <div className="w-4 h-4 bg-yellow-400 rounded"></div>
-                  <span>1-2 especialistas</span>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <div className="w-4 h-4 bg-blue-500 rounded"></div>
-                  <span>3-5 especialistas</span>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <div className="w-4 h-4 bg-green-500 rounded"></div>
-                  <span>6+ especialistas</span>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );
