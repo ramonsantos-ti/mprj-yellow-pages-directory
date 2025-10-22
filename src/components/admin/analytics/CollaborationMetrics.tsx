@@ -12,21 +12,35 @@ interface CollaborationMetricsProps {
 const CollaborationMetrics: React.FC<CollaborationMetricsProps> = ({ profiles }) => {
   const activeProfiles = profiles.filter(p => p.isActive !== false);
   
-  // Mapeamento de tipos de colaboração para versões acentuadas
-  const collaborationMapping: Record<string, string> = {
-    'Consultoria interna': 'Consultoria Interna',
-    'Parecer tecnico': 'Parecer Técnico',
-    'Parecer técnico': 'Parecer Técnico',
-    'Capacitacao/treinamento': 'Capacitação/Treinamento',
-    'Capacitação/treinamento': 'Capacitação/Treinamento',
-    'Projeto especial': 'Projeto Especial',
-    'Mentoria': 'Mentoria',
-    'Coaching': 'Coaching',
-    'Grupo de trabalho': 'Grupo de Trabalho',
-    'Comissao': 'Comissão',
-    'Comissão': 'Comissão',
-    'Grupo de Atuacao Especializada': 'Grupo de Atuação Especializada',
-    'Grupo de Atuação Especializada': 'Grupo de Atuação Especializada'
+  // Função para formatar tipos de colaboração com acentuação e capitalização corretas
+  const formatCollaborationType = (tipo: string): string => {
+    const lowerTipo = tipo.toLowerCase();
+    
+    const mappings: Record<string, string> = {
+      'consultoria interna': 'Consultoria Interna',
+      'parecer tecnico': 'Parecer Técnico',
+      'parecer técnico': 'Parecer Técnico',
+      'capacitacao/treinamento': 'Capacitação/Treinamento',
+      'capacitação/treinamento': 'Capacitação/Treinamento',
+      'projeto especial': 'Projeto Especial',
+      'mentoria': 'Mentoria',
+      'coaching': 'Coaching',
+      'grupo de trabalho': 'Grupo de Trabalho',
+      'comissao': 'Comissão',
+      'comissão': 'Comissão',
+      'grupo de atuacao especializada': 'Grupo de Atuação Especializada',
+      'grupo de atuação especializada': 'Grupo de Atuação Especializada'
+    };
+    
+    // Tenta encontrar no mapeamento (case-insensitive)
+    const mapped = mappings[lowerTipo];
+    if (mapped) return mapped;
+    
+    // Se não encontrar, capitaliza cada palavra
+    return tipo
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
   };
 
   // Disponibilidade para Colaboração
@@ -171,7 +185,7 @@ const CollaborationMetrics: React.FC<CollaborationMetricsProps> = ({ profiles })
               .map(([tipo, count]) => (
                 <div key={tipo} className="space-y-1">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium">{collaborationMapping[tipo] || tipo}</span>
+                    <span className="text-sm font-medium">{formatCollaborationType(tipo)}</span>
                     <div className="flex items-center space-x-2">
                       <Badge variant="secondary">{count} pessoas</Badge>
                       <span className="text-xs text-muted-foreground">
