@@ -14,32 +14,55 @@ const CollaborationMetrics: React.FC<CollaborationMetricsProps> = ({ profiles })
   
   // Função para formatar tipos de colaboração com acentuação e capitalização corretas
   const formatCollaborationType = (tipo: string): string => {
-    const lowerTipo = tipo.toLowerCase();
+    // Normaliza o tipo: remove underscores, converte para lowercase
+    const normalized = tipo.toLowerCase().replace(/_/g, ' ').trim();
     
     const mappings: Record<string, string> = {
+      // Variações de Consultoria
       'consultoria interna': 'Consultoria Interna',
+      
+      // Variações de Parecer Técnico
       'parecer tecnico': 'Parecer Técnico',
       'parecer técnico': 'Parecer Técnico',
+      
+      // Variações de Capacitação/Treinamento
       'capacitacao/treinamento': 'Capacitação/Treinamento',
       'capacitação/treinamento': 'Capacitação/Treinamento',
+      'capacitacao': 'Capacitação/Treinamento',
+      'capacitação': 'Capacitação/Treinamento',
+      
+      // Variações de Projeto Especial
       'projeto especial': 'Projeto Especial',
+      
+      // Mentoria e Coaching
       'mentoria': 'Mentoria',
       'coaching': 'Coaching',
+      
+      // Variações de Grupo de Trabalho
       'grupo de trabalho': 'Grupo de Trabalho',
+      'grupo trabalho': 'Grupo de Trabalho',
+      'gurpo trabalho': 'Grupo de Trabalho',
+      
+      // Variações de Comissão
       'comissao': 'Comissão',
       'comissão': 'Comissão',
+      
+      // Variações de Grupo de Atuação Especializada
       'grupo de atuacao especializada': 'Grupo de Atuação Especializada',
-      'grupo de atuação especializada': 'Grupo de Atuação Especializada'
+      'grupo de atuação especializada': 'Grupo de Atuação Especializada',
+      'grupo atuacao especializada': 'Grupo de Atuação Especializada',
+      'grupo atuacao': 'Grupo de Atuação Especializada',
+      'grupo atuação': 'Grupo de Atuação Especializada'
     };
     
-    // Tenta encontrar no mapeamento (case-insensitive)
-    const mapped = mappings[lowerTipo];
+    // Tenta encontrar no mapeamento
+    const mapped = mappings[normalized];
     if (mapped) return mapped;
     
-    // Se não encontrar, capitaliza cada palavra
-    return tipo
+    // Se não encontrar, capitaliza cada palavra e restaura separadores
+    return normalized
       .split(' ')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
   };
 
