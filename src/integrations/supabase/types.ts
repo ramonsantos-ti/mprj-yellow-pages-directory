@@ -134,7 +134,7 @@ export type Database = {
           entity_type: string
           error_message: string | null
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           module: string | null
           new_value: string | null
           operation_type: string | null
@@ -156,7 +156,7 @@ export type Database = {
           entity_type: string
           error_message?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           module?: string | null
           new_value?: string | null
           operation_type?: string | null
@@ -178,7 +178,7 @@ export type Database = {
           entity_type?: string
           error_message?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           module?: string | null
           new_value?: string | null
           operation_type?: string | null
@@ -366,6 +366,38 @@ export type Database = {
           },
         ]
       }
+      profile_views: {
+        Row: {
+          created_at: string | null
+          id: string
+          profile_id: string
+          user_id: string | null
+          viewed_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          profile_id: string
+          user_id?: string | null
+          viewed_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          profile_id?: string
+          user_id?: string | null
+          viewed_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_views_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           aceite_termos: boolean | null
@@ -513,14 +545,22 @@ export type Database = {
         }
         Returns: string
       }
+      get_top_profiles: {
+        Args: { limit_count?: number }
+        Returns: {
+          cargo: string[]
+          foto_url: string
+          matricula: string
+          name: string
+          profile_id: string
+          view_count: number
+        }[]
+      }
       get_user_role: {
         Args: { user_uuid: string }
         Returns: Database["public"]["Enums"]["app_role"]
       }
-      is_admin: {
-        Args: { user_uuid: string }
-        Returns: boolean
-      }
+      is_admin: { Args: { user_uuid: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "user"

@@ -1,6 +1,7 @@
 
 import React, { useEffect } from "react";
 import { useProfileData } from "@/hooks/useProfileData";
+import { useProfileView } from "@/hooks/useProfileView";
 import LoadingState from "./LoadingState";
 import ErrorState from "./ErrorState";
 import ProfileHeader from "./ProfileHeader";
@@ -20,6 +21,9 @@ interface ProfileDetailViewProps {
 
 const ProfileDetailView: React.FC<ProfileDetailViewProps> = ({ profileId }) => {
   const { userProfile, loading, error, loadUserProfile } = useProfileData(profileId);
+  
+  // Registrar visualização do perfil
+  useProfileView(profileId);
 
   useEffect(() => {
     loadUserProfile();
