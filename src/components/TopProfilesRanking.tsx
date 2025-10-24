@@ -52,8 +52,30 @@ const TopProfilesRanking: React.FC = () => {
     );
   }
 
-  if (error || !topProfiles?.length) {
+  if (error) {
     return null;
+  }
+
+  if (!topProfiles?.length) {
+    return (
+      <Card className="sticky top-4 shadow-lg">
+        <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 border-b">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <TrendingUp className="w-5 h-5 text-primary" />
+            Top 10 Perfis Mais Acessados
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-6 text-center">
+          <Eye className="w-12 h-12 mx-auto mb-3 text-muted-foreground opacity-50" />
+          <p className="text-sm text-muted-foreground">
+            Nenhum perfil visualizado ainda.
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            O ranking será atualizado conforme os perfis forem acessados.
+          </p>
+        </CardContent>
+      </Card>
+    );
   }
 
   return (
