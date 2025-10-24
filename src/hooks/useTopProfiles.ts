@@ -20,7 +20,8 @@ export const useTopProfiles = (limit: number = 10) => {
       if (error) throw error;
       return data as TopProfile[];
     },
-    staleTime: 5 * 60 * 1000, // Cache por 5 minutos
-    refetchInterval: 5 * 60 * 1000, // Atualiza a cada 5 minutos
+    staleTime: 0, // Sem cache
+    refetchInterval: 3000, // Atualiza a cada 3 segundos
+    refetchOnWindowFocus: true, // Atualiza ao focar na janela
   });
 };
