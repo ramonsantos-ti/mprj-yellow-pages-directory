@@ -154,7 +154,7 @@ const Home: React.FC = () => {
             </div>
           ) : (
             <>
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
+              <div className="grid gap-6 grid-cols-1">
                 {paginatedProfiles.map(profile => (
                   <ProfileCard key={profile.id} profile={profile} />
                 ))}
