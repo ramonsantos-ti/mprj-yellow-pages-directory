@@ -22,9 +22,9 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
 
   return (
     <Card className="hover:shadow-lg transition-shadow duration-200">
-      <div className="flex flex-col md:flex-row gap-6 p-6">
+      <div className="flex flex-col md:flex-row gap-4 p-4">
         {/* Photo container with maximum height */}
-        <div className="w-full md:w-48 h-64 md:h-80 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border">
+        <div className="w-full md:w-32 h-48 md:h-56 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border">
           {profile.fotoUrl ? (
             <img 
               src={profile.fotoUrl} 
@@ -60,20 +60,20 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
         <div className="flex-1 flex flex-col justify-between min-w-0">
           {/* Header section */}
           <div>
-            <h3 className="text-2xl font-semibold text-gray-900 mb-2">
+            <h3 className="text-xl font-semibold text-gray-900 mb-1.5">
               {profile.name}
             </h3>
-            <p className="text-sm text-gray-600 mb-3">Matrícula: {profile.matricula}</p>
+            <p className="text-xs text-gray-600 mb-2">Matrícula: {profile.matricula}</p>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
               {/* Left column */}
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {/* Cargo */}
                 <div>
-                  <p className="text-xs font-medium text-gray-500 mb-1">Cargo</p>
+                  <p className="text-[10px] font-medium text-gray-500 mb-0.5">Cargo</p>
                   <div className="flex flex-wrap gap-1">
                     {profile.cargo.map((cargo, index) => (
-                      <Badge key={index} variant="secondary" className="text-xs">
+                      <Badge key={index} variant="secondary" className="text-[10px] py-0 px-1.5">
                         {cargo}
                       </Badge>
                     ))}
@@ -83,10 +83,10 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
                 {/* Função */}
                 {profile.funcao && profile.funcao.length > 0 && (
                   <div>
-                    <p className="text-xs font-medium text-gray-500 mb-1">Função</p>
+                    <p className="text-[10px] font-medium text-gray-500 mb-0.5">Função</p>
                     <div className="flex flex-wrap gap-1">
                       {profile.funcao.map((funcao, index) => (
-                        <Badge key={index} variant="outline" className="text-xs">
+                        <Badge key={index} variant="outline" className="text-[10px] py-0 px-1.5">
                           {funcao}
                         </Badge>
                       ))}
@@ -96,12 +96,12 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
                 
                 {/* Unidades */}
                 <div>
-                  <p className="text-xs font-medium text-gray-500 mb-1">Unidades</p>
-                  <div className="flex items-start space-x-2">
-                    <MapPin className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                  <p className="text-[10px] font-medium text-gray-500 mb-0.5">Unidades</p>
+                  <div className="flex items-start space-x-1.5">
+                    <MapPin className="w-3 h-3 text-gray-400 mt-0.5 flex-shrink-0" />
                     <div className="flex flex-wrap gap-1">
                       {profile.unidade.map((unidade, index) => (
-                        <Badge key={index} variant="outline" className="text-xs">
+                        <Badge key={index} variant="outline" className="text-[10px] py-0 px-1.5">
                           {unidade}
                         </Badge>
                       ))}
@@ -111,19 +111,19 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
               </div>
               
               {/* Right column */}
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {/* Contato */}
                 <div>
-                  <p className="text-xs font-medium text-gray-500 mb-1">Contato</p>
-                  <div className="space-y-1">
-                    <div className="flex items-center space-x-2">
-                      <Mail className="w-4 h-4 text-gray-400" />
-                      <span className="text-sm text-gray-600 truncate">{profile.email}</span>
+                  <p className="text-[10px] font-medium text-gray-500 mb-0.5">Contato</p>
+                  <div className="space-y-0.5">
+                    <div className="flex items-center space-x-1.5">
+                      <Mail className="w-3 h-3 text-gray-400" />
+                      <span className="text-xs text-gray-600 truncate">{profile.email}</span>
                     </div>
                     {profile.telefone && (
-                      <div className="flex items-center space-x-2">
-                        <Phone className="w-4 h-4 text-gray-400" />
-                        <span className="text-sm text-gray-600">{profile.telefone}</span>
+                      <div className="flex items-center space-x-1.5">
+                        <Phone className="w-3 h-3 text-gray-400" />
+                        <span className="text-xs text-gray-600">{profile.telefone}</span>
                       </div>
                     )}
                   </div>
@@ -131,15 +131,15 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
                 
                 {/* Temas de Interesse */}
                 <div>
-                  <p className="text-xs font-medium text-gray-500 mb-1">Temas de Interesse</p>
+                  <p className="text-[10px] font-medium text-gray-500 mb-0.5">Temas de Interesse</p>
                   <div className="flex flex-wrap gap-1">
                     {profile.temasInteresse.slice(0, 4).map((tema, index) => (
-                      <Badge key={index} className="text-xs bg-red-100 text-red-900 hover:bg-red-200">
+                      <Badge key={index} className="text-[10px] py-0 px-1.5 bg-red-100 text-red-900 hover:bg-red-200">
                         {tema}
                       </Badge>
                     ))}
                     {profile.temasInteresse.length > 4 && (
-                      <Badge variant="outline" className="text-xs">
+                      <Badge variant="outline" className="text-[10px] py-0 px-1.5">
                         +{profile.temasInteresse.length - 4} mais
                       </Badge>
                     )}
@@ -150,8 +150,8 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
             
             {/* Biografia */}
             {profile.biografia && (
-              <div className="mb-4">
-                <p className="text-sm text-gray-600 line-clamp-3">
+              <div className="mb-3">
+                <p className="text-xs text-gray-600 line-clamp-2">
                   {profile.biografia}
                 </p>
               </div>
@@ -159,8 +159,8 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
           </div>
           
           {/* Footer section */}
-          <div className="flex items-center justify-between pt-4 border-t">
-            <div className="flex items-center space-x-2 text-xs text-gray-500">
+          <div className="flex items-center justify-between pt-3 border-t">
+            <div className="flex items-center space-x-1.5 text-[10px] text-gray-500">
               <Calendar className="w-3 h-3" />
               <span>
                 Atualizado em {format(profile.lastUpdated, "dd/MM/yyyy", {
@@ -169,7 +169,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
               </span>
             </div>
             
-            <Link to={`/profile/${profile.id}`} className="bg-red-900 text-white py-2 px-6 rounded-md text-sm font-medium hover:bg-red-800 transition-colors">
+            <Link to={`/profile/${profile.id}`} className="bg-red-900 text-white py-1.5 px-4 rounded-md text-xs font-medium hover:bg-red-800 transition-colors">
               Ver Perfil Completo
             </Link>
           </div>
