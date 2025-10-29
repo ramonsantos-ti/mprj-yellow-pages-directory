@@ -93,28 +93,28 @@ const Home: React.FC = () => {
 
   return (
       <div className="space-y-6">
-        <div className="text-center space-y-4 bg-white rounded-xl shadow-md p-6">
-          <div className="flex justify-center mb-6">
-            <img
-              src="/lovable-uploads/2aae1185-7d52-453a-942a-1ef1876196b1.jpg"
-              alt="MPRJ Logo Secundária"
-              className="h-40 w-auto rounded-xl border border-gray-200 shadow-sm"
-            />
-          </div>
-
-          <h1 className="text-4xl font-bold text-gray-900">
-            Sistema de Especialistas
-          </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Encontre especialistas do MPRJ por área de conhecimento, cargo ou unidade de trabalho
-          </p>
-          <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
-            <Users className="w-4 h-4" />
-            <span>{profiles.length} especialistas cadastrados</span>
-            <span>•</span>
-            <span>{filteredProfiles.length} encontrados</span>
-          </div>
+      <div className="text-center space-y-3 bg-white rounded-xl shadow-md p-5">
+        <div className="flex justify-center mb-4">
+          <img
+            src="/lovable-uploads/2aae1185-7d52-453a-942a-1ef1876196b1.jpg"
+            alt="MPRJ Logo Secundária"
+            className="h-32 w-auto rounded-xl border border-gray-200 shadow-sm"
+          />
         </div>
+
+        <h1 className="text-3xl font-bold text-gray-900">
+          Sistema de Especialistas
+        </h1>
+        <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+          Encontre especialistas do MPRJ por área de conhecimento, cargo ou unidade de trabalho
+        </p>
+        <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
+          <Users className="w-4 h-4" />
+          <span>{profiles.length} especialistas cadastrados</span>
+          <span>•</span>
+          <span>{filteredProfiles.length} encontrados</span>
+        </div>
+      </div>
 
       <Card>
         <CardContent className="pt-6">
