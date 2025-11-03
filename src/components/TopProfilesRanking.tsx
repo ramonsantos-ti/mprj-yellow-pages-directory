@@ -2,22 +2,13 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, Eye, Crown, Medal, Award } from 'lucide-react';
+import { TrendingUp, Eye } from 'lucide-react';
 import { useTopProfiles } from '@/hooks/useTopProfiles';
 import { Link } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const TopProfilesRanking: React.FC = () => {
   const { data: topProfiles, isLoading, error } = useTopProfiles(10);
-
-  const getRankIcon = (position: number) => {
-    switch(position) {
-      case 1: return <Crown className="w-4 h-4 text-yellow-500" />;
-      case 2: return <Medal className="w-4 h-4 text-gray-400" />;
-      case 3: return <Award className="w-4 h-4 text-orange-600" />;
-      default: return null;
-    }
-  };
 
   const getInitials = (name: string) => {
     return name
@@ -89,7 +80,24 @@ const TopProfilesRanking: React.FC = () => {
       <CardContent className="p-4">
         <div className="space-y-2">
           {topProfiles.map((profile, index) => {
-            const position = index + 1;
+            // Calcula a posição considerando empates
+            let position = 1;
+            for (let i = 0; i < index; i++) {
+              if (topProfiles[i].view_count > profile.view_count) {
+                position++;
+              }
+            }
+            
+            // Define a cor de fundo baseado na posição
+            const getBackgroundColor = (pos: number) => {
+              switch(pos) {
+                case 1: return 'bg-gradient-to-r from-yellow-400/40 to-yellow-300/20'; // Dourado
+                case 2: return 'bg-gradient-to-r from-gray-300/40 to-gray-200/20'; // Cinza/Prata
+                case 3: return 'bg-gradient-to-r from-orange-400/40 to-orange-300/20'; // Bronze
+                default: return 'bg-white';
+              }
+            };
+            
             return (
               <Link
                 key={profile.profile_id}
@@ -98,19 +106,13 @@ const TopProfilesRanking: React.FC = () => {
               >
                 <div className={`
                   flex items-center gap-3 p-2 rounded-lg transition-all
-                  hover:bg-primary/5 hover:shadow-md
-                  ${position <= 3 ? 'bg-gradient-to-r from-primary/5 to-transparent' : ''}
+                  hover:shadow-md
+                  ${getBackgroundColor(position)}
                 `}>
                   <div className="flex items-center gap-2 min-w-[40px]">
-                    <span className={`
-                      font-bold text-sm
-                      ${position === 1 ? 'text-yellow-600' : ''}
-                      ${position === 2 ? 'text-gray-500' : ''}
-                      ${position === 3 ? 'text-orange-600' : 'text-muted-foreground'}
-                    `}>
+                    <span className="font-bold text-sm text-black">
                       {position}º
                     </span>
-                    {getRankIcon(position)}
                   </div>
 
                   <Avatar className="w-10 h-10 border-2 border-background shadow">
@@ -121,22 +123,22 @@ const TopProfilesRanking: React.FC = () => {
                   </Avatar>
 
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-sm text-foreground truncate group-hover:text-primary transition-colors">
+                    <p className="font-semibold text-sm text-black truncate">
                       {profile.name}
                     </p>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-xs text-black">
                         {profile.matricula}
                       </span>
                       {profile.cargo?.[0] && (
-                        <Badge variant="outline" className="text-xs px-1 py-0">
+                        <Badge variant="outline" className="text-xs px-1 py-0 text-black border-black/20">
                           {profile.cargo[0]}
                         </Badge>
                       )}
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-1 text-xs text-black">
                     <Eye className="w-3 h-3" />
                     <span className="font-medium">{profile.view_count}</span>
                   </div>
