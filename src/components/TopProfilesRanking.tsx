@@ -71,7 +71,7 @@ const TopProfilesRanking: React.FC = () => {
 
   return (
     <Card className="sticky top-4 shadow-lg">
-      <CardHeader className="bg-primary border-b">
+      <CardHeader className="bg-[#6e4200] border-b">
         <CardTitle className="flex items-center gap-2 text-lg text-white">
           <TrendingUp className="w-5 h-5 text-white" />
           Top 10 Perfis Mais Acessados
