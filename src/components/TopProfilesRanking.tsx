@@ -82,9 +82,23 @@ const TopProfilesRanking: React.FC = () => {
           {topProfiles.map((profile, index) => {
             // Calcula a posição considerando empates
             let position = 1;
-            for (let i = 0; i < index; i++) {
-              if (topProfiles[i].view_count > profile.view_count) {
-                position++;
+            if (index > 0) {
+              // Se o view_count for diferente do anterior, a posição é index + 1
+              if (topProfiles[index].view_count < topProfiles[index - 1].view_count) {
+                position = index + 1;
+              } else {
+                // Se for igual ao anterior, mantém a mesma posição
+                // Precisamos buscar qual foi a última posição atribuída
+                let lastPosition = 1;
+                for (let i = index - 1; i >= 0; i--) {
+                  if (topProfiles[i].view_count === topProfiles[index].view_count) {
+                    continue;
+                  } else {
+                    lastPosition = i + 2;
+                    break;
+                  }
+                }
+                position = lastPosition;
               }
             }
             
