@@ -79,28 +79,23 @@ const TopProfilesRanking: React.FC = () => {
       </CardHeader>
       <CardContent className="p-4">
         <div className="space-y-2">
-          {topProfiles.map((profile, index) => {
-            // Calcula a posição considerando empates
-            let position = 1;
-            if (index > 0) {
-              // Se o view_count for diferente do anterior, a posição é index + 1
-              if (topProfiles[index].view_count < topProfiles[index - 1].view_count) {
-                position = index + 1;
+          {(() => {
+            // Calcula todas as posições considerando empates
+            const positions: number[] = [];
+            topProfiles.forEach((profile, index) => {
+              if (index === 0) {
+                positions.push(1);
+              } else if (profile.view_count === topProfiles[index - 1].view_count) {
+                // Empate: mantém a mesma posição do anterior
+                positions.push(positions[index - 1]);
               } else {
-                // Se for igual ao anterior, mantém a mesma posição
-                // Precisamos buscar qual foi a última posição atribuída
-                let lastPosition = 1;
-                for (let i = index - 1; i >= 0; i--) {
-                  if (topProfiles[i].view_count === topProfiles[index].view_count) {
-                    continue;
-                  } else {
-                    lastPosition = i + 2;
-                    break;
-                  }
-                }
-                position = lastPosition;
+                // Não há empate: posição anterior + 1
+                positions.push(positions[index - 1] + 1);
               }
-            }
+            });
+
+            return topProfiles.map((profile, index) => {
+              const position = positions[index];
             
             // Define a cor de fundo baseado na posição
             const getBackgroundColor = (pos: number) => {
@@ -159,7 +154,8 @@ const TopProfilesRanking: React.FC = () => {
                 </div>
               </Link>
             );
-          })}
+            });
+          })()}
         </div>
       </CardContent>
     </Card>
