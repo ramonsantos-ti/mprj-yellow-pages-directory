@@ -1,23 +1,111 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { FileText, Download } from 'lucide-react';
+import { Profile } from '../../types';
 
 interface ReportsTabProps {
   allCargos: string[];
   allUnidades: string[];
   allAreas: string[];
   generateReport: (reportType: string) => void;
+  profiles: Profile[];
+  generateDetailedReport: (profiles: Profile[]) => void;
 }
 
 const ReportsTab: React.FC<ReportsTabProps> = ({
   allCargos,
   allUnidades,
   allAreas,
-  generateReport
+  generateReport,
+  profiles,
+  generateDetailedReport
 }) => {
+  const [selectedCargo, setSelectedCargo] = useState<string>('all');
+  const [selectedUnidade, setSelectedUnidade] = useState<string>('all');
+  const [selectedArea, setSelectedArea] = useState<string>('all');
+  const [selectedStatus, setSelectedStatus] = useState<string>('all');
+  const [selectedPhoto, setSelectedPhoto] = useState<string>('all');
+  const [selectedComplete, setSelectedComplete] = useState<string>('all');
+  const [selectedRecent, setSelectedRecent] = useState<string>('all');
+
+  const getFilteredProfiles = (): Profile[] => {
+    return profiles.filter(profile => {
+      // Filter by cargo
+      if (selectedCargo !== 'all' && !profile.cargo?.includes(selectedCargo)) {
+        return false;
+      }
+
+      // Filter by unidade
+      if (selectedUnidade !== 'all' && !profile.unidade?.includes(selectedUnidade)) {
+        return false;
+      }
+
+      // Filter by area
+      if (selectedArea !== 'all' && !profile.temasInteresse?.includes(selectedArea)) {
+        return false;
+      }
+
+      // Filter by status
+      if (selectedStatus === 'active' && profile.isActive === false) {
+        return false;
+      }
+      if (selectedStatus === 'inactive' && profile.isActive !== false) {
+        return false;
+      }
+
+      // Filter by photo
+      if (selectedPhoto === 'with_photo' && !profile.fotoUrl) {
+        return false;
+      }
+      if (selectedPhoto === 'without_photo' && profile.fotoUrl) {
+        return false;
+      }
+
+      // Filter by profile completeness
+      if (selectedComplete === 'complete') {
+        const isComplete = profile.biografia && 
+                          profile.cargo?.length > 0 && 
+                          profile.unidade?.length > 0 &&
+                          profile.formacaoAcademica?.length > 0;
+        if (!isComplete) return false;
+      }
+      if (selectedComplete === 'incomplete') {
+        const isComplete = profile.biografia && 
+                          profile.cargo?.length > 0 && 
+                          profile.unidade?.length > 0 &&
+                          profile.formacaoAcademica?.length > 0;
+        if (isComplete) return false;
+      }
+
+      // Filter by recent updates (last 30 days)
+      if (selectedRecent === 'recent') {
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        const lastUpdated = new Date(profile.lastUpdated);
+        if (lastUpdated < thirtyDaysAgo) return false;
+      }
+      if (selectedRecent === 'old') {
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        const lastUpdated = new Date(profile.lastUpdated);
+        if (lastUpdated >= thirtyDaysAgo) return false;
+      }
+
+      return true;
+    });
+  };
+
+  const handleGenerateDetailedReport = () => {
+    const filteredProfiles = getFilteredProfiles();
+    if (filteredProfiles.length === 0) {
+      alert('Nenhum perfil encontrado com os filtros selecionados.');
+      return;
+    }
+    generateDetailedReport(filteredProfiles);
+  };
   return (
     <Card>
       <CardHeader>
@@ -31,7 +119,7 @@ const ReportsTab: React.FC<ReportsTabProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
               <label className="block text-sm font-medium mb-2">Filtrar por cargo</label>
-              <Select>
+              <Select value={selectedCargo} onValueChange={setSelectedCargo}>
                 <SelectTrigger>
                   <SelectValue placeholder="Todos os cargos" />
                 </SelectTrigger>
@@ -45,7 +133,7 @@ const ReportsTab: React.FC<ReportsTabProps> = ({
             </div>
             <div>
               <label className="block text-sm font-medium mb-2">Filtrar por unidade</label>
-              <Select>
+              <Select value={selectedUnidade} onValueChange={setSelectedUnidade}>
                 <SelectTrigger>
                   <SelectValue placeholder="Todas as unidades" />
                 </SelectTrigger>
@@ -59,7 +147,7 @@ const ReportsTab: React.FC<ReportsTabProps> = ({
             </div>
             <div>
               <label className="block text-sm font-medium mb-2">Área de conhecimento</label>
-              <Select>
+              <Select value={selectedArea} onValueChange={setSelectedArea}>
                 <SelectTrigger>
                   <SelectValue placeholder="Todas as áreas" />
                 </SelectTrigger>
@@ -73,7 +161,7 @@ const ReportsTab: React.FC<ReportsTabProps> = ({
             </div>
             <div>
               <label className="block text-sm font-medium mb-2">Status</label>
-              <Select>
+              <Select value={selectedStatus} onValueChange={setSelectedStatus}>
                 <SelectTrigger>
                   <SelectValue placeholder="Todos os status" />
                 </SelectTrigger>
@@ -88,7 +176,7 @@ const ReportsTab: React.FC<ReportsTabProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium mb-2">Possui foto</label>
-              <Select>
+              <Select value={selectedPhoto} onValueChange={setSelectedPhoto}>
                 <SelectTrigger>
                   <SelectValue placeholder="Todos" />
                 </SelectTrigger>
@@ -101,7 +189,7 @@ const ReportsTab: React.FC<ReportsTabProps> = ({
             </div>
             <div>
               <label className="block text-sm font-medium mb-2">Perfil completo</label>
-              <Select>
+              <Select value={selectedComplete} onValueChange={setSelectedComplete}>
                 <SelectTrigger>
                   <SelectValue placeholder="Todos" />
                 </SelectTrigger>
@@ -114,7 +202,7 @@ const ReportsTab: React.FC<ReportsTabProps> = ({
             </div>
             <div>
               <label className="block text-sm font-medium mb-2">Atualizado nos últimos 30 dias</label>
-              <Select>
+              <Select value={selectedRecent} onValueChange={setSelectedRecent}>
                 <SelectTrigger>
                   <SelectValue placeholder="Todos" />
                 </SelectTrigger>
@@ -126,13 +214,18 @@ const ReportsTab: React.FC<ReportsTabProps> = ({
               </Select>
             </div>
           </div>
+          <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-sm text-blue-900">
+              <strong>Perfis encontrados:</strong> {getFilteredProfiles().length} de {profiles.length}
+            </p>
+          </div>
           <div className="flex space-x-2">
             <Button 
-              onClick={() => generateReport('filtered')}
+              onClick={handleGenerateDetailedReport}
               className="bg-red-900 hover:bg-red-800"
             >
               <Download className="w-4 h-4 mr-2" />
-              Gerar Relatório Completo (PDF)
+              Gerar Relatório Detalhado (PDF)
             </Button>
             <Button variant="outline">
               <FileText className="w-4 h-4 mr-2" />

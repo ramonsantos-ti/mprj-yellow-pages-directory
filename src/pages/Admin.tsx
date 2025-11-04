@@ -5,7 +5,7 @@ import { StandardMessage } from '../types/admin';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Card, CardContent } from '../components/ui/card';
 import { Loader2, AlertCircle } from 'lucide-react';
-import { generateProfileReport } from '../utils/pdfReports';
+import { generateProfileReport, generateDetailedProfileReport } from '../utils/pdfReports';
 import ProfilesTab from '../components/admin/ProfilesTab';
 import AuditTab from '../components/admin/AuditTab';
 import NotificationsTab from '../components/admin/NotificationsTab';
@@ -118,6 +118,20 @@ const Admin: React.FC = () => {
     );
   };
 
+  const generateDetailedReport = async (filteredProfiles: any[]) => {
+    generateDetailedProfileReport(filteredProfiles);
+    
+    await addAuditLog(
+      'Relatório detalhado gerado',
+      'Administrador',
+      `Relatório detalhado de perfis foi gerado`,
+      'Relatório',
+      undefined,
+      undefined,
+      `${filteredProfiles.length} perfis incluídos`
+    );
+  };
+
   if (profilesLoading || auditLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -212,6 +226,8 @@ const Admin: React.FC = () => {
             allUnidades={allUnidades}
             allAreas={allAreas}
             generateReport={generateReport}
+            profiles={profiles}
+            generateDetailedReport={generateDetailedReport}
           />
         </TabsContent>
 
