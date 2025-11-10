@@ -366,6 +366,67 @@ export type Database = {
           },
         ]
       }
+      profile_reviews: {
+        Row: {
+          admin_id: string | null
+          admin_notes: string | null
+          comment: string
+          created_at: string
+          id: string
+          profile_id: string
+          rating: number
+          reviewer_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          admin_id?: string | null
+          admin_notes?: string | null
+          comment: string
+          created_at?: string
+          id?: string
+          profile_id: string
+          rating: number
+          reviewer_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          admin_id?: string | null
+          admin_notes?: string | null
+          comment?: string
+          created_at?: string
+          id?: string
+          profile_id?: string
+          rating?: number
+          reviewer_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_reviews_admin_id_fkey"
+            columns: ["admin_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profile_reviews_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profile_reviews_reviewer_id_fkey"
+            columns: ["reviewer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profile_views: {
         Row: {
           created_at: string | null
@@ -554,6 +615,18 @@ export type Database = {
           name: string
           profile_id: string
           view_count: number
+        }[]
+      }
+      get_top_rated_profiles: {
+        Args: { limit_count?: number }
+        Returns: {
+          average_rating: number
+          cargo: string[]
+          foto_url: string
+          matricula: string
+          name: string
+          profile_id: string
+          review_count: number
         }[]
       }
       get_user_role: {

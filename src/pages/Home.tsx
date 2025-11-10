@@ -1,7 +1,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useProfiles } from '../hooks/useProfiles';
 import ProfileCard from '../components/ProfileCard';
-import TopProfilesRanking from '../components/TopProfilesRanking';
+import TopProfilesRanking from '@/components/TopProfilesRanking';
+import TopRatedProfilesRanking from '@/components/TopRatedProfilesRanking';
 import { Card, CardContent } from '../components/ui/card';
 import { Input } from '../components/ui/input';
 import { Search, Users, Loader2, AlertCircle, ChevronsLeft, ChevronsRight } from 'lucide-react';
@@ -273,8 +274,12 @@ const Home: React.FC = () => {
           )}
         </div>
 
+        {/* Sidebar direito com rankings - apenas desktop */}
         <div className="hidden lg:block w-80 flex-shrink-0">
-          <TopProfilesRanking />
+          <div className="space-y-6">
+            <TopRatedProfilesRanking />
+            <TopProfilesRanking />
+          </div>
         </div>
       </div>
     </div>

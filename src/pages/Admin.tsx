@@ -177,12 +177,14 @@ const Admin: React.FC = () => {
       </div>
 
       <Tabs defaultValue="profiles" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="profiles">Gestão de Perfis</TabsTrigger>
-          <TabsTrigger value="audit">Logs de Auditoria</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-7">
+          <TabsTrigger value="profiles">Perfis</TabsTrigger>
+          <TabsTrigger value="audit">Auditoria</TabsTrigger>
           <TabsTrigger value="notifications">Notificações</TabsTrigger>
           <TabsTrigger value="reports">Relatórios</TabsTrigger>
-          <TabsTrigger value="knowledge-areas">Áreas de Conhecimento</TabsTrigger>
+          <TabsTrigger value="reviews">Avaliações</TabsTrigger>
+          <TabsTrigger value="knowledge">Áreas</TabsTrigger>
+          <TabsTrigger value="analytics">Analytics</TabsTrigger>
         </TabsList>
 
         <TabsContent value="profiles">

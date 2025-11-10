@@ -110,3 +110,40 @@ export interface SearchFilters {
   deficiencia?: string;
   tipoPcd?: string;
 }
+
+export interface ProfileReview {
+  id: string;
+  profile_id: string;
+  reviewer_id: string;
+  rating: number;
+  comment: string;
+  status: 'pending' | 'approved' | 'rejected';
+  admin_id?: string;
+  admin_notes?: string;
+  created_at: string;
+  updated_at: string;
+  profile?: {
+    name: string;
+    matricula: string;
+    email: string;
+  };
+  reviewer?: {
+    name: string;
+    matricula: string;
+    email: string;
+  };
+  admin?: {
+    name: string;
+    matricula: string;
+  };
+}
+
+export interface TopRatedProfile {
+  profile_id: string;
+  name: string;
+  matricula: string;
+  foto_url: string | null;
+  cargo: string[];
+  average_rating: number;
+  review_count: number;
+}
