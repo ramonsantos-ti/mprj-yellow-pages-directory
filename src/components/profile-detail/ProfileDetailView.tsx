@@ -34,6 +34,19 @@ const ProfileDetailView: React.FC<ProfileDetailViewProps> = ({ profileId }) => {
 
   const isOwnProfile = userProfile?.userId === user?.id;
 
+  // Debug logs
+  useEffect(() => {
+    console.log('[ProfileDetailView] Debug info:', {
+      user: user?.id,
+      userEmail: user?.email,
+      userProfileId: userProfile?.userId,
+      isOwnProfile,
+      hasReviewed,
+      profileId,
+      reviewsCount: reviews.length
+    });
+  }, [user, userProfile, isOwnProfile, hasReviewed, reviews]);
+
   useEffect(() => {
     loadUserProfile();
   }, [profileId]);

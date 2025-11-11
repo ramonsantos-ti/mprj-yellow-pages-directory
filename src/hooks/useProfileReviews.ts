@@ -31,22 +31,39 @@ export const useProfileReviews = (profileId: string) => {
     queryKey: ['user-reviewed', profileId],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return false;
+      console.log('[useProfileReviews] Checking if user reviewed. Auth user:', user?.id, user?.email);
+      
+      if (!user) {
+        console.log('[useProfileReviews] No authenticated user');
+        return false;
+      }
 
-      const { data: profile } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('id')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
-      if (!profile) return false;
+      console.log('[useProfileReviews] User profile:', profile, 'error:', profileError);
 
-      const { data } = await supabase
+      if (!profile) {
+        console.log('[useProfileReviews] No profile found for user');
+        return false;
+      }
+
+      const { data, error } = await supabase
         .from('profile_reviews')
         .select('id')
         .eq('profile_id', profileId)
         .eq('reviewer_id', profile.id)
         .maybeSingle();
+
+      console.log('[useProfileReviews] Review check result:', { 
+        hasReview: !!data, 
+        error,
+        profileId,
+        reviewerId: profile.id 
+      });
 
       return !!data;
     },
@@ -59,13 +76,13 @@ export const useProfileReviews = (profileId: string) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Usuário não autenticado');
 
-      const { data: profile } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('id')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
-      if (!profile) throw new Error('Perfil não encontrado');
+      if (!profile || profileError) throw new Error('Perfil não encontrado');
 
       const { error } = await supabase
         .from('profile_reviews')
