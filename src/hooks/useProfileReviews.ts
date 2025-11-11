@@ -14,13 +14,16 @@ export const useProfileReviews = (profileId: string) => {
         .from('profile_reviews')
         .select(`
           *,
-          reviewer:reviewer_id!profile_reviews_reviewer_id_fkey(name, matricula, email)
+          reviewer:profiles!reviewer_id(name, matricula, email)
         `)
         .eq('profile_id', profileId)
         .eq('status', 'approved')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('[useProfileReviews] Error fetching reviews:', error);
+        throw error;
+      }
       return data as any as ProfileReview[];
     },
     enabled: !!profileId,
