@@ -14,7 +14,7 @@ export const useProfileReviews = (profileId: string) => {
         .from('profile_reviews')
         .select(`
           *,
-          reviewer:profiles!reviewer_id(name, matricula, email)
+          reviewer:profiles!profile_reviews_reviewer_id_fkey(name, matricula, email)
         `)
         .eq('profile_id', profileId)
         .eq('status', 'approved')

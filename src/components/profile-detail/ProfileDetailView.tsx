@@ -32,7 +32,7 @@ const ProfileDetailView: React.FC<ProfileDetailViewProps> = ({ profileId }) => {
   // Registrar visualização do perfil
   useProfileView(profileId);
 
-  const isOwnProfile = userProfile?.userId === user?.id;
+  const isOwnProfile = user?.profileId === profileId;
 
   // Debug logs
   useEffect(() => {
