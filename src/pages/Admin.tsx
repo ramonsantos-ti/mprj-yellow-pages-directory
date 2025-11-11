@@ -11,6 +11,8 @@ import AuditTab from '../components/admin/AuditTab';
 import NotificationsTab from '../components/admin/NotificationsTab';
 import ReportsTab from '../components/admin/ReportsTab';
 import KnowledgeAreasManagementTab from '../components/admin/KnowledgeAreasManagementTab';
+import { ReviewsTab } from '../components/admin/ReviewsTab';
+import AnalyticsTab from '../components/admin/AnalyticsTab';
 
 const Admin: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -233,10 +235,17 @@ const Admin: React.FC = () => {
           />
         </TabsContent>
 
-        <TabsContent value="knowledge-areas">
+        <TabsContent value="reviews">
+          <ReviewsTab />
+        </TabsContent>
+
+        <TabsContent value="knowledge">
           <KnowledgeAreasManagementTab />
         </TabsContent>
 
+        <TabsContent value="analytics">
+          <AnalyticsTab profiles={profiles} />
+        </TabsContent>
       </Tabs>
     </div>
   );
