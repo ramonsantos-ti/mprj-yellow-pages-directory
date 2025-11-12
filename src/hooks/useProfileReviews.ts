@@ -45,6 +45,7 @@ export const useProfileReviews = (profileId: string) => {
         .from('profiles')
         .select('id')
         .eq('user_id', user.id)
+        .eq('email', user.email)
         .limit(1);
 
       console.log('[useProfileReviews] User profiles:', profiles, 'error:', profileError);

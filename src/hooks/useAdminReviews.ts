@@ -47,6 +47,7 @@ export const useAdminReviews = () => {
         .from('profiles')
         .select('id')
         .eq('user_id', user.id)
+        .eq('email', user.email)
         .limit(1);
 
       if (!adminProfiles || adminProfiles.length === 0) throw new Error('Perfil admin não encontrado');
@@ -84,6 +85,7 @@ export const useAdminReviews = () => {
         .from('profiles')
         .select('id')
         .eq('user_id', user.id)
+        .eq('email', user.email)
         .limit(1);
 
       if (!adminProfiles || adminProfiles.length === 0) throw new Error('Perfil admin não encontrado');
@@ -129,6 +131,7 @@ export const useAdminReviews = () => {
         .from('profiles')
         .select('id')
         .eq('user_id', user.id)
+        .eq('email', user.email)
         .limit(1);
 
       if (!adminProfiles || adminProfiles.length === 0) throw new Error('Perfil admin não encontrado');
