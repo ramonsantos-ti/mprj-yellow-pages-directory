@@ -76,8 +76,15 @@ export const useProfileReviews = (profileId: string) => {
   // Criar avaliação
   const createReview = useMutation({
     mutationFn: async ({ rating, comment }: { rating: number; comment: string }) => {
+      console.log('[createReview] Starting review creation for profile:', profileId);
+      
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Usuário não autenticado');
+      console.log('[createReview] Auth user:', user?.id, user?.email);
+      
+      if (!user) {
+        console.error('[createReview] No authenticated user');
+        throw new Error('Usuário não autenticado');
+      }
 
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
@@ -85,7 +92,28 @@ export const useProfileReviews = (profileId: string) => {
         .eq('user_id', user.id)
         .maybeSingle();
 
-      if (!profile || profileError) throw new Error('Perfil não encontrado');
+      console.log('[createReview] Profile lookup result:', { 
+        profile, 
+        profileError,
+        userId: user.id 
+      });
+
+      if (profileError) {
+        console.error('[createReview] Error fetching profile:', profileError);
+        throw new Error('Erro ao buscar perfil: ' + profileError.message);
+      }
+
+      if (!profile) {
+        console.error('[createReview] No profile found for user_id:', user.id);
+        throw new Error('Perfil não encontrado. Por favor, complete seu cadastro primeiro.');
+      }
+
+      console.log('[createReview] Inserting review:', {
+        profile_id: profileId,
+        reviewer_id: profile.id,
+        rating,
+        comment
+      });
 
       const { error } = await supabase
         .from('profile_reviews')
@@ -96,7 +124,12 @@ export const useProfileReviews = (profileId: string) => {
           comment,
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error('[createReview] Error inserting review:', error);
+        throw error;
+      }
+
+      console.log('[createReview] Review created successfully');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['profile-reviews', profileId] });
