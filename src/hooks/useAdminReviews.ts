@@ -10,17 +10,29 @@ export const useAdminReviews = () => {
   const { data: reviews, isLoading } = useQuery({
     queryKey: ['admin-reviews'],
     queryFn: async () => {
+      console.log('[useAdminReviews] Fetching all reviews...');
+      
       const { data, error } = await supabase
         .from('profile_reviews')
         .select(`
           *,
-          profile:profile_id!profile_reviews_profile_id_fkey(name, matricula, email),
-          reviewer:reviewer_id!profile_reviews_reviewer_id_fkey(name, matricula, email),
-          admin:admin_id!profile_reviews_admin_id_fkey(name, matricula)
+          profile:profiles!profile_id(name, matricula, email),
+          reviewer:profiles!reviewer_id(name, matricula, email),
+          admin:profiles!admin_id(name, matricula)
         `)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      console.log('[useAdminReviews] Query result:', { 
+        reviewsCount: data?.length, 
+        error,
+        reviews: data 
+      });
+
+      if (error) {
+        console.error('[useAdminReviews] Error fetching reviews:', error);
+        throw error;
+      }
+      
       return data as any as ProfileReview[];
     },
   });
@@ -31,13 +43,14 @@ export const useAdminReviews = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Não autenticado');
 
-      const { data: adminProfile } = await supabase
+      const { data: adminProfiles } = await supabase
         .from('profiles')
         .select('id')
         .eq('user_id', user.id)
-        .single();
+        .limit(1);
 
-      if (!adminProfile) throw new Error('Perfil admin não encontrado');
+      if (!adminProfiles || adminProfiles.length === 0) throw new Error('Perfil admin não encontrado');
+      const adminProfile = adminProfiles[0];
 
       const { error } = await supabase
         .from('profile_reviews')
@@ -67,13 +80,14 @@ export const useAdminReviews = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Não autenticado');
 
-      const { data: adminProfile } = await supabase
+      const { data: adminProfiles } = await supabase
         .from('profiles')
         .select('id')
         .eq('user_id', user.id)
-        .single();
+        .limit(1);
 
-      if (!adminProfile) throw new Error('Perfil admin não encontrado');
+      if (!adminProfiles || adminProfiles.length === 0) throw new Error('Perfil admin não encontrado');
+      const adminProfile = adminProfiles[0];
 
       const { error } = await supabase
         .from('profile_reviews')
@@ -111,13 +125,14 @@ export const useAdminReviews = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Não autenticado');
 
-      const { data: adminProfile } = await supabase
+      const { data: adminProfiles } = await supabase
         .from('profiles')
         .select('id')
         .eq('user_id', user.id)
-        .single();
+        .limit(1);
 
-      if (!adminProfile) throw new Error('Perfil admin não encontrado');
+      if (!adminProfiles || adminProfiles.length === 0) throw new Error('Perfil admin não encontrado');
+      const adminProfile = adminProfiles[0];
 
       const { error } = await supabase
         .from('profile_reviews')
