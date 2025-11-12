@@ -41,18 +41,20 @@ export const useProfileReviews = (profileId: string) => {
         return false;
       }
 
-      const { data: profile, error: profileError } = await supabase
+      const { data: profiles, error: profileError } = await supabase
         .from('profiles')
         .select('id')
         .eq('user_id', user.id)
-        .maybeSingle();
+        .limit(1);
 
-      console.log('[useProfileReviews] User profile:', profile, 'error:', profileError);
+      console.log('[useProfileReviews] User profiles:', profiles, 'error:', profileError);
 
-      if (!profile) {
+      if (!profiles || profiles.length === 0) {
         console.log('[useProfileReviews] No profile found for user');
         return false;
       }
+
+      const profile = profiles[0];
 
       const { data, error } = await supabase
         .from('profile_reviews')
@@ -86,14 +88,14 @@ export const useProfileReviews = (profileId: string) => {
         throw new Error('Usuário não autenticado');
       }
 
-      const { data: profile, error: profileError } = await supabase
+      const { data: profiles, error: profileError } = await supabase
         .from('profiles')
         .select('id')
         .eq('user_id', user.id)
-        .maybeSingle();
+        .limit(1);
 
       console.log('[createReview] Profile lookup result:', { 
-        profile, 
+        profiles, 
         profileError,
         userId: user.id 
       });
@@ -103,10 +105,12 @@ export const useProfileReviews = (profileId: string) => {
         throw new Error('Erro ao buscar perfil: ' + profileError.message);
       }
 
-      if (!profile) {
+      if (!profiles || profiles.length === 0) {
         console.error('[createReview] No profile found for user_id:', user.id);
         throw new Error('Perfil não encontrado. Por favor, complete seu cadastro primeiro.');
       }
+
+      const profile = profiles[0];
 
       console.log('[createReview] Inserting review:', {
         profile_id: profileId,
