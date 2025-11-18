@@ -45,9 +45,10 @@ export const useAdminReviews = () => {
 
       const { data: adminProfiles } = await supabase
         .from('profiles')
-        .select('id')
+        .select('id, email, matricula, name, created_at')
         .eq('user_id', user.id)
         .eq('email', user.email)
+        .order('created_at', { ascending: false })
         .limit(1);
 
       if (!adminProfiles || adminProfiles.length === 0) throw new Error('Perfil admin não encontrado');
@@ -83,9 +84,10 @@ export const useAdminReviews = () => {
 
       const { data: adminProfiles } = await supabase
         .from('profiles')
-        .select('id')
+        .select('id, email, matricula, name, created_at')
         .eq('user_id', user.id)
         .eq('email', user.email)
+        .order('created_at', { ascending: false })
         .limit(1);
 
       if (!adminProfiles || adminProfiles.length === 0) throw new Error('Perfil admin não encontrado');
@@ -129,9 +131,10 @@ export const useAdminReviews = () => {
 
       const { data: adminProfiles } = await supabase
         .from('profiles')
-        .select('id')
+        .select('id, email, matricula, name, created_at')
         .eq('user_id', user.id)
         .eq('email', user.email)
+        .order('created_at', { ascending: false })
         .limit(1);
 
       if (!adminProfiles || adminProfiles.length === 0) throw new Error('Perfil admin não encontrado');
