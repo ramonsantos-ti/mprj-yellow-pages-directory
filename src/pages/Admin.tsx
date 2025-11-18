@@ -1,13 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { useAdminProfiles } from '../hooks/useAdminProfiles';
-import { useAuditLogs } from '../hooks/useAuditLogs';
 import { StandardMessage } from '../types/admin';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Card, CardContent } from '../components/ui/card';
 import { Loader2, AlertCircle } from 'lucide-react';
 import { generateProfileReport, generateDetailedProfileReport } from '../utils/pdfReports';
 import ProfilesTab from '../components/admin/ProfilesTab';
-import AuditTab from '../components/admin/AuditTab';
 import NotificationsTab from '../components/admin/NotificationsTab';
 import ReportsTab from '../components/admin/ReportsTab';
 import KnowledgeAreasManagementTab from '../components/admin/KnowledgeAreasManagementTab';
@@ -25,8 +23,6 @@ const Admin: React.FC = () => {
     promoteToAdmin,
     deleteProfile 
   } = useAdminProfiles();
-  
-  const { auditLogs, loading: auditLoading, addAuditLog } = useAuditLogs();
   
   const [standardMessages, setStandardMessages] = useState<StandardMessage[]>([
     {
@@ -87,17 +83,6 @@ const Admin: React.FC = () => {
       recipients = selectedRecipients;
     }
     
-    // Register in audit log
-    await addAuditLog(
-      'Notificação enviada',
-      'Administrador',
-      `Notificação "${messageSubject}" enviada`,
-      'Notificação',
-      undefined,
-      `${recipients.length} destinatários`,
-      `Assunto: ${messageSubject}`
-    );
-    
     // Clear form
     setMessageSubject('');
     setMessageContent('');
@@ -108,33 +93,13 @@ const Admin: React.FC = () => {
 
   const generateReport = async (reportType: string) => {
     generateProfileReport(profiles, reportType);
-    
-    await addAuditLog(
-      'Relatório gerado',
-      'Administrador',
-      `Relatório de tipo "${reportType}" foi gerado`,
-      'Relatório',
-      undefined,
-      undefined,
-      `Tipo: ${reportType}, ${profiles.length} perfis incluídos`
-    );
   };
 
   const generateDetailedReport = async (filteredProfiles: any[]) => {
     generateDetailedProfileReport(filteredProfiles);
-    
-    await addAuditLog(
-      'Relatório detalhado gerado',
-      'Administrador',
-      `Relatório detalhado de perfis foi gerado`,
-      'Relatório',
-      undefined,
-      undefined,
-      `${filteredProfiles.length} perfis incluídos`
-    );
   };
 
-  if (profilesLoading || auditLoading) {
+  if (profilesLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
@@ -179,9 +144,8 @@ const Admin: React.FC = () => {
       </div>
 
       <Tabs defaultValue="profiles" className="w-full">
-        <TabsList className="grid w-full grid-cols-7">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="profiles">Perfis</TabsTrigger>
-          <TabsTrigger value="audit">Auditoria</TabsTrigger>
           <TabsTrigger value="notifications">Notificações</TabsTrigger>
           <TabsTrigger value="reports">Relatórios</TabsTrigger>
           <TabsTrigger value="reviews">Avaliações</TabsTrigger>
@@ -190,19 +154,7 @@ const Admin: React.FC = () => {
         </TabsList>
 
         <TabsContent value="profiles">
-          <ProfilesTab
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            filteredProfiles={filteredProfiles}
-            toggleProfileStatus={toggleProfileStatus}
-            promoteToAdmin={promoteToAdmin}
-            deleteProfile={deleteProfile}
-            updateProfile={updateProfile}
-          />
-        </TabsContent>
-
-        <TabsContent value="audit">
-          <AuditTab auditLogs={auditLogs} />
+...
         </TabsContent>
 
         <TabsContent value="notifications">
