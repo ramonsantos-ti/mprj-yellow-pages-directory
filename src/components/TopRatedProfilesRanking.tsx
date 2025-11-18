@@ -21,9 +21,9 @@ const TopRatedProfilesRanking: React.FC = () => {
   if (isLoading) {
     return (
       <Card className="shadow-lg">
-        <CardHeader className="bg-gradient-to-r from-amber-600 to-orange-600">
-          <CardTitle className="text-white flex items-center gap-2">
-            <Trophy className="h-5 w-5" />
+        <CardHeader className="bg-red-900 border-b rounded-t-lg">
+          <CardTitle className="flex items-center gap-2 text-lg text-white">
+            <Trophy className="w-5 h-5 text-white" />
             TOP 10 Mais Bem Avaliados
           </CardTitle>
         </CardHeader>
@@ -50,9 +50,9 @@ const TopRatedProfilesRanking: React.FC = () => {
   if (!profiles || profiles.length === 0) {
     return (
       <Card className="shadow-lg">
-        <CardHeader className="bg-gradient-to-r from-amber-600 to-orange-600">
-          <CardTitle className="text-white flex items-center gap-2">
-            <Trophy className="h-5 w-5" />
+        <CardHeader className="bg-red-900 border-b rounded-t-lg">
+          <CardTitle className="flex items-center gap-2 text-lg text-white">
+            <Trophy className="w-5 h-5 text-white" />
             TOP 10 Mais Bem Avaliados
           </CardTitle>
         </CardHeader>
@@ -95,9 +95,9 @@ const TopRatedProfilesRanking: React.FC = () => {
 
   return (
     <Card className="shadow-lg">
-      <CardHeader className="bg-gradient-to-r from-amber-600 to-orange-600">
-        <CardTitle className="text-white flex items-center gap-2">
-          <Trophy className="h-5 w-5" />
+      <CardHeader className="bg-red-900 border-b rounded-t-lg">
+        <CardTitle className="flex items-center gap-2 text-lg text-white">
+          <Trophy className="w-5 h-5 text-white" />
           TOP 10 Mais Bem Avaliados
         </CardTitle>
       </CardHeader>
