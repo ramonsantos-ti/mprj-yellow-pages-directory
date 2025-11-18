@@ -43,12 +43,13 @@ export const useProfileReviews = (profileId: string) => {
 
       const { data: profiles, error: profileError } = await supabase
         .from('profiles')
-        .select('id')
+        .select('id, email, matricula, name, created_at')
         .eq('user_id', user.id)
         .eq('email', user.email)
+        .order('created_at', { ascending: false })
         .limit(1);
 
-      console.log('[useProfileReviews] User profiles:', profiles, 'error:', profileError);
+      console.log('[useProfileReviews] User:', user.email, 'Found profiles:', profiles, 'error:', profileError);
 
       if (!profiles || profiles.length === 0) {
         console.log('[useProfileReviews] No profile found for user');
@@ -91,14 +92,17 @@ export const useProfileReviews = (profileId: string) => {
 
       const { data: profiles, error: profileError } = await supabase
         .from('profiles')
-        .select('id')
+        .select('id, email, matricula, name, created_at')
         .eq('user_id', user.id)
+        .eq('email', user.email)
+        .order('created_at', { ascending: false })
         .limit(1);
 
       console.log('[createReview] Profile lookup result:', { 
         profiles, 
         profileError,
-        userId: user.id 
+        userId: user.id,
+        userEmail: user.email
       });
 
       if (profileError) {
