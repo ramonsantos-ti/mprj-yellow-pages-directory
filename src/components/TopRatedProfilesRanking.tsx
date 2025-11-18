@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Star, Trophy } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useTopRatedProfiles } from '@/hooks/useTopRatedProfiles';
 
@@ -66,30 +67,32 @@ const TopRatedProfilesRanking: React.FC = () => {
   }
 
   // Calculate ranking positions with tie handling
-  let currentRank = 1;
-  const rankedProfiles = profiles.map((profile, index) => {
-    if (index > 0) {
-      const prevProfile = profiles[index - 1];
-      if (
-        profile.average_rating !== prevProfile.average_rating ||
-        profile.review_count !== prevProfile.review_count
-      ) {
-        currentRank = index + 1;
-      }
+  const positions: number[] = [];
+  profiles.forEach((profile, index) => {
+    if (index === 0) {
+      positions.push(1);
+    } else if (
+      profile.average_rating === profiles[index - 1].average_rating &&
+      profile.review_count === profiles[index - 1].review_count
+    ) {
+      // Tie: keep same position as previous
+      positions.push(positions[index - 1]);
+    } else {
+      // No tie: previous position + 1
+      positions.push(positions[index - 1] + 1);
     }
-    return { ...profile, rank: currentRank };
   });
 
-  const getRankStyle = (rank: number) => {
-    switch (rank) {
+  const getBackgroundColor = (pos: number) => {
+    switch (pos) {
       case 1:
-        return 'bg-gradient-to-r from-yellow-400 to-yellow-600 text-yellow-900 font-bold shadow-lg';
+        return 'bg-gradient-to-r from-yellow-400/40 to-yellow-300/20'; // Gold
       case 2:
-        return 'bg-gradient-to-r from-gray-300 to-gray-400 text-gray-900 font-semibold shadow-md';
+        return 'bg-gradient-to-r from-gray-300/40 to-gray-200/20'; // Silver
       case 3:
-        return 'bg-gradient-to-r from-orange-400 to-orange-600 text-orange-900 font-semibold shadow-md';
+        return 'bg-gradient-to-r from-orange-400/40 to-orange-300/20'; // Bronze
       default:
-        return 'bg-muted text-muted-foreground font-medium';
+        return 'bg-white';
     }
   };
 
@@ -103,48 +106,59 @@ const TopRatedProfilesRanking: React.FC = () => {
       </CardHeader>
       <CardContent className="p-4">
         <div className="space-y-2">
-          {rankedProfiles.map((profile) => (
-            <Link
-              key={profile.profile_id}
-              to={`/profile/${profile.profile_id}`}
-              className="block"
-            >
-              <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-accent transition-colors">
+          {profiles.map((profile, index) => {
+            const position = positions[index];
+
+            return (
+              <Link
+                key={profile.profile_id}
+                to={`/profile/${profile.profile_id}`}
+                className="block group"
+              >
                 <div
-                  className={`w-8 h-8 rounded flex items-center justify-center text-sm ${getRankStyle(
-                    profile.rank
-                  )}`}
+                  className={`
+                    flex items-center gap-3 p-2 rounded-lg transition-all
+                    hover:shadow-md
+                    ${getBackgroundColor(position)}
+                  `}
                 >
-                  {profile.rank}º
-                </div>
-
-                <Avatar className="h-10 w-10 border-2 border-border">
-                  <AvatarImage src={profile.foto_url || undefined} />
-                  <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-                    {getInitials(profile.name)}
-                  </AvatarFallback>
-                </Avatar>
-
-                <div className="flex-1 min-w-0">
-                  <div className="font-medium text-sm truncate">
-                    {profile.name}
+                  <div className="flex items-center gap-2 min-w-[40px]">
+                    <span className="font-bold text-sm text-black">
+                      {position}º
+                    </span>
                   </div>
-                  <div className="text-xs text-muted-foreground">
-                    {profile.matricula}
+
+                  <Avatar className="w-10 h-10 border-2 border-background shadow">
+                    <AvatarImage src={profile.foto_url || undefined} />
+                    <AvatarFallback className="bg-primary text-primary-foreground text-xs">
+                      {getInitials(profile.name)}
+                    </AvatarFallback>
+                  </Avatar>
+
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-sm text-black truncate">
+                      {profile.name}
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-black">
+                        {profile.matricula}
+                      </span>
+                      {profile.cargo?.[0] && (
+                        <Badge variant="outline" className="text-xs px-1 py-0 text-black border-black/20">
+                          {profile.cargo[0]}
+                        </Badge>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1 mt-1">
+
+                  <div className="flex items-center gap-1 text-xs text-black">
                     <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                    <span className="text-xs font-semibold text-yellow-600">
-                      {profile.average_rating.toFixed(2)}
-                    </span>
-                    <span className="text-xs text-muted-foreground">
-                      ({profile.review_count} {profile.review_count === 1 ? 'avaliação' : 'avaliações'})
-                    </span>
+                    <span className="font-medium">{profile.average_rating.toFixed(2)}</span>
                   </div>
                 </div>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            );
+          })}
         </div>
       </CardContent>
     </Card>
