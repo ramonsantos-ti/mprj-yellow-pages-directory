@@ -154,7 +154,15 @@ const Admin: React.FC = () => {
         </TabsList>
 
         <TabsContent value="profiles">
-...
+          <ProfilesTab
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            filteredProfiles={filteredProfiles}
+            toggleProfileStatus={toggleProfileStatus}
+            promoteToAdmin={promoteToAdmin}
+            deleteProfile={deleteProfile}
+            updateProfile={updateProfile}
+          />
         </TabsContent>
 
         <TabsContent value="notifications">
