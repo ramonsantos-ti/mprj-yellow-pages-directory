@@ -38,62 +38,68 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Fetch user role from user_roles table (security best practice)
+  const fetchUserRole = async (userId: string): Promise<'admin' | 'user'> => {
+    try {
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .maybeSingle();
+      
+      if (error) {
+        console.error('[AuthContext] Error fetching user role:', error);
+        return 'user';
+      }
+      
+      return (data?.role as 'admin' | 'user') || 'user';
+    } catch (error) {
+      console.error('[AuthContext] Error in fetchUserRole:', error);
+      return 'user';
+    }
+  };
+
   // Fetch user profile data from Supabase
   const fetchUserProfile = async (supabaseUser: SupabaseUser): Promise<User | null> => {
     try {
       console.log('[AuthContext] Fetching profile for user:', supabaseUser.id, supabaseUser.email);
-      console.log('[AuthContext] User metadata:', supabaseUser.user_metadata);
       
-      // NOVA ESTRATÉGIA: Buscar sempre por email primeiro para evitar conflitos de user_id
-      const { data: profileByEmail, error: emailError } = await supabase
+      // Buscar perfil por user_id (agora cada perfil tem user_id único)
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('*')
-        .eq('email', supabaseUser.email)
+        .eq('user_id', supabaseUser.id)
         .maybeSingle();
       
-      console.log('[AuthContext] Profile search by email result:', { profileByEmail, emailError });
+      console.log('[AuthContext] Profile search by user_id result:', { profile, profileError });
 
-      if (emailError && emailError.code !== 'PGRST116') {
-        console.error('[AuthContext] Error fetching profile by email:', emailError);
+      if (profileError && profileError.code !== 'PGRST116') {
+        console.error('[AuthContext] Error fetching profile:', profileError);
         return null;
       }
 
-      if (!profileByEmail) {
-        console.log('[AuthContext] No profile found for email:', supabaseUser.email);
+      if (!profile) {
+        console.log('[AuthContext] No profile found for user_id:', supabaseUser.id);
         return null;
       }
 
-      // Sempre atualizar o user_id para garantir consistência
-      if (profileByEmail.user_id !== supabaseUser.id) {
-        console.log('[AuthContext] Updating profile user_id from', profileByEmail.user_id, 'to', supabaseUser.id);
-        const { error: updateError } = await supabase
-          .from('profiles')
-          .update({ user_id: supabaseUser.id })
-          .eq('id', profileByEmail.id);
-          
-        if (updateError) {
-          console.error('[AuthContext] Error updating profile user_id:', updateError);
-        } else {
-          console.log('[AuthContext] Profile user_id updated successfully');
-        }
-      }
-
-      const profile = { ...profileByEmail, user_id: supabaseUser.id };
+      // Fetch role from user_roles table (security best practice)
+      const role = await fetchUserRole(supabaseUser.id);
 
       console.log('[AuthContext] Profile loaded successfully:', {
         name: profile.name,
-        role: profile.role,
+        role: role,
         profileId: profile.id,
         userId: profile.user_id,
         email: profile.email
       });
 
       return {
-        id: supabaseUser.id, // Garantir que seja sempre o auth.uid()
+        id: supabaseUser.id,
         email: profile.email,
         name: profile.name,
         matricula: profile.matricula,
-        role: profile.role || 'user',
+        role: role,
         profileId: profile.id
       };
     } catch (error) {
@@ -108,7 +114,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         console.log('[AuthContext] Auth state changed:', { event, session: !!session, userEmail: session?.user?.email });
         
         setSession(session);
@@ -151,7 +157,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, []);
 
-  // --- NOVO: Logout automático por inatividade ---
+  // --- Logout automático por inatividade ---
   useAutoLogout(
     15 * 60 * 1000, // 15 minutos em ms
     () => {
@@ -167,7 +173,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     }
   );
-  // --- FIM NOVO ---
 
   const login = async (email: string, password: string): Promise<{ error?: string }> => {
     try {
@@ -222,6 +227,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         if (profileError) {
           console.error('Profile update error:', profileError);
+        }
+
+        // Add default 'user' role to user_roles table
+        const { error: roleError } = await supabase
+          .from('user_roles')
+          .insert({ user_id: data.user.id, role: 'user' });
+
+        if (roleError) {
+          console.error('Role insert error:', roleError);
         }
       }
 
